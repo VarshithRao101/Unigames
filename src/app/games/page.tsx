@@ -304,7 +304,6 @@ export default function GamesPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <span className="kicker mb-3">Operational Command</span>
                 <h1 className="text-4xl md:text-5xl font-black mb-3 leading-[0.9] tracking-tighter uppercase">
                   SELECT YOUR <br />
                   <span className="gradient-text">TACTICAL ARENA</span>
@@ -400,18 +399,18 @@ export default function GamesPage() {
             </div>
 
             {/* Game Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredGames.map((game, i) => {
                 const isComingSoon = game.status === "in-dev";
                 
                 return (
                   <motion.article 
                     key={game.slug}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={{ delay: i * 0.04 }}
                     viewport={{ once: true }}
-                    className={`group relative h-[450px] rounded-[2.5rem] overflow-hidden flex flex-col justify-between p-8 ${
+                    className={`group relative h-[290px] rounded-2xl overflow-hidden flex flex-col justify-between p-4 ${
                       isComingSoon 
                         ? 'border-2 border-dashed border-slate-700 bg-white/2' 
                         : 'border-2 border-black bg-slate-dark/60 glass panel-interactive shadow-card'
@@ -425,11 +424,11 @@ export default function GamesPage() {
                           <img 
                             src={game.image} 
                             alt={game.name} 
-                            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 group-hover:scale-105 transition-all duration-700" 
+                            className="absolute inset-0 w-full h-full object-cover opacity-15 group-hover:opacity-25 group-hover:scale-105 transition-all duration-700" 
                           />
                         ) : (
                           <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
-                            <Gamepad2 className="w-16 h-16 text-white/5" />
+                            <Gamepad2 className="w-12 h-12 text-white/5" />
                           </div>
                         )}
                       </>
@@ -437,52 +436,52 @@ export default function GamesPage() {
 
                     {/* Card Header Status */}
                     <div className="relative z-20 flex justify-between items-start">
-                      <span className="px-2.5 py-1 rounded-md bg-slate-950/80 border border-black font-black text-[8px] uppercase tracking-widest text-slate-400">
+                      <span className="px-2 py-0.5 rounded-md bg-slate-950/80 border border-black font-black text-[7.5px] uppercase tracking-widest text-slate-400">
                         CMD-{game.shortCode}
                       </span>
                       
                       {game.status === 'released' && (
-                        <span className="px-2.5 py-1 rounded-md bg-success/15 border border-success/30 text-success font-black text-[8px] uppercase tracking-widest">
-                          Operational
+                        <span className="px-2 py-0.5 rounded-md bg-success/15 border border-success/30 text-success font-black text-[7.5px] uppercase tracking-widest">
+                          Active
                         </span>
                       )}
                       {game.status === 'beta' && (
-                        <span className="px-2.5 py-1 rounded-md bg-brand-orange/15 border border-brand-orange/30 text-brand-orange font-black text-[8px] uppercase tracking-widest">
-                          Beta Testing
+                        <span className="px-2 py-0.5 rounded-md bg-brand-orange/15 border border-brand-orange/30 text-brand-orange font-black text-[7.5px] uppercase tracking-widest">
+                          Beta
                         </span>
                       )}
                       {isComingSoon && (
-                        <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-black text-slate-500 font-black text-[8px] uppercase tracking-widest animate-pulse">
-                          Syncing Sector
+                        <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-black text-slate-500 font-black text-[7.5px] uppercase tracking-widest animate-pulse">
+                          Syncing
                         </span>
                       )}
                     </div>
 
                     {/* Card Content & Action Area */}
                     <div className="relative z-20">
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        {game.tags.map((t, idx) => (
-                          <span key={idx} className="text-[7px] font-black uppercase tracking-widest text-slate-500 border border-slate-700/40 px-1.5 py-0.5 rounded">
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {game.tags.slice(0, 2).map((t, idx) => (
+                          <span key={idx} className="text-[6.5px] font-black uppercase tracking-widest text-slate-500 border border-slate-700/40 px-1 py-0.2 rounded">
                             {t}
                           </span>
                         ))}
                       </div>
 
-                      <h3 className="text-2xl font-black mb-2 uppercase tracking-tighter text-white group-hover:text-brand-orange transition-colors">
+                      <h3 className="text-lg font-black mb-1 uppercase tracking-tighter text-white group-hover:text-brand-orange transition-colors">
                         {game.name}
                       </h3>
                       
-                      <p className="text-[10px] text-slate-400 font-bold leading-relaxed mb-6 line-clamp-2">
+                      <p className="text-[9.5px] text-slate-400 font-bold leading-normal mb-3 line-clamp-2">
                         {game.description}
                       </p>
 
                       {/* Synchronization Progress Bar */}
-                      <div className="space-y-1 mb-6">
-                        <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-wider text-slate-500">
-                          <span>Sync Integrity</span>
+                      <div className="space-y-1 mb-3.5">
+                        <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-wider text-slate-505">
+                          <span>Sync</span>
                           <span>{game.progressPercent}%</span>
                         </div>
-                        <div className="h-2 w-full bg-slate-900 border border-black rounded-full overflow-hidden">
+                        <div className="h-1 w-full bg-slate-950 border border-black rounded-full overflow-hidden">
                           <div 
                             className={`h-full transition-all duration-500 ${
                               isComingSoon ? 'bg-slate-700' : 'bg-brand-orange'
@@ -494,13 +493,13 @@ export default function GamesPage() {
 
                       <div className="flex justify-end">
                         {isComingSoon ? (
-                          <Button disabled className="w-full h-11 border-2 border-slate-800 bg-transparent text-slate-600 rounded-xl uppercase text-[9px] font-black cursor-not-allowed">
-                            Offline Sector
+                          <Button disabled className="w-full h-9 border-2 border-slate-850 bg-transparent text-slate-600 rounded-lg uppercase text-[8px] font-black cursor-not-allowed">
+                            Offline
                           </Button>
                         ) : (
                           <Link href={`/games/${game.slug}`} className="w-full">
-                            <Button className="btn-gaming w-full h-11 rounded-xl font-black uppercase text-[9px]">
-                              Deploy Arena <Play className="ml-2 w-3.5 h-3.5 fill-current" />
+                            <Button className="btn-gaming w-full h-9 rounded-lg font-black uppercase text-[8px]">
+                              Deploy Arena <Play className="ml-1.5 w-3 h-3 fill-current" />
                             </Button>
                           </Link>
                         )}
