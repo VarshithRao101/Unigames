@@ -181,7 +181,7 @@ export const ChatBot: React.FC = () => {
                     />
                     <Button 
                       type="submit" 
-                      size="icon" 
+                      size="sm" 
                       className="shrink-0 bg-brand-amber hover:bg-brand-amber/80 text-slate-950"
                       disabled={!input.trim()}
                     >

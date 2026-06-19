@@ -9,11 +9,10 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 
 const navItems = [
-  { label: "Home", href: "/", icon: Home },
   { label: "Games", href: "/games", icon: Gamepad2 },
+  { label: "Community", href: "/community", icon: MessageSquareText },
   { label: "Leaderboard", href: "/leaderboards", icon: Trophy },
   { label: "Lobbies", href: "/rooms", icon: DoorOpen },
-  { label: "Community", href: "/chat", icon: MessageSquareText },
 ];
 
 export function Navbar() {

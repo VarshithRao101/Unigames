@@ -32,3 +32,20 @@ We successfully mapped the complete platform specifications and visual design la
 * Specified button variants, interactive forms, active game cards, dotted "coming soon" cards, leaderboards, achievement grids, and progress indicators.
 * Detailed custom ease timings for transitions and loading states.
 
+
+## Cel-Shaded 2D Rework & Landing Page Integration (June 2026)
+
+We implemented a visual and layout overhaul to pivot UniGames into a high-impact, cartoonish/cel-shaded gaming aesthetic.
+
+### 1. Mixed Homepage & Community Uplink
+* Swapped navigation layout, removing the standalone unauthenticated Home tab and placing the **Community Hub** at the landing page root `/`.
+* Mixed the global squad chat node and active sync lists directly into the main landing page alongside the primary "Ready to Dominate" hero launcher.
+* Cleaned up the redundant matching log feeds to focus on live messaging.
+
+### 2. Yellowish-Grey Cel-Shaded Theme
+* Shifted global theme background color to a premium dark yellowish-grey (`#161713`) with `#24261f` card surfaces.
+* Added a custom 2D cartoonish visual layer utilizing thick solid black borders (`border-4` / `3.5px solid #000000`) and flat offset black shadows (`box-shadow: 6px 6px 0px #000000`) on all cards, buttons, inputs, and components.
+* Configured sketchbook grid halftone patterns on the background (`opacity: 0.08`) and added crisp white inset highlight borders.
+* Standardized compact layout gaps and margins for a console-dashboard aesthetic.
+* Generated and absolute-positioned floating **2D Cel-Shaded Cartoon Decors** (Gamepad, Shield, and Trophy) in the Hero, Communication Uplink, and bottom Legacy card backgrounds with flat drop-shadow filters and Framer Motion hover animations.
+

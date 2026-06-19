@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-orange: #ff6b00; /* Vibrant AAA Orange */
+  --color-brand-orange: #ffaa00; /* Flat bright yellow-orange */
   --color-brand-amber: #f97316;
   --color-brand-light: #fb923c;
   --color-brand-dark: #c2410c;
-  --color-brand-neon: #ff8a00;
+  --color-brand-neon: #ffaa00;
 
-  --color-slate-dark: #02040a; /* Deeper black */
-  --color-slate-muted: #6b7280;
-  --color-grey-border: #1f2230;
-  --color-grey-surface: #0d0f18;
-  --color-grey-light: #070810;
-  --color-white: #f8fafc;
+  --color-slate-dark: #161713; /* Yellowish Grey Dark Background */
+  --color-slate-muted: #8c8f85;
+  --color-grey-border: #000000; /* Pure Black Borders */
+  --color-grey-surface: #24261f; /* Lighter Yellowish Grey for Panels */
+  --color-grey-light: #1c1d18;
+  --color-white: #ffffff;
 
-  --color-success: #00ffcc; /* Neon Cyan/Green */
+  --color-success: #00ffcc; 
   --color-warning: #fbbf24;
   --color-danger: #ff4d4d;
   --color-info: #00d2ff;
@@ -25,17 +25,17 @@
   --font-space: var(--font-space), sans-serif;
   --font-orbitron: 'Orbitron', sans-serif;
 
-  --shadow-premium: 0 20px 60px rgba(0, 0, 0, 0.8);
-  --shadow-orange: 0 0 40px rgba(255, 107, 0, 0.3);
-  --shadow-neon: 0 0 20px rgba(255, 107, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.2);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-premium: 4px 4px 0px 0px #000000;
+  --shadow-orange: 4px 4px 0px 0px #000000;
+  --shadow-neon: 6px 6px 0px 0px #000000;
+  --shadow-card: 6px 6px 0px 0px #000000;
 }
 
 :root {
-  --background: #02040a;
-  --foreground: #f8fafc;
-  --brand-orange: 255, 107, 0;
-  --slate-950: 2, 4, 10;
+  --background: #161713;
+  --foreground: #fcfdfa;
+  --brand-orange: 255, 170, 0;
+  --slate-950: 22, 23, 19;
 }
 
 html { 
@@ -45,27 +45,24 @@ html {
 }
 
 body {
-  background: 
-    radial-gradient(circle at 50% -20%, rgba(255, 107, 0, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 0% 0%, rgba(255, 107, 0, 0.05) 0%, transparent 30%),
-    radial-gradient(circle at 100% 100%, rgba(0, 210, 255, 0.05) 0%, transparent 30%),
-    #02040a;
+  background: #161713 !important;
   color: var(--foreground);
   font-family: var(--font-inter);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Premium scanline and grid background */
+/* 2D comic halftone/grid style background */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 107, 0, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 107, 0, 0.02) 1px, transparent 1px);
-  background-size: 50px 50px;
-  mask-image: radial-gradient(circle at 50% 50%, black, transparent 90%);
+    linear-gradient(#000000 1.5px, transparent 1.5px),
+    linear-gradient(90deg, #000000 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  opacity: 0.08;
+  mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
   pointer-events: none;
   z-index: 0;
 }
@@ -76,53 +73,54 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
 }
 
-/* ── Glassmorphism Core ─────────────────────── */
+/* ── 2D Cel-Shaded Glassmorphism Panels ─────────────────────── */
 .glass {
-  background: rgba(13, 15, 24, 0.7);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: #24261f !important;
+  border: 3.5px solid #000000 !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+  backdrop-filter: none !important;
+  border-radius: 2rem !important;
 }
 
 .glass-orange {
-  background: rgba(255, 107, 0, 0.05);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 107, 0, 0.2);
-  box-shadow: 0 8px 32px rgba(255, 107, 0, 0.1);
+  background: #3c392c !important;
+  border: 3.5px solid #000000 !important;
+  box-shadow: 6px 6px 0px 0px #000000, inset 0px 0px 0px 2.5px #ffaa00 !important;
+  backdrop-filter: none !important;
 }
 
-/* ── Panel system ───────────────────────────── */
+/* ── Cel-Shaded Panel System ───────────────────────────── */
 .panel {
-  background: linear-gradient(165deg, rgba(15, 17, 26, 0.8) 0%, rgba(5, 7, 12, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(16px);
+  background: #24261f !important;
+  border: 3.5px solid #000000 !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+  border-radius: 2rem !important;
 }
 
 .panel-interactive {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .panel-interactive:hover {
-  border-color: rgba(255, 107, 0, 0.3);
-  background: linear-gradient(165deg, rgba(20, 22, 34, 0.8) 0%, rgba(10, 12, 20, 0.9) 100%);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 107, 0, 0.1);
-  transform: translateY(-4px);
+  border-color: #000000 !important;
+  background: #2d3027 !important;
+  box-shadow: 10px 10px 0px 0px #000000 !important;
+  transform: translate(-4px, -4px) !important;
 }
 
-/* ── Glow Effects ───────────────────────────── */
+/* ── Glow Effects Overridden for 2D Comic flat shadows ── */
 .neon-glow-orange {
-  box-shadow: 0 0 20px rgba(255, 107, 0, 0.4), 0 0 40px rgba(255, 107, 0, 0.2);
+  box-shadow: 6px 6px 0px 0px #000000 !important;
 }
 
 .text-neon-orange {
-  color: #ff6b00;
-  text-shadow: 0 0 10px rgba(255, 107, 0, 0.8), 0 0 20px rgba(255, 107, 0, 0.4);
+  color: #ffaa00;
+  text-shadow: none !important;
 }
 
 .border-neon-orange {
-  border-color: #ff6b00;
-  box-shadow: inset 0 0 10px rgba(255, 107, 0, 0.2), 0 0 10px rgba(255, 107, 0, 0.2);
+  border-color: #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
 }
 
 /* ── Typography ────────────────────────────── */
@@ -138,117 +136,124 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  border-radius: 999px;
-  background: rgba(255, 107, 0, 0.1);
-  border: 1px solid rgba(255, 107, 0, 0.3);
-  color: #ff8a00;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  background: #1c1d18;
+  border: 3px solid #000000;
+  color: #ffaa00;
   font-family: var(--font-outfit);
   font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
+  font-weight: 900;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  box-shadow: 3px 3px 0px 0px #000000;
 }
 
-/* ── Animations ────────────────────────────── */
-@keyframes pulse-orange {
-  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 20px rgba(255, 107, 0, 0.6); }
-  50% { opacity: 0.8; transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 107, 0, 0.9); }
-}
-
-.animate-pulse-orange {
-  animation: pulse-orange 2s infinite ease-in-out;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* ── Button Premium ────────────────────────── */
+/* ── Flat Gaming Button overrides ────────────────────────── */
 .btn-gaming {
-  position: relative;
-  overflow: hidden;
-  background: #ff6b00;
-  color: #02040a;
+  background: #ffaa00 !important;
+  color: #000000 !important;
+  border: 3.5px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  border-radius: 1rem !important;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease !important;
   z-index: 1;
 }
 
 .btn-gaming::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: 0.5s;
-  z-index: -1;
-}
-
-.btn-gaming:hover::before {
-  left: 100%;
+  display: none !important; /* Remove tech sweep */
 }
 
 .btn-gaming:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
+  background: #ffbb00 !important;
+  transform: translate(-3px, -3px) !important;
+  box-shadow: 7px 7px 0px 0px #000000 !important;
+}
+
+.btn-gaming:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px #000000 !important;
+}
+
+/* ── Global 2D Cel-Shaded overrides on standard buttons ── */
+button:not(.btn-gaming):not([disabled]) {
+  border: 3.5px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  transition: all 0.1s ease-in-out !important;
+  cursor: pointer;
+}
+button:not(.btn-gaming):not([disabled]):hover {
+  transform: translate(-2.5px, -2.5px) !important;
+  box-shadow: 6.5px 6.5px 0px 0px #000000 !important;
+}
+button:not(.btn-gaming):not([disabled]):active {
+  transform: translate(1.5px, 1.5px) !important;
+  box-shadow: 2px 2px 0px 0px #000000 !important;
+}
+
+/* ── Cel-Shaded Input overrides ── */
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+  border: 3.5px solid #000000 !important;
+  background: #1c1d18 !important;
+  color: #ffffff !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+  border-radius: 1rem !important;
+  font-weight: 800 !important;
+}
+input[type="text"]:focus, select:focus, textarea:focus {
+  border-color: #ffaa00 !important;
+  box-shadow: 5px 5px 0px 0px #000000, inset 0px 0px 0px 2px #ffaa00 !important;
+  outline: none !important;
 }
 
 /* ── Gradient Text ─────────────────────────── */
 .gradient-text {
-  background: linear-gradient(to right, #ff6b00, #ff8a00, #ffb300);
+  background: linear-gradient(to right, #ffaa00, #ffc800);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Responsive Spacing ────────────────────── */
+/* ── Spacing made tighter (congested, medium spacing) ── */
 .section-padding {
-  padding-top: 6rem;
-  padding-bottom: 6rem;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
 }
 
 @media (min-width: 1024px) {
   .section-padding {
-    padding-top: 8rem;
-    padding-bottom: 8rem;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
   }
 }
 
 /* ── Background Elements ───────────────────── */
 .bg-mesh {
   background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 107, 0, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 210, 255, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(255, 107, 0, 0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(0, 210, 255, 0.1) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(255, 170, 0, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 170, 0, 0.1) 0px, transparent 50%);
 }
 
 /* ── Scrollbar ─────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #02040a;
+  background: #161713;
+  border-left: 3px solid #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
+  background: #24261f;
+  border: 3px solid #000000;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff6b00;
+  background: #ffaa00;
 }
 
 /* ── Custom Utilities ──────────────────────── */
@@ -259,4 +264,24 @@ h1, h2, h3, h4, h5, h6 {
 .mask-edge-fade {
   mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
+
+/* ── Disable all white borders globally to maintain 2D cel-shaded gaming vibe ── */
+.border-white,
+.border-white\/5,
+.border-white\/10,
+.border-white\/15,
+.border-white\/20,
+.border-white\/25,
+.border-white\/30,
+.border-white\/35,
+.border-white\/40,
+.border-white\/45,
+.border-white\/50,
+.border-white\/60,
+.border-white\/70,
+.border-white\/80,
+.border-white\/90 {
+  border-color: #000000 !important;
+}
+
 

@@ -9,6 +9,7 @@ import { useAnalytics } from "./analytics";
 import { Shield, Sparkles, ShoppingBag, CheckCircle, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+
 interface AdWrapperProps {
   placement: AdPlacement;
   className?: string;
@@ -18,6 +19,7 @@ export function PlatformAdComponent({ placement, className }: AdWrapperProps) {
   const pathname = usePathname();
   const analytics = useAnalytics();
   const [isVisible, setIsVisible] = useState(false);
+
   const [loaded, setLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -247,13 +249,16 @@ export function CyberAdBox({ label = "ADVERTISEMENT SPACE", className = "" }: { 
 import { X } from "lucide-react";
 
 export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(isOpen ? 5 : 0);
   const [canClose, setCanClose] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    setCountdown(5);
-    setCanClose(false);
+    // Initialize states asynchronously to avoid synchronous setState in effect
+    setTimeout(() => {
+      setCountdown(5);
+      setCanClose(false);
+    }, 0);
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {

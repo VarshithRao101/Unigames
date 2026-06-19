@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/theme-context";
 import { ToastProvider } from "@/context/toast-context";
 import { PWARegister } from "@/components/common/pwa-register";
 import { ChatBot } from "@/components/common/chatbot";
+import { SideChatWidget } from "@/components/common/side-chat-widget";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -89,6 +90,7 @@ export default function RootLayout({
             <AuthProvider>
               {children}
               <ChatBot />
+              <SideChatWidget />
               <PWARegister />
             </AuthProvider>
           </ToastProvider>

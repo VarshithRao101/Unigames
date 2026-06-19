@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { 
-  Trophy, TrendingUp, Users, Eye, DollarSign, 
-  ShoppingBag, Sparkles, SlidersHorizontal, Settings, HelpCircle, 
-  Share2, ChevronRight, Award, Zap, Activity, Clock
+import React, { useState } from "react";
+import {
+  Trophy, TrendingUp, Users, Eye, DollarSign,
+  ShoppingBag, Sparkles, Activity, Clock
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 
 interface StatItem {
   label: string;
@@ -19,21 +18,20 @@ interface StatItem {
 export function UserEngagementDashboard() {
   const [activeTab, setActiveTab] = useState<"engagement" | "monetization">("engagement");
 
-  const [eventsCount, setEventsCount] = useState(0);
-
-  useEffect(() => {
+  const [eventsCount] = useState(() => {
     if (typeof window !== "undefined") {
       try {
         const raw = localStorage.getItem("unigames_analytics_events");
         if (raw) {
           const events = JSON.parse(raw);
-          setEventsCount(events.length);
+          return events.length;
         }
       } catch (e) {
         console.error(e);
       }
     }
-  }, []);
+    return 0;
+  });
 
   const stats: StatItem[] = [
     {
