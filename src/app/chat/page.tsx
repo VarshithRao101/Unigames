@@ -97,11 +97,11 @@ export default function ChatPage() {
                    ))}
                 </div>
 
-                <Link href="/rooms" className="mt-8 block">
-                   <Button variant="outline" className="w-full h-14 rounded-2xl border-white/10 hover:bg-white/5 font-black uppercase text-[10px] tracking-widest gap-2">
-                      <DoorOpen className="w-4 h-4" /> Tactical Lobbies
-                   </Button>
-                </Link>
+                 <Link href="/rooms" className="mt-8 block">
+                    <Button variant="outline" className="w-full h-14 rounded-2xl border-white/10 hover:bg-white/5 font-black uppercase text-[10px] tracking-widest">
+                       Tactical Lobbies
+                    </Button>
+                 </Link>
              </div>
              
              {/* Security Note */}
@@ -168,7 +168,7 @@ export default function ChatPage() {
                       />
                    </div>
                    <Button type="submit" className="btn-gaming h-16 px-10 rounded-2xl">
-                      Transmit <Send className="ml-2 w-5 h-5 fill-current" />
+                      Transmit
                    </Button>
                 </form>
              </div>

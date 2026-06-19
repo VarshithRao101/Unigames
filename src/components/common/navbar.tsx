@@ -89,14 +89,16 @@ export function Navbar() {
           <div className="h-6 w-px bg-white/10 hidden md:block" />
 
           {user ? (
-            <div className="flex items-center gap-3 bg-white/5 p-1 rounded-full border border-white/5 pr-4">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-orange to-brand-neon flex items-center justify-center font-black text-slate-950 text-sm">
-                {user.username.charAt(0).toUpperCase()}
+            <Link href="/profile">
+              <div className="flex items-center gap-3 bg-white/5 p-1 rounded-full border border-white/5 hover:border-brand-orange/40 transition-all cursor-pointer pr-4">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-orange to-brand-neon flex items-center justify-center font-black text-slate-950 text-sm">
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline font-outfit text-[10px] font-black uppercase tracking-widest text-white">
+                  {user.username}
+                </span>
               </div>
-              <span className="hidden sm:inline font-outfit text-[10px] font-black uppercase tracking-widest text-white">
-                {user.username}
-              </span>
-            </div>
+            </Link>
           ) : (
             <Link href="/auth/login" className="hidden sm:block">
               {/* User Profile */}

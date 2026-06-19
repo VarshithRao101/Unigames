@@ -7,13 +7,31 @@ import { Navbar } from "@/components/common/navbar";
 import { Sidebar } from "@/components/common/sidebar";
 import { Button } from "@/components/ui/button";
 import { 
-  Copy, Users, Send, CheckCircle2, AlertCircle, ArrowLeft, Gamepad, Sparkles, 
-  Share2, Crown, LogOut, Trophy, Play, Check, Plus, User, Eye, BookOpen, Clock, 
-  HelpCircle, RefreshCw, X, ShieldAlert, Award, ChevronRight, Zap
+  Copy, Users, Send, AlertCircle, Crown, LogOut, Trophy, Play, Check, Plus, Eye, BookOpen, Clock, 
+  HelpCircle, RefreshCw, X, ShieldAlert, Award, Zap, Share2, Gamepad2
 } from "lucide-react";
+
+const getGameIcon = (id: string) => {
+  switch (id) {
+    case "test-arena":
+      return <ShieldAlert className="w-6 h-6 text-brand-orange" />;
+    case "chess":
+      return <Crown className="w-6 h-6 text-brand-orange" />;
+    case "tictactoe":
+      return <Gamepad2 className="w-6 h-6 text-brand-orange" />;
+    case "ludo":
+      return <Trophy className="w-6 h-6 text-brand-orange" />;
+    case "snakes":
+      return <Zap className="w-6 h-6 text-brand-orange" />;
+    default:
+      return <Gamepad2 className="w-6 h-6 text-brand-orange" />;
+  }
+};
 import { motion, AnimatePresence } from "framer-motion";
 import { GameContainer } from "@/games/container";
 import { PlatformAdComponent, PopupAd } from "@/monetization/ad-components";
+import { ROOMS_AVAILABLE } from "@/data/platform";
+import { loadCreatedRooms } from "@/utils/mock-room-store";
 
 interface Player {
   id: string;
@@ -41,7 +59,7 @@ interface GameConfig {
 const GAME_CONFIGS: Record<string, GameConfig> = {
   "test-arena": {
     id: "test-arena",
-    name: "UniGames Test Arena",
+    name: "Test Arena",
     maxPlayers: 2,
     rules: "Simulate gameplay results, XP payouts, achievements, and spectator checks.",
     description: "A training sandbox to simulate match results, test reward payouts, and review spectator sync functions.",
@@ -57,7 +75,7 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
   },
   chess: {
     id: "chess",
-    name: "Chess Online",
+    name: "Chess Arena",
     maxPlayers: 2,
     rules: "Standard checkmate win conditions. 10m timer.",
     description: "A classic strategy game for 2 players. Control your pieces, protect your king, and checkmate the opponent.",
@@ -71,13 +89,29 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
       "Castle early to safeguard your king and activate your rooks.",
     ],
   },
+  tictactoe: {
+    id: "tictactoe",
+    name: "Tic-Tac-Toe",
+    maxPlayers: 2,
+    rules: "Command the classic board in high-speed, 2-player rounds.",
+    description: "A fast room for quick wins, simple turns, and instant replay.",
+    objectives: "Make a line of three to win.",
+    duration: "Fast Rounds",
+    winConditions: "Instant line of 3, or draw if full.",
+    thumb: "❌",
+    tips: [
+      "Try to secure the center cell on your first move if possible.",
+      "Always block your opponent if they have two in a row.",
+      "Look for double attack opportunities to guarantee a win."
+    ]
+  },
   ludo: {
     id: "ludo",
-    name: "Ludo Club",
+    name: "Ludo Rush",
     maxPlayers: 4,
     rules: "Navigate 4 tokens to the home pocket. 4-player FFA.",
     description: "Classic strategy board game for up to 4 players. Roll the dice, move your tokens, and make it home first.",
-    objectives: "Get all 4 of your colored tokens into the home pocket.",
+    objectives: "Get all 4 of your tokens into the home pocket.",
     duration: "15-20 Minutes",
     winConditions: "First player to get all tokens home wins.",
     thumb: "🎲",
@@ -89,7 +123,7 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
   },
   snakes: {
     id: "snakes",
-    name: "Snake & Ladder Arena",
+    name: "Snakes & Ladders",
     maxPlayers: 6,
     rules: "Climb ladders, avoid snakes, reach square 100.",
     description: "Traditional board game of luck and strategy. Climb up ladders and avoid sliding down snake tails.",
@@ -124,11 +158,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
   // Load game config from localStorage or default to chess
   const [gameId, setGameId] = useState<string>("chess");
-  const [roomName, setRoomName] = useState<string>("Arena Showdown");
+  const [roomName, setRoomName] = useState<string>("Battle Room");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [passwordInput, setPasswordInput] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+  const [region, setRegion] = useState<string>("Mumbai Hub");
 
   // Room states
   const [players, setPlayers] = useState<Player[]>([]);
@@ -137,7 +172,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     { id: "spec2", name: "LurkerPro", avatar: "L" },
   ]);
   const [chatMessages, setChatMessages] = useState<{ sender: string; text: string; time: string; isSystem?: boolean }[]>([
-    { sender: "System", text: "Match lobby ready. Share the code to invite players.", time: "12:00", isSystem: true },
+    { sender: "System", text: "Match room ready. Share the code to invite players.", time: "12:00", isSystem: true },
   ]);
   const [inputText, setInputText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -167,15 +202,37 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
   // Initialize data
   useEffect(() => {
-    const cachedGameId = localStorage.getItem(`room_game_${roomCode}`);
-    if (cachedGameId && GAME_CONFIGS[cachedGameId]) {
-      setGameId(cachedGameId);
+    const createdRooms = loadCreatedRooms();
+    let targetRoom = createdRooms.find((r) => r.code === roomCode);
+    if (!targetRoom) {
+      targetRoom = ROOMS_AVAILABLE.find((r) => r.code === roomCode);
     }
+
+    let resolvedGameId = "chess";
     
-    // Simulate private password requirement randomly if roomCode starts with "P" or setup state
-    if (roomCode.startsWith("P") || roomCode.length % 2 === 0) {
-      setIsPrivate(true);
-      setIsLocked(true);
+    if (targetRoom) {
+      resolvedGameId = targetRoom.gameSlug;
+      setGameId(targetRoom.gameSlug);
+      setRoomName(targetRoom.name);
+      setIsPrivate(targetRoom.isPrivate);
+      setRegion(targetRoom.region || "Mumbai Hub");
+
+      // Creator bypass check (using host matches "You" or local storage creator flag)
+      const isCreator = (typeof window !== "undefined" && window.localStorage.getItem(`room_creator_${roomCode}`) === "true") || targetRoom.host === "You";
+      
+      if (targetRoom.isPrivate && !isCreator) {
+        setIsLocked(true);
+      } else {
+        setIsLocked(false);
+      }
+    } else {
+      // Fallback for custom or direct codes
+      const cachedGameId = (typeof window !== "undefined" && window.localStorage.getItem(`room_game_${roomCode}`)) || "chess";
+      resolvedGameId = cachedGameId;
+      setGameId(cachedGameId);
+      setIsPrivate(false);
+      setIsLocked(false);
+      setRegion("Mumbai Hub");
     }
 
     // Initialize players list based on game capacity
@@ -184,21 +241,31 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       { id: "p2", name: "AliceW", isHost: false, isReady: true, avatar: "A", isAI: false, color: "#1971C2" },
     ];
     setPlayers(initialPlayers);
-    setLoadingTip(GAME_CONFIGS[cachedGameId || "chess"]?.tips[0] || GAME_CONFIGS.chess.tips[0]);
+    
+    const config = GAME_CONFIGS[resolvedGameId] || GAME_CONFIGS.chess;
+    setLoadingTip(config.tips[0]);
   }, [roomCode]);
 
   // Handle password entry
   const handleVerifyPassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === "1234" || passwordInput === "unigames") {
+    const createdRooms = loadCreatedRooms();
+    let targetRoom = createdRooms.find((r) => r.code === roomCode);
+    if (!targetRoom) {
+      targetRoom = ROOMS_AVAILABLE.find((r) => r.code === roomCode);
+    }
+    
+    const requiredPasscode = targetRoom?.passcode || "1234";
+
+    if (passwordInput === requiredPasscode) {
       setIsLocked(false);
       setPasswordError("");
       setChatMessages((prev) => [
         ...prev,
-        { sender: "System", text: "You have unlocked and joined the private lobby.", time: "Now", isSystem: true }
+        { sender: "System", text: "You have unlocked and joined the private lobby room.", time: "Now", isSystem: true }
       ]);
     } else {
-      setPasswordError("Incorrect Access Code. (Try '1234')");
+      setPasswordError("Incorrect Passcode. Access Denied.");
     }
   };
 
@@ -486,11 +553,11 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
             key={player.id}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-2xl transition-all hover:border-slate-700"
+            className="flex items-center justify-between p-4 bg-[#1c1d18] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]"
           >
             <div className="flex items-center gap-3">
               <div 
-                className="w-10 h-10 rounded-full text-slate-950 font-outfit font-black flex items-center justify-center text-sm shadow-md"
+                className="w-10 h-10 rounded-full border-[2px] border-black text-slate-950 font-outfit font-black flex items-center justify-center text-sm shadow-[2px_2px_0px_#000000]"
                 style={{ backgroundColor: player.color || "#FFC107" }}
               >
                 {player.avatar}
@@ -499,13 +566,13 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <p className="font-outfit font-extrabold text-sm text-white flex items-center gap-1.5">
                   {player.name}
                   {player.isHost && (
-                    <span className="text-[8px] font-black uppercase tracking-wider bg-brand-amber/10 border border-brand-amber/30 text-brand-amber px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                    <span className="text-[8px] font-black uppercase tracking-wider bg-brand-orange/10 border-2 border-black text-brand-orange px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-[1px_1px_0px_#000000]">
                       <Crown className="w-2.5 h-2.5" /> Host
                     </span>
                   )}
                   {player.isAI && (
-                    <span className="text-[8px] font-black uppercase tracking-wider bg-green-500/10 border border-green-500/30 text-green-400 px-2 py-0.5 rounded-full">
-                      AI Bot
+                    <span className="text-[8px] font-black uppercase tracking-wider bg-green-550/10 border-2 border-black text-green-400 px-2 py-0.5 rounded-full shadow-[1px_1px_0px_#000000]">
+                      AI
                     </span>
                   )}
                 </p>
@@ -514,10 +581,10 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
             </div>
 
             <div className="flex items-center gap-3">
-              <span className={`text-[10px] font-extrabold font-outfit uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+              <span className={`text-[10px] font-extrabold font-outfit uppercase tracking-wider px-2 py-0.5 rounded-md border-2 border-black shadow-[1.5px_1.5px_0px_#000000] ${
                 player.isReady 
-                  ? "bg-success/10 border-success/30 text-green-400" 
-                  : "bg-slate-950 border-slate-800 text-slate-500"
+                  ? "bg-green-550/10 text-green-450" 
+                  : "bg-slate-950 text-slate-500"
               }`}>
                 {player.isReady ? "Ready" : "Waiting"}
               </span>
@@ -525,7 +592,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               {players.length > 1 && !player.isHost && (
                 <button
                   onClick={() => handleRemovePlayer(player.id)}
-                  className="p-1.5 rounded-lg border border-slate-800 text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg border-2 border-black text-slate-500 hover:text-red-400 hover:bg-[#ff4d4d]/10 transition-all cursor-pointer shadow-[1.5px_1.5px_0px_#000000] active:translate-y-0.5"
                   title="Remove player"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -538,10 +605,10 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         slots.push(
           <div
             key={`empty-${i}`}
-            className="flex items-center justify-between p-4 bg-slate-950 border border-dashed border-slate-900 rounded-2xl"
+            className="flex items-center justify-between p-4 bg-[#161713]/40 border-[3px] border-dashed border-black/40 rounded-2xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border border-dashed border-slate-800 text-slate-700 flex items-center justify-center font-outfit font-extrabold text-xs">
+              <div className="w-10 h-10 rounded-full border-[2.5px] border-dashed border-black/40 text-slate-700 flex items-center justify-center font-outfit font-extrabold text-xs">
                 +
               </div>
               <div>
@@ -550,14 +617,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               </div>
             </div>
 
-            <Button
-              variant="ghost"
+            <button
               onClick={handleAddAI}
-              leftIcon={<Plus className="w-3 h-3 text-slate-500" />}
-              className="h-8 px-3 border border-slate-900 text-[9px] hover:text-brand-amber font-extrabold tracking-wider"
+              className="h-8 px-3 border-2 border-black text-[9px] font-black bg-white text-slate-950 uppercase tracking-widest shadow-[2px_2px_0px_#000000] hover:bg-brand-orange hover:text-slate-950 transition-all cursor-pointer active:translate-y-0.5"
             >
               Add Bot
-            </Button>
+            </button>
           </div>
         );
       }
@@ -571,48 +636,48 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       <>
         <Navbar />
         <Sidebar />
-        <main className="flex-1 pt-24 bg-slate-950 text-white min-h-screen pb-20 flex items-center justify-center">
+        <main className="flex-1 pt-24 bg-[#161713] text-white min-h-screen pb-20 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md w-full bg-slate-900/60 border border-slate-900 p-8 rounded-3xl space-y-6 text-center shadow-2xl"
+            className="max-w-md w-full bg-[#24261f] border-[4px] border-black p-8 rounded-[2.5rem] space-y-6 text-center shadow-[8px_8px_0px_#000000]"
           >
-            <div className="w-16 h-16 bg-brand-amber/10 border border-brand-amber/25 rounded-2xl flex items-center justify-center mx-auto text-brand-amber">
+            <div className="w-16 h-16 bg-brand-orange border-[3.5px] border-black rounded-2xl flex items-center justify-center mx-auto text-slate-950 shadow-[3px_3px_0px_#000000]">
               <ShieldAlert className="w-8 h-8" />
             </div>
 
             <div>
-              <span className="text-[10px] font-black uppercase tracking-widest bg-brand-amber/10 text-brand-amber border border-brand-amber/20 px-2.5 py-1 rounded-full">
-                Locked Lobby
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] bg-brand-orange text-slate-950 border-2 border-black px-3 py-1 rounded-lg shadow-[2px_2px_0px_#000000] mb-4 inline-block">
+                Private Room
               </span>
-              <h1 className="font-outfit font-black text-2xl uppercase tracking-wide mt-3">Private Room Access</h1>
-              <p className="text-xs text-slate-400 mt-1">Lobby Room #{roomCode} requires a passcode authorization validation key to join.</p>
+              <h1 className="font-outfit font-black text-2xl uppercase tracking-wide mt-3 text-white">Lobby Code Required</h1>
+              <p className="text-xs text-slate-400 mt-2 font-semibold leading-relaxed">Room #{roomCode} is passcode protected.</p>
             </div>
 
-            <form onSubmit={handleVerifyPassword} className="space-y-4">
+            <form onSubmit={handleVerifyPassword} className="space-y-6">
               <div>
                 <input
                   type="password"
-                  placeholder="Enter 4-Digit Passcode"
+                  placeholder="ENTER PASSCODE"
                   maxLength={10}
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-900 focus:border-brand-amber rounded-xl px-4 py-3 text-xs text-center font-mono font-extrabold uppercase tracking-widest outline-none transition-all placeholder:font-sans placeholder:tracking-normal placeholder:font-medium text-white"
+                  className="w-full h-14 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl px-6 text-center text-base font-space font-black tracking-[0.4em] text-brand-orange shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
                 />
                 {passwordError && (
-                  <p className="text-[10px] text-danger font-semibold mt-2">{passwordError}</p>
+                  <p className="text-[10px] text-danger font-black mt-2 uppercase tracking-wide">{passwordError}</p>
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Link href="/rooms" className="flex-1">
-                  <Button variant="secondary" className="w-full h-11 uppercase font-bold text-xs">
+                  <button type="button" className="w-full h-12 text-[10px] font-black tracking-widest bg-slate-800 text-slate-300 border-[3.5px] border-black rounded-2xl shadow-[3px_3px_0px_#000000] hover:bg-slate-700 active:translate-y-0.5 transition-all cursor-pointer">
                     Cancel
-                  </Button>
+                  </button>
                 </Link>
-                <Button type="submit" variant="primary" className="flex-1 h-11 uppercase font-bold text-xs">
+                <button type="submit" className="btn-gaming flex-1 h-12 text-[10px] font-black tracking-widest rounded-2xl shadow-[3px_3px_0px_#000000]">
                   Unlock Room
-                </Button>
+                </button>
               </div>
             </form>
           </motion.div>
@@ -626,7 +691,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       <Navbar />
       <Sidebar />
 
-      <main className="flex-1 pt-24 bg-slate-950 text-white min-h-screen pb-20 selection:bg-brand-amber selection:text-slate-950">
+      <main className="flex-1 pt-24 bg-[#161713] text-white min-h-screen pb-20 selection:bg-brand-orange selection:text-slate-950">
         <div className="max-w-7xl mx-auto px-6">
           
           <AnimatePresence mode="wait">
@@ -639,47 +704,41 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 className="space-y-8"
               >
                 {/* Header Lobby Navigation */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-slate-900/60 border border-slate-900 p-6 rounded-3xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000]">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-3xl">
-                      {game.thumb}
+                    <div className="w-12 h-12 bg-slate-950 border-[2.5px] border-black rounded-2xl flex items-center justify-center shadow-[2.5px_2.5px_0px_#000000]">
+                      {getGameIcon(game.id)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-widest bg-brand-amber/10 border border-brand-amber/35 text-brand-amber px-2.5 py-0.5 rounded-full">
-                          Lobby #{roomCode}
+                        <span className="text-[9px] font-black uppercase tracking-[0.15em] bg-brand-orange text-slate-950 border-2 border-black px-2.5 py-0.5 rounded-lg shadow-[1.5px_1.5px_0px_#000000]">
+                          Room Code: #{roomCode}
                         </span>
                         {isPrivate && (
-                          <span className="p-1 rounded bg-slate-950 border border-slate-800 text-brand-amber">
+                          <span className="p-1 rounded bg-[#1c1d18] border-2 border-black text-brand-orange shadow-[1.5px_1.5px_0px_#000000]">
                             <ShieldAlert className="w-3.5 h-3.5" />
                           </span>
                         )}
                       </div>
-                      <h1 className="font-outfit font-black text-xl uppercase tracking-wide mt-1">
+                      <h1 className="font-outfit font-black text-xl uppercase tracking-wide mt-2.5 text-white">
                         {roomName}
                       </h1>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <Button
-                      variant="secondary"
-                      size="sm"
+                    <button
                       onClick={() => setIsInviteOpen(true)}
-                      leftIcon={<Share2 className="w-4 h-4 text-brand-amber" />}
-                      className="h-10 border-slate-800 font-extrabold text-[10px] uppercase tracking-wider text-slate-300"
+                      className="h-10 px-4 border-[2.5px] border-black bg-[#1c1d18] text-white hover:text-brand-orange shadow-[3px_3px_0px_#000000] font-black text-[9.5px] uppercase tracking-widest active:translate-y-0.5 transition-all cursor-pointer rounded-xl flex items-center justify-center"
                     >
                       Invite Friends
-                    </Button>
+                    </button>
                     <Link href="/rooms">
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        leftIcon={<LogOut className="w-4 h-4" />}
-                        className="h-10 font-extrabold text-[10px] uppercase tracking-wider"
+                      <button
+                        className="h-10 px-4 border-[2.5px] border-black bg-[#ff4d4d] text-black font-black text-[9.5px] uppercase tracking-widest shadow-[3px_3px_0px_#000000] active:translate-y-0.5 hover:bg-[#ff6666] transition-all cursor-pointer rounded-xl flex items-center justify-center"
                       >
-                        Leave
-                      </Button>
+                        Leave Room
+                      </button>
                     </Link>
                   </div>
                 </div>
@@ -695,18 +754,17 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <div className="lg:col-span-8 space-y-6">
                     
                     {/* Players slots system */}
-                    <div className="bg-slate-900/60 border border-slate-900 p-6 rounded-3xl space-y-4">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                          <Users className="w-4 h-4 text-brand-amber" />
-                          Multiplayer Match Slots ({players.length}/{game.maxPlayers})
+                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
+                      <div className="flex justify-between items-center pb-2">
+                        <h3 className="font-outfit font-black text-[10px] uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                          <Users className="w-4 h-4 text-brand-orange" />
+                          Players ({players.length}/{game.maxPlayers})
                         </h3>
                         
                         <button
                           onClick={handleToggleSpectatorMode}
-                          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-brand-amber hover:underline hover:text-brand-light transition-all bg-brand-amber/5 border border-brand-amber/20 px-3 py-1 rounded-xl"
+                          className="flex items-center text-[8.5px] font-black uppercase tracking-widest text-brand-orange bg-[#1c1d18] border-2 border-black px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:text-white cursor-pointer"
                         >
-                          <Eye className="w-3.5 h-3.5" />
                           {isSpectatingOnly ? "Join as Player" : "Switch to Spectator"}
                         </button>
                       </div>
@@ -717,36 +775,36 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     </div>
 
                     {/* Game Rules panel */}
-                    <div className="bg-slate-900/40 border border-slate-900 p-6 rounded-3xl space-y-5">
+                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-5">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-brand-amber" />
-                        Dynamic Game Rules & Configuration
+                        <BookOpen className="w-4 h-4 text-brand-orange" />
+                        Rules & Details
                       </h3>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-1">
-                          <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Match Objectives</span>
-                          <p className="text-xs text-slate-300 leading-relaxed">{game.objectives}</p>
+                          <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Objectives</span>
+                          <p className="text-xs text-slate-300 leading-relaxed font-semibold">{game.objectives}</p>
                         </div>
                         <div className="space-y-1">
-                          <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Duration Limit</span>
-                          <p className="text-xs text-slate-300 leading-relaxed flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-brand-amber" />
+                          <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Duration</span>
+                          <p className="text-xs text-slate-300 leading-relaxed font-semibold flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-brand-orange" />
                             {game.duration}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Win Conditions</span>
-                          <p className="text-xs text-slate-300 leading-relaxed">{game.winConditions}</p>
+                          <p className="text-xs text-slate-300 leading-relaxed font-semibold">{game.winConditions}</p>
                         </div>
                       </div>
 
-                      <div className="bg-slate-950 p-4 border border-slate-900 rounded-2xl flex gap-3.5 items-start">
-                        <HelpCircle className="w-5 h-5 text-brand-amber shrink-0 mt-0.5" />
+                      <div className="bg-[#1c1d18] p-4 border-[3px] border-black rounded-2xl flex gap-3.5 items-start shadow-[3px_3px_0px_#000000]">
+                        <HelpCircle className="w-5 h-5 text-brand-orange shrink-0 mt-0.5" />
                         <div>
-                          <h4 className="font-outfit font-extrabold text-[10px] text-slate-200 uppercase tracking-wide">Lobby Status</h4>
-                          <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
-                            {game.description} The game room is fully configured for real-time play.
+                          <h4 className="font-outfit font-extrabold text-[10px] text-slate-200 uppercase tracking-wide">About Game</h4>
+                          <p className="text-[10.5px] text-slate-400 mt-1 leading-relaxed font-medium">
+                            {game.description} The game room is ready for players to join.
                           </p>
                         </div>
                       </div>
@@ -758,13 +816,13 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <div className="lg:col-span-4 space-y-6">
                     
                     {/* Chat Board */}
-                    <div className="bg-slate-900/60 border border-slate-900 p-6 rounded-3xl flex flex-col h-[350px]">
+                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] flex flex-col h-[380px]">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 mb-3">
-                        Lobby Room Chat
+                        Room Chat
                       </h3>
 
                       {/* Messages scroll box */}
-                      <div className="flex-1 overflow-y-auto bg-slate-950 border border-slate-900 rounded-2xl p-4 flex flex-col gap-3 mb-4">
+                      <div className="flex-1 overflow-y-auto bg-[#1c1d18] border-[3px] border-black rounded-2xl p-4 flex flex-col gap-3 mb-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
                         {chatMessages.map((msg, idx) => (
                           <div
                             key={idx}
@@ -786,12 +844,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                             )}
 
                             <div
-                              className={`text-[11px] font-medium leading-relaxed rounded-2xl p-2.5 ${
+                              className={`text-[11px] font-semibold leading-relaxed rounded-2xl p-2.5 ${
                                 msg.isSystem
-                                  ? "bg-slate-900/30 text-slate-500 border border-slate-900/40 text-[9px] font-mono py-1 rounded-lg"
+                                  ? "bg-slate-900/30 text-slate-550 border border-slate-900/40 text-[9px] font-mono py-1 rounded-lg"
                                   : msg.sender === "You"
-                                  ? "bg-brand-amber text-slate-950 rounded-tr-none font-bold"
-                                  : "bg-slate-900 text-white rounded-tl-none border border-slate-800"
+                                  ? "bg-brand-orange text-slate-950 border-[2.5px] border-black font-extrabold rounded-2xl rounded-tr-none shadow-[2px_2px_0px_#000000]"
+                                  : "bg-[#161713] text-white border-[2.5px] border-black font-bold rounded-2xl rounded-tl-none shadow-[2px_2px_0px_#000000]"
                               }`}
                             >
                               {msg.text}
@@ -807,53 +865,53 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           type="text"
                           value={inputText}
                           onChange={(e) => setInputText(e.target.value)}
-                          placeholder="Broadcast message..."
-                          className="flex-1 bg-slate-950 text-xs font-semibold border border-slate-900 focus:border-brand-amber rounded-xl px-4 py-2.5 outline-none transition-all placeholder:text-slate-600 text-white"
+                          placeholder="Type message..."
+                          className="flex-1 bg-[#1c1d18] text-xs font-bold border-[3px] border-black rounded-xl px-4 py-2.5 outline-none focus:border-brand-orange placeholder:text-slate-500 text-white shadow-[2px_2px_0px_#000000]"
                         />
-                        <Button variant="primary" type="submit" className="h-9 px-3.5">
-                          <Send className="w-3.5 h-3.5 text-slate-950" />
-                        </Button>
+                        <button type="submit" className="btn-gaming h-11 px-4 rounded-xl flex items-center justify-center">
+                          <Send className="w-3.5 h-3.5 text-slate-950 stroke-[3]" />
+                        </button>
                       </form>
                     </div>
 
                     {/* Launch / Start Panel */}
-                    <div className="bg-slate-900/60 border border-slate-900 p-6 rounded-3xl space-y-4">
+                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-slate-400 font-outfit font-black uppercase tracking-wider">Ready Up Check</span>
-                        <span className="text-brand-amber font-mono font-bold">
+                        <span className="text-slate-400 font-outfit font-black uppercase tracking-wider">Ready Check</span>
+                        <span className="text-brand-orange font-mono font-black">
                           {players.filter(p => p.isReady).length}/{players.length} Ready
                         </span>
                       </div>
 
                       <div className="flex gap-3">
                         {!isSpectatingOnly && (
-                          <Button
-                            variant={players.find((p) => p.id === "p1")?.isReady ? "secondary" : "primary"}
-                            size="md"
+                          <button
                             onClick={handleToggleReady}
-                            className="flex-1 uppercase font-bold text-xs"
+                            className={`flex-1 h-12 uppercase font-black text-xs rounded-xl border-[3.5px] border-black shadow-[3px_3px_0px_#000000] cursor-pointer ${
+                              players.find((p) => p.id === "p1")?.isReady 
+                                ? "bg-slate-800 text-white hover:bg-slate-700" 
+                                : "bg-brand-orange text-slate-950 hover:bg-brand-orange/90"
+                            }`}
                           >
                             {players.find((p) => p.id === "p1")?.isReady ? "Cancel Ready" : "Ready Up"}
-                          </Button>
+                          </button>
                         )}
 
                         {players.find((p) => p.id === "p1")?.isHost && (
-                          <Button
-                            variant="primary"
-                            size="md"
+                          <button
                             onClick={handleStartMatch}
                             disabled={players.length < 2 || !players.every(p => p.isReady)}
-                            className="flex-1 bg-brand-amber text-slate-950 hover:bg-brand-light uppercase font-bold text-xs tracking-wider"
+                            className="btn-gaming flex-1 h-12 text-slate-950 uppercase font-black text-xs tracking-wider rounded-xl shadow-[3px_3px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-[3px_3px_0px_#000000]"
                           >
                             Start Match
-                          </Button>
+                          </button>
                         )}
                       </div>
 
                       {players.length < 2 && (
-                        <p className="text-[10px] text-slate-500 font-bold text-center flex items-center justify-center gap-1.5">
-                          <AlertCircle className="w-3.5 h-3.5 text-brand-amber" />
-                          A minimum of 2 players are required to start.
+                        <p className="text-[10px] text-slate-400 font-bold text-center flex items-center justify-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5 text-brand-orange" />
+                          At least 2 players are required to start.
                         </p>
                       )}
                     </div>
@@ -871,49 +929,40 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
-                className="max-w-4xl mx-auto bg-slate-900 border border-slate-800 text-white rounded-3xl p-12 text-center flex flex-col justify-center items-center min-h-[550px] shadow-2xl relative overflow-hidden"
+                className="max-w-2xl mx-auto bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center flex flex-col justify-center items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative overflow-hidden"
               >
-                {/* Background lighting */}
-                <div className="absolute inset-0 bg-radial-gradient from-brand-amber/10 via-transparent to-transparent pointer-events-none" />
-
-                <span className="text-[10px] font-black uppercase tracking-widest bg-brand-amber/10 text-brand-amber border border-brand-amber/35 px-4 py-1.5 rounded-full z-10">
-                  Preparing Match Arena
+                <span className="text-[10px] font-black uppercase tracking-widest bg-brand-orange/15 text-brand-orange border-[2.5px] border-black px-4 py-1.5 rounded-xl shadow-[2px_2px_0px_#000000] z-10">
+                  Starting Game
                 </span>
                 
                 <h1 className="font-outfit font-black text-3xl uppercase tracking-wide mt-6 z-10">
-                  {game.name} LOBBY
+                  {game.name} ROOM
                 </h1>
                 
                 <div className="flex items-center gap-8 my-10 z-10">
-                  {players.slice(0, 3).map((p, index) => (
+                  {players.slice(0, 3).map((p) => (
                     <div key={p.id} className="relative flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full border-4 border-brand-amber/80 bg-slate-950 flex items-center justify-center font-outfit font-black text-lg relative animate-pulse">
+                      <div className="w-16 h-16 rounded-full border-[3.5px] border-black bg-[#1c1d18] flex items-center justify-center font-outfit font-black text-lg relative shadow-[3px_3px_0px_#000000]">
                         {p.avatar}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 mt-2 font-mono">{p.name}</span>
+                      <span className="text-[10px] font-black text-slate-450 mt-3">{p.name}</span>
                     </div>
                   ))}
                   {players.length > 3 && (
-                    <div className="w-12 h-12 rounded-full border-2 border-dashed border-slate-700 bg-slate-950 flex items-center justify-center font-outfit font-bold text-xs text-slate-500">
+                    <div className="w-12 h-12 rounded-full border-[3px] border-dashed border-black/40 bg-[#1c1d18] flex items-center justify-center font-outfit font-bold text-xs text-slate-500">
                       +{players.length - 3}
                     </div>
                   )}
                 </div>
 
                 <div className="relative flex items-center justify-center w-36 h-36 my-6 z-10">
-                  <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: [1, 1.2, 1], opacity: 1 }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className="absolute inset-0 rounded-full bg-brand-amber/10 border border-brand-amber/30"
-                  />
-                  <div className="w-24 h-24 rounded-full bg-brand-amber text-slate-950 flex items-center justify-center font-outfit font-black text-5xl shadow-lg">
+                  <div className="w-24 h-24 rounded-full bg-brand-orange border-[4px] border-black text-slate-950 flex items-center justify-center font-outfit font-black text-5xl shadow-[4px_4px_0px_#000000]">
                     {countdown}
                   </div>
                 </div>
 
                 <p className="text-xs text-slate-400 font-extrabold tracking-wider uppercase mt-4 z-10">
-                  Match Starts In A Moment...
+                  Game Starts In A Moment...
                 </p>
               </motion.div>
             )}
@@ -925,38 +974,40 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="max-w-4xl mx-auto bg-slate-900 border border-slate-800 text-white rounded-3xl p-12 text-center flex flex-col justify-between items-center min-h-[550px] shadow-2xl relative"
+                className="max-w-2xl mx-auto bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-10 text-center flex flex-col justify-between items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative"
               >
-                <div className="w-full flex justify-between items-center border-b border-slate-800/80 pb-6">
+                <div className="w-full flex justify-between items-center border-b-[3px] border-black/40 pb-6">
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">{game.thumb}</span>
+                    <div className="w-10 h-10 bg-slate-950 border-[2px] border-black rounded-xl flex items-center justify-center shadow-[2px_2px_0px_#000000]">
+                      {getGameIcon(game.id)}
+                    </div>
                     <div className="text-left">
                       <h4 className="font-outfit font-black text-sm uppercase tracking-wide">{game.name}</h4>
-                      <p className="text-[10px] text-brand-amber font-mono font-bold">Region: Mumbai</p>
+                      <p className="text-[10px] text-brand-orange font-bold uppercase tracking-widest mt-0.5">Region: {region}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-slate-500">Lobby Code: #{roomCode}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Room Code: #{roomCode}</span>
                 </div>
 
                 <div className="my-10 space-y-6 max-w-lg">
-                  <div className="p-3 bg-brand-amber/5 border border-brand-amber/15 rounded-2xl">
-                    <span className="font-outfit font-black text-[9px] uppercase tracking-widest text-brand-amber flex items-center justify-center gap-1">
+                  <div className="p-4 bg-[#1c1d18] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
+                    <span className="font-outfit font-black text-[9px] uppercase tracking-widest text-brand-orange flex items-center justify-center gap-1">
                       <HelpCircle className="w-3.5 h-3.5" /> Loading Tips & Advice
                     </span>
-                    <p className="text-xs text-slate-300 font-medium leading-relaxed mt-2 italic">
+                    <p className="text-xs text-slate-305 font-semibold leading-relaxed mt-2.5 italic">
                       "{loadingTip}"
                     </p>
                   </div>
                 </div>
 
                 <div className="w-full space-y-3">
-                  <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 font-extrabold px-1">
-                    <span>Loading game arena...</span>
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-450 tracking-widest px-1">
+                    <span>Loading game...</span>
                     <span>{loadingProgress}%</span>
                   </div>
-                  <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                  <div className="w-full h-4 bg-[#1c1d18] border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0px_#000000]">
                     <motion.div 
-                      className="h-full bg-brand-amber"
+                      className="h-full bg-brand-orange"
                       animate={{ width: `${loadingProgress}%` }}
                       transition={{ duration: 0.1 }}
                     />
@@ -997,33 +1048,31 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 className="max-w-4xl mx-auto space-y-8"
               >
                 {/* Result header banner */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center relative overflow-hidden shadow-2xl flex flex-col items-center">
-                  <div className="absolute inset-0 bg-radial-gradient from-success/15 via-transparent to-transparent pointer-events-none" />
-
-                  <div className="w-16 h-16 bg-brand-amber text-slate-950 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                <div className="bg-[#24261f] border-[4px] border-black rounded-[2.5rem] p-8 text-center relative overflow-hidden shadow-[8px_8px_0px_#000000] flex flex-col items-center">
+                  <div className="w-16 h-16 bg-brand-orange border-[3.5px] border-black text-slate-950 rounded-2xl flex items-center justify-center mb-4 shadow-[4px_4px_0px_#000000]">
                     <Trophy className="w-8 h-8 fill-current" />
                   </div>
 
                   <h1 className="font-outfit font-black text-3xl uppercase tracking-wider text-white">
-                    VICTORY MATCH COMPLETED!
+                    Match Completed!
                   </h1>
-                  <p className="text-xs text-slate-400 font-bold mt-1">Match results calculated for Lobby Room #{roomCode}.</p>
+                  <p className="text-xs text-slate-400 font-bold mt-1.5">Results calculated for Room #{roomCode}.</p>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full mt-8 max-w-2xl border-t border-slate-800/80 pt-6 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full mt-8 border-t-[3px] border-black/40 pt-6 text-center">
                     <div>
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">XP Awarded</span>
-                      <p className="font-outfit font-black text-lg text-brand-amber mt-0.5">+150 XP</p>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">XP Awarded</span>
+                      <p className="font-outfit font-black text-lg text-brand-orange mt-0.5">+150 XP</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Platform Coins</span>
-                      <p className="font-outfit font-black text-lg text-brand-amber mt-0.5">+45 Coins</p>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Coins</span>
+                      <p className="font-outfit font-black text-lg text-brand-orange mt-0.5">+45 Coins</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Match Duration</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Duration</span>
                       <p className="font-outfit font-black text-lg text-white mt-0.5">8m 42s</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Achievements</span>
+                      <span className="text-[9px] font-black text-slate-550 uppercase tracking-widest">Achievements</span>
                       <p className="font-outfit font-black text-lg text-white mt-0.5">1 Unlocked</p>
                     </div>
                   </div>
@@ -1033,31 +1082,31 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                   
                   {/* Standings table */}
-                  <div className="md:col-span-8 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-                    <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400">Match Leaderboard Standings</h3>
+                  <div className="md:col-span-8 bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+                    <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400">Leaderboard Standings</h3>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs font-medium">
+                      <table className="w-full text-left text-xs font-semibold">
                         <thead>
-                          <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          <tr className="border-b-[3px] border-black/40 text-[10px] font-black text-slate-500 uppercase tracking-wider">
                             <th className="pb-3">Rank</th>
                             <th className="pb-3">Player</th>
                             <th className="pb-3 text-center">Role / Side</th>
                             <th className="pb-3 text-right">Score</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y-[2px] divide-black/20">
                           {players.map((p, idx) => (
-                            <tr key={p.id} className="text-white hover:bg-slate-950/40">
-                              <td className="py-3 font-outfit font-black text-brand-amber">#{idx + 1}</td>
+                            <tr key={p.id} className="text-white hover:bg-black/10">
+                              <td className="py-3 font-outfit font-black text-brand-orange">#{idx + 1}</td>
                               <td className="py-3 flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center font-outfit font-bold text-[10px]">
+                                <div className="w-7 h-7 rounded-full bg-slate-950 border-[2px] border-black flex items-center justify-center font-outfit font-black text-[10px] shadow-[1.5px_1.5px_0px_#000000]">
                                   {p.avatar}
                                 </div>
                                 <span className="font-bold">{p.name}</span>
                               </td>
-                              <td className="py-3 text-center text-slate-400 font-bold">{idx === 0 ? "Host / White" : "Challenger"}</td>
-                              <td className="py-3 text-right text-brand-amber font-mono font-black">{idx === 0 ? "1.0 (Win)" : "0.0"}</td>
+                              <td className="py-3 text-center text-slate-450 font-bold">{idx === 0 ? "Host / White" : "Challenger"}</td>
+                              <td className="py-3 text-right text-brand-orange font-mono font-black">{idx === 0 ? "1.0 (Win)" : "0.0"}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -1067,39 +1116,36 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                   {/* Achievements and stats column */}
                   <div className="md:col-span-4 space-y-6">
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                    <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <Award className="w-4 h-4 text-brand-amber" /> Achievements Unlocked
+                        <Award className="w-4 h-4 text-brand-orange" /> Achievements
                       </h3>
 
-                      <div className="bg-slate-950 border border-slate-850 p-3 rounded-2xl flex gap-3 items-center">
-                        <div className="p-2.5 bg-brand-amber/10 text-brand-amber border border-brand-amber/20 rounded-xl">
+                      <div className="bg-[#1c1d18] border-[3px] border-black p-3.5 rounded-2xl flex gap-3 items-center shadow-[3px_3px_0px_#000000]">
+                        <div className="p-2 bg-brand-orange/15 text-brand-orange border-2 border-black rounded-xl shadow-[1.5px_1.5px_0px_#000000]">
                           <Zap className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="font-outfit font-black text-[10px] text-white uppercase tracking-wider">Lounge Challenger</h4>
-                          <p className="text-[9px] text-slate-500 mt-0.5">Win a custom match room showdown.</p>
+                          <h4 className="font-outfit font-black text-[10px] text-white uppercase tracking-wider">Challenger</h4>
+                          <p className="text-[9px] font-bold text-slate-550 mt-0.5">Win a custom match room.</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+                    <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
                       <div className="flex gap-3">
-                        <Button 
-                          variant="secondary" 
+                        <button 
                           onClick={handlePlayAgain}
-                          leftIcon={<RefreshCw className="w-3.5 h-3.5 text-brand-amber" />}
-                          className="flex-1 uppercase font-bold text-xs h-10 border-slate-800 text-slate-300"
+                          className="flex-1 uppercase font-black text-xs h-12 bg-slate-800 text-slate-350 border-[3.5px] border-black rounded-xl shadow-[3px_3px_0px_#000000] cursor-pointer hover:bg-slate-700 hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all"
                         >
                           Play Again
-                        </Button>
+                        </button>
                         <Link href="/rooms" className="flex-1">
-                          <Button 
-                            variant="primary" 
-                            className="w-full uppercase font-bold text-xs h-10 text-slate-950"
+                          <button 
+                            className="btn-gaming w-full uppercase font-black text-xs h-12 text-slate-950 rounded-xl shadow-[3px_3px_0px_#000000]"
                           >
                             Browse Rooms
-                          </Button>
+                          </button>
                         </Link>
                       </div>
                     </div>
@@ -1119,72 +1165,74 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       {/* PREMIUM INVITATION MODAL */}
       <AnimatePresence>
         {isInviteOpen && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="max-w-md w-full bg-slate-900 border border-slate-800 text-white rounded-3xl p-6 space-y-5 shadow-2xl relative"
+              className="max-w-md w-full bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-6 space-y-5 shadow-[8px_8px_0px_#000000] relative"
             >
               <button
                 onClick={() => setIsInviteOpen(false)}
-                className="absolute top-4 right-4 p-1 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition-all cursor-pointer"
+                className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full border-2 border-black bg-[#ff4d4d] text-black shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:bg-[#ff6666] cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 stroke-[3.5]" />
               </button>
 
               <div>
-                <h3 className="font-outfit font-black text-base uppercase tracking-wide">Invite Friends to Lobby</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Share connection links or invite active platform friends.</p>
+                <h3 className="font-outfit font-black text-base uppercase tracking-wide">Invite Friends</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">Share connection links or invite platform friends.</p>
               </div>
 
               {/* Copy links */}
               <div className="space-y-2">
-                <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Direct Invitation Code</span>
+                <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Room Code</span>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-slate-950 border border-slate-850 px-4 py-2.5 rounded-xl text-xs font-mono font-bold tracking-widest text-brand-amber flex items-center justify-between">
+                  <div className="flex-grow bg-[#1c1d18] border-[3px] border-black px-4 py-2.5 rounded-xl text-xs font-mono font-black tracking-widest text-brand-orange flex items-center justify-between shadow-[2px_2px_0px_#000000]">
                     <span>#{roomCode}</span>
-                    <span className="text-[9px] text-slate-500 font-sans tracking-normal uppercase font-bold">Expires in 2 hrs</span>
+                    <span className="text-[9px] text-slate-550 font-sans tracking-normal uppercase font-bold">Expires in 2 hrs</span>
                   </div>
-                  <Button
-                    variant="primary"
+                  <button
                     onClick={handleCopyLink}
-                    className="h-10 px-4"
+                    className="btn-gaming h-11 px-4 rounded-xl flex items-center justify-center shadow-[2px_2px_0px_#000000]"
                   >
-                    {copied ? <Check className="w-4 h-4 text-slate-950" /> : <Copy className="w-4 h-4 text-slate-950" />}
-                  </Button>
+                    {copied ? <Check className="w-4 h-4 text-slate-950 stroke-[3.5]" /> : <Copy className="w-4 h-4 text-slate-950" />}
+                  </button>
                 </div>
               </div>
 
               {/* Online Friends List */}
               <div className="space-y-3 pt-2">
-                <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Online Platform Friends</span>
+                <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Online Friends</span>
                 
-                <div className="max-h-[180px] overflow-y-auto space-y-2 bg-slate-950 p-2.5 rounded-xl border border-slate-850">
+                <div className="max-h-[180px] overflow-y-auto space-y-2 bg-[#1c1d18] p-2.5 rounded-xl border-[3px] border-black shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
                   {ONLINE_FRIENDS.map((friend) => (
-                    <div key={friend.id} className="flex items-center justify-between p-2 hover:bg-slate-900/60 rounded-xl transition-all">
+                    <div key={friend.id} className="flex items-center justify-between p-2 hover:bg-black/20 rounded-xl transition-all">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center font-outfit font-bold text-xs text-white">
+                        <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-white shadow-[1px_1px_0px_#000000]">
                           {friend.avatar}
                         </div>
                         <div>
-                          <p className="font-outfit font-extrabold text-xs text-white leading-none">{friend.name}</p>
+                          <p className="font-outfit font-black text-xs text-white leading-none">{friend.name}</p>
                           <span className={`text-[8px] font-bold uppercase tracking-wider ${
-                            friend.status === "Online" ? "text-green-400" : friend.status === "Playing" ? "text-brand-amber" : "text-slate-600"
+                            friend.status === "Online" ? "text-green-400" : friend.status === "Playing" ? "text-brand-orange" : "text-slate-650"
                           }`}>
                             {friend.status}
                           </span>
                         </div>
                       </div>
 
-                      <Button
-                        variant={invitedFriends[friend.id] ? "secondary" : "primary"}
+                      <button
                         onClick={() => handleInviteFriend(friend.id, friend.name)}
                         disabled={friend.status === "Offline" || invitedFriends[friend.id]}
-                        className="h-8 px-3 text-[9px] font-bold uppercase tracking-wider"
+                        className={`h-8 px-3 text-[9px] font-black uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] cursor-pointer ${
+                          invitedFriends[friend.id] 
+                            ? "bg-slate-800 text-slate-500 border-2 border-transparent" 
+                            : "btn-gaming"
+                        }`}
                       >
                         {invitedFriends[friend.id] ? "Invited" : "Invite"}
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -1198,4 +1246,3 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     </>
   );
 }
-

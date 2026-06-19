@@ -77,6 +77,28 @@ export const PLATFORM_GAMES: PlatformGame[] = [
     features: ["Instant reset", "Spectator view", "Simple controls"],
     votes: 720,
   },
+  {
+    id: "g2",
+    slug: "chess",
+    name: "Chess Arena",
+    shortCode: "CHS",
+    tone: "amber",
+    spotlight: "Tactical warfare on 64 squares",
+    category: "Strategy",
+    multiplayerType: "2 Players",
+    status: "beta",
+    progressPercent: 95,
+    developerName: "UniGames",
+    tags: ["deep strategy", "ranked", "classic"],
+    description: "Tactical warfare on a 64-square battlefield. Synchronize moves in real-time.",
+    rules: [
+      "Take your opponent's king to checkmate.",
+      "Players take turns moving one piece at a time.",
+      "Follow standard chess rules and timed match options.",
+    ],
+    features: ["Elo ratings", "Move history", "Timed matches"],
+    votes: 450,
+  },
 ];
 
 export const ROOMS_AVAILABLE: LobbyRoom[] = [

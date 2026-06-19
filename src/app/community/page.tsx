@@ -245,12 +245,12 @@ export default function CommunityPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link href="/rooms/create">
                     <Button className="btn-gaming h-12 px-8 rounded-xl text-sm shadow-neon-orange">
-                      Start Playing <Zap className="ml-2 w-4 h-4 fill-current" />
+                      Start Playing
                     </Button>
                   </Link>
                   <Link href="/rooms">
                     <Button variant="outline" className="h-12 px-8 rounded-xl border-white/10 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
-                      Explore Lobbies <Globe className="ml-2 w-4 h-4" />
+                      Explore Lobbies
                     </Button>
                   </Link>
                 </div>
@@ -517,7 +517,7 @@ export default function CommunityPage() {
                            />
                         </div>
                         <Button type="submit" className="btn-gaming h-10 px-6 rounded-xl text-xs">
-                           Transmit <Send className="ml-1.5 w-4 h-4 fill-current" />
+                           Transmit
                         </Button>
                      </form>
                   </div>
@@ -543,7 +543,7 @@ export default function CommunityPage() {
                     at your exact skill level in under 5 seconds. Ready?
                   </p>
                   <Button className="btn-gaming h-12 px-8 rounded-xl text-sm shadow-neon-orange">
-                    Start Quick Rush <Zap className="ml-2 w-4 h-4 fill-current" />
+                    Start Quick Rush
                   </Button>
                 </div>
 
@@ -808,7 +808,7 @@ export default function CommunityPage() {
                 <SectionHeading kicker="Rankings" title="Global Leaderboard" description="The definitive record of strategic dominance. Earn XP in match rooms to ascend the divisions." />
                 <Link href="/leaderboards">
                   <Button variant="outline" className="h-10 px-6 rounded-lg border-white/10 hover:bg-white/5 font-black uppercase text-[9px] tracking-widest">
-                    View Full Standings <ArrowUpRight className="ml-1.5 w-3.5 h-3.5" />
+                    View Full Standings
                   </Button>
                 </Link>
               </div>

@@ -1,14 +1,13 @@
 "use client";
 
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, DoorOpen, Play, Shield } from "lucide-react";
+import { DoorOpen, Play, X } from "lucide-react";
 import { PublicLayout } from "@/components/common/layouts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PLATFORM_GAMES, ROOMS_AVAILABLE, getGameBySlug } from "@/data/platform";
-import { CyberAdBox, PlatformAdComponent } from "@/monetization/ad-components";
+import { getGameBySlug } from "@/data/platform";
 
 export default function GameDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -16,10 +15,6 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
   const [roomCode, setRoomCode] = useState("");
 
   const game = getGameBySlug(resolvedParams.slug);
-  const openRooms = useMemo(
-    () => ROOMS_AVAILABLE.filter((room) => room.gameSlug === resolvedParams.slug),
-    [resolvedParams.slug]
-  );
 
   const handleJoinRoom = (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,172 +47,101 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
     );
   }
 
-  const isLive = game.status === "released" || game.status === "beta";
-
   return (
     <PublicLayout>
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <Link
-          href="/games"
-          className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 hover:text-brand-light"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to games
-        </Link>
+      <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 flex flex-col items-center justify-center min-h-[70vh]">
+        <div className="relative w-full max-w-2xl bg-[#24261f] border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden">
+          {/* Close Button ("Wrong" cancel button that redirects to /games) */}
+          <Link href="/games">
+            <button 
+              className="absolute top-5 right-5 flex items-center justify-center w-9 h-9 rounded-full border-[3px] border-black bg-[#ff4d4d] hover:bg-[#ff6666] text-black shadow-[3px_3px_0px_#000000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000000] transition-all duration-100 cursor-pointer z-50"
+            >
+              <X className="w-4 h-4 stroke-[3]" />
+            </button>
+          </Link>
 
-        <section className="mt-5 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="panel-strong edge-glow rounded-[2rem] px-6 py-7">
-            <div className="relative w-full h-[220px] rounded-3xl border border-brand-amber/20 overflow-hidden shadow-tactile bg-slate-950/40 mb-6">
-              <img 
-                src="/cyber_arena.png" 
-                alt="Cyber Arena Illustration" 
-                className="absolute inset-0 w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
+            {/* Left Side: Game Details & Info */}
+            <div className="md:col-span-7 p-6 md:p-8 flex flex-col justify-between border-b-[4px] md:border-b-0 md:border-r-[4px] border-black">
               <div>
-                <p className="kicker">{game.category}</p>
-                <h1 className="mt-5 text-4xl font-black uppercase tracking-[0.18em] text-white sm:text-5xl">
+                <span className="kicker px-3 py-1 text-[8.5px] font-black uppercase tracking-[0.2em]">
+                  {game.category}
+                </span>
+                <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-white">
                   {game.name}
-                </h1>
-                <p className="mt-3 text-base font-semibold text-slate-300">{game.multiplayerType}</p>
-              </div>
-              <div className="rounded-full border border-brand-amber/25 bg-brand-amber/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-light">
-                {game.status.replace("_", " ")}
-              </div>
-            </div>
+                </h2>
+                
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border border-slate-700/60 bg-black/25 px-2 py-0.5 rounded">
+                    {game.multiplayerType}
+                  </span>
+                  {(game.tags || []).map((tag) => (
+                    <span key={tag} className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border border-slate-700/60 bg-black/25 px-2 py-0.5 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
 
-            <p className="mt-6 max-w-3xl text-base font-semibold leading-7 text-slate-400">
-              {game.description}
-            </p>
-
-            <div className="mt-7 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-3xl border border-grey-border bg-black/10 px-4 py-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                  Match type
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">{game.multiplayerType}</p>
-              </div>
-              <div className="rounded-3xl border border-grey-border bg-black/10 px-4 py-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                  Room status
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">
-                  {isLive ? "Open for rooms" : `${game.progressPercent}% ready`}
-                </p>
-              </div>
-              <div className="rounded-3xl border border-grey-border bg-black/10 px-4 py-4">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                  Best use
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">{game.spotlight}</p>
-              </div>
-            </div>
-
-            <div className="mt-7 rounded-[1.5rem] border border-grey-border bg-black/10 px-5 py-5">
-              <p className="font-outfit text-sm font-black uppercase tracking-[0.18em] text-white">
-                How it plays
-              </p>
-              <div className="mt-4 space-y-3">
-                {game.rules.map((rule) => (
-                  <div key={rule} className="flex gap-3">
-                    <span className="status-dot mt-2 shrink-0" />
-                    <p className="text-sm font-semibold leading-6 text-slate-300">{rule}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="panel rounded-[2rem] px-6 py-6">
-              <p className="font-outfit text-xl font-black uppercase tracking-[0.18em] text-white">
-                Play this game
-              </p>
-              <p className="mt-2 text-sm font-semibold text-slate-400">
-                Create your own room or jump into a code.
-              </p>
-
-              <div className="mt-5 space-y-3">
-                <Link href={`/rooms/create?game=${game.slug}`}>
-                  <Button className="w-full" leftIcon={<Play className="h-4 w-4" />}>
-                    Create room
-                  </Button>
-                </Link>
-                <Link href="/rooms">
-                  <Button variant="secondary" className="w-full" leftIcon={<DoorOpen className="h-4 w-4" />}>
-                    Browse all rooms
-                  </Button>
-                </Link>
-              </div>
-
-              <form onSubmit={handleJoinRoom} className="mt-6 space-y-3">
-                <Input
-                  label="Join with room code"
-                  value={roomCode}
-                  onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
-                  maxLength={6}
-                  placeholder="Enter room code"
-                />
-                <Button type="submit" variant="glass" className="w-full">
-                  Join room
-                </Button>
-              </form>
-            </div>
-
-            <div className="panel rounded-[2rem] px-6 py-6">
-              <div className="mb-4 flex items-center gap-2">
-                <Shield className="h-5 w-5 text-brand-amber" />
-                <p className="font-outfit text-sm font-black uppercase tracking-[0.18em] text-white">
-                  Rooms for this game
+                <p className="mt-5 text-[11.5px] font-semibold text-slate-400 leading-relaxed">
+                  {game.description}
                 </p>
               </div>
 
-              {openRooms.length > 0 ? (
-                <div className="space-y-3">
-                  {openRooms.map((room) => (
-                    <div
-                      key={room.code}
-                      className="rounded-[1.5rem] border border-grey-border bg-black/10 px-4 py-4"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-outfit text-sm font-black uppercase tracking-[0.14em] text-white">
-                            {room.name}
-                          </p>
-                          <p className="mt-1 text-xs font-semibold text-slate-400">
-                            {room.currentPlayers}/{room.maxPlayers} players · {room.region}
-                          </p>
-                        </div>
-                        <Link href={`/rooms/${room.code}`}>
-                          <Button size="sm">Open</Button>
-                        </Link>
-                      </div>
+              <div className="mt-6 p-4 rounded-2xl bg-black/20 border-2 border-black">
+                <p className="font-outfit text-[10px] font-black uppercase tracking-widest text-brand-orange">
+                  How it plays
+                </p>
+                <div className="mt-3 space-y-2.5">
+                  {(game.rules || []).map((rule) => (
+                    <div key={rule} className="flex gap-2">
+                      <span className="w-1.5 h-1.5 bg-brand-orange rounded-full mt-1.5 shrink-0" />
+                      <p className="text-[10px] font-semibold leading-normal text-slate-300">{rule}</p>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-sm font-semibold text-slate-400">
-                  No saved demo rooms for this game yet. Create the first one.
-                </p>
-              )}
+              </div>
             </div>
 
-            <div className="rounded-[2rem] border border-brand-amber/15 bg-black/15 px-6 py-6">
-              <p className="font-outfit text-sm font-black uppercase tracking-[0.18em] text-brand-light">
-                Battle Room Rules
-              </p>
-              <p className="mt-3 text-sm font-semibold leading-6 text-slate-300">
-                Ready to prove your skills? Jump into an active lobby, customize your match parameters, and play against friends or bots.
-              </p>
-            </div>
+            {/* Right Side: Deploy Panel */}
+            <div className="md:col-span-5 p-6 md:p-8 bg-[#1c1d18] flex flex-col justify-center">
+              <div className="space-y-6">
+                <div className="text-center md:text-left">
+                  <h3 className="text-base font-black text-white tracking-wider uppercase">Deploy Arena</h3>
+                  <p className="text-[9px] font-semibold text-slate-500 mt-1">Start match or join lobby</p>
+                </div>
 
-            <div className="mt-4">
-              <PlatformAdComponent placement="game_details" />
+                <Button 
+                  onClick={() => {
+                    router.push(`/rooms/create?game=${game.slug}`);
+                  }}
+                  className="btn-gaming w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                >
+                  Create Room
+                </Button>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t-2 border-black/50"></div>
+                  <span className="flex-shrink mx-3 text-[8.5px] font-black text-slate-600 uppercase tracking-widest">OR</span>
+                  <div className="flex-grow border-t-2 border-black/50"></div>
+                </div>
+
+                <form onSubmit={handleJoinRoom} className="space-y-3.5">
+                  <Input 
+                    label="Join with code"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                    maxLength={6}
+                    placeholder="ENTER CODE"
+                    className="text-center tracking-[0.2em] font-black uppercase h-11"
+                  />
+                  <Button type="submit" variant="secondary" className="w-full h-11 text-[9.5px] font-black tracking-widest">
+                    Join Room
+                  </Button>
+                </form>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
       </main>
     </PublicLayout>
   );

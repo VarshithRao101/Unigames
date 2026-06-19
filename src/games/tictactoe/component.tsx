@@ -128,30 +128,30 @@ export default function TicTacToeGame() {
   return (
     <div className="flex flex-col items-center justify-center space-y-6 max-w-md mx-auto py-8">
       {/* Turn indicator / status banner */}
-      <div className="w-full text-center p-3 bg-slate-900 border border-slate-800 rounded-2xl">
+      <div className="w-full text-center p-4 bg-[#24261f] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
         <p className="font-outfit font-black text-sm text-white uppercase tracking-wide">
           {statusText}
         </p>
         {isSpectator && (
-          <span className="text-[10px] text-brand-amber font-bold uppercase tracking-wider block mt-1">
+          <span className="text-[10px] text-brand-orange font-bold uppercase tracking-wider block mt-1">
             Spectator View
           </span>
         )}
       </div>
 
       {/* 3x3 Grid Board */}
-      <div className="grid grid-cols-3 gap-3 w-72 h-72 bg-slate-950 p-3 rounded-3xl border border-slate-900 relative">
+      <div className="grid grid-cols-3 gap-3.5 w-72 h-72 bg-[#1c1d18] p-4 rounded-3xl border-[3.5px] border-black shadow-[4px_4px_0px_#000000] relative">
         {board.map((cell: string, idx: number) => (
           <button
             key={idx}
             onClick={() => handleCellClick(idx)}
             disabled={isSpectator || !isMyTurn || cell !== "" || !!winnerId || isDraw}
-            className={`rounded-2xl flex items-center justify-center text-3xl font-outfit font-black transition-all cursor-pointer select-none border border-slate-900 ${
+            className={`rounded-2xl flex items-center justify-center text-3xl font-outfit font-black transition-all cursor-pointer select-none border-[3px] border-black shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000000] disabled:transform-none disabled:shadow-[2px_2px_0px_#000000] disabled:cursor-not-allowed ${
               cell === "" 
-                ? "bg-slate-900/60 hover:bg-slate-900 text-transparent" 
+                ? "bg-[#1c1d18] hover:bg-[#24261f] text-transparent" 
                 : cell === "X" 
-                ? "bg-brand-amber/15 border-brand-amber/30 text-brand-amber" 
-                : "bg-indigo-500/15 border-indigo-500/30 text-indigo-400"
+                ? "bg-[#ffaa00] text-black" 
+                : "bg-[#00ffcc] text-black"
             }`}
           >
             {cell}
@@ -161,30 +161,28 @@ export default function TicTacToeGame() {
 
       {/* Players hud */}
       <div className="grid grid-cols-2 gap-4 w-full text-xs font-semibold">
-        <div className="bg-slate-900 border border-slate-800 p-3 rounded-2xl text-center space-y-1">
-          <div className="flex items-center justify-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-brand-amber flex items-center justify-center font-bold text-[8px] text-slate-950">X</span>
-            <span className="text-white block font-bold truncate max-w-[120px]">{players[0]?.name || "Challenger A"}</span>
+        <div className="bg-[#24261f] border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4 rounded-full bg-[#ffaa00] border-2 border-black flex items-center justify-center font-black text-[9px] text-black">X</span>
+            <span className="text-white block font-extrabold truncate max-w-[120px]">{players[0]?.name || "Challenger A"}</span>
           </div>
-          <span className="text-[9px] text-slate-500 font-mono block">Player 1</span>
+          <span className="text-[9px] text-slate-500 font-extrabold block">Player 1</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-3 rounded-2xl text-center space-y-1">
-          <div className="flex items-center justify-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 flex items-center justify-center font-bold text-[8px] text-slate-950">O</span>
-            <span className="text-white block font-bold truncate max-w-[120px]">{players[1]?.name || "Challenger B"}</span>
+        <div className="bg-[#24261f] border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4 rounded-full bg-[#00ffcc] border-2 border-black flex items-center justify-center font-black text-[9px] text-black">O</span>
+            <span className="text-white block font-extrabold truncate max-w-[120px]">{players[1]?.name || "Challenger B"}</span>
           </div>
-          <span className="text-[9px] text-slate-500 font-mono block">Player 2</span>
+          <span className="text-[9px] text-slate-500 font-extrabold block">Player 2</span>
         </div>
       </div>
 
       {/* Restart / Reset for Dev tests */}
       {localPlayer?.isHost && (winnerId || isDraw) && (
         <Button
-          variant="secondary"
           onClick={handleRestart}
-          leftIcon={<RefreshCw className="w-4 h-4 text-brand-amber" />}
-          className="h-10 text-xs uppercase font-bold px-6 border-slate-800 text-slate-300"
+          className="btn-gaming h-10 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000]"
         >
           Reset Board
         </Button>

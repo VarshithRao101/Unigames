@@ -21,7 +21,7 @@ export default function NotFound() {
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="/">
-              <Button leftIcon={<ArrowLeft className="h-4 w-4" />}>Back to home</Button>
+              <Button>Back to home</Button>
             </Link>
             <Link href="/rooms">
               <Button variant="secondary">Browse rooms</Button>
