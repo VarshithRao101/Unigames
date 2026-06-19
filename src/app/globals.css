@@ -267,20 +267,7 @@ input[type="text"]:focus, select:focus, textarea:focus {
 
 /* ── Disable all white borders globally to maintain 2D cel-shaded gaming vibe ── */
 .border-white,
-.border-white\/5,
-.border-white\/10,
-.border-white\/15,
-.border-white\/20,
-.border-white\/25,
-.border-white\/30,
-.border-white\/35,
-.border-white\/40,
-.border-white\/45,
-.border-white\/50,
-.border-white\/60,
-.border-white\/70,
-.border-white\/80,
-.border-white\/90 {
+[class*="border-white/"] {
   border-color: #000000 !important;
 }
 
