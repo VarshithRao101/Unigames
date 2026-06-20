@@ -223,34 +223,75 @@ body::before {
   z-index: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
   font-family: var(--font-outfit);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em !important;
   text-transform: uppercase;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+  font-weight: 900 !important;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem) !important;
+  line-height: 1.1 !important;
+}
+
+h2 {
+  font-family: var(--font-outfit);
+  letter-spacing: 0.015em !important;
+  text-transform: uppercase;
+  text-shadow: 1.75px 1.75px 0px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 900 !important;
+  font-size: clamp(1.3rem, 2.8vw, 1.8rem) !important;
+  line-height: 1.15 !important;
+}
+
+h3 {
+  font-family: var(--font-outfit);
+  letter-spacing: 0.01em !important;
+  text-transform: uppercase;
+  text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.25) !important;
+  font-weight: 900 !important;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem) !important;
+  line-height: 1.2 !important;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-outfit);
+  letter-spacing: normal !important;
+  text-transform: uppercase;
+  font-weight: 900 !important;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem) !important;
 }
 
 /* ── 2D Cel-Shaded Glassmorphism Panels ─────────────────────── */
 .glass {
-  background: var(--panel-bg) !important;
-  border: 3.5px solid #000000 !important;
-  box-shadow: 6px 6px 0px 0px #000000 !important;
+  background-color: var(--panel-bg) !important;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.22) 1.2px, transparent 1.2px) !important;
+  background-size: 10px 10px !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
   backdrop-filter: none !important;
-  border-radius: 2rem !important;
+  border-radius: 1.25rem !important;
+  padding: 1.25rem !important;
 }
 
 .glass-orange {
-  background: var(--glass-orange-bg) !important;
-  border: 3.5px solid #000000 !important;
-  box-shadow: 6px 6px 0px 0px #000000, inset 0px 0px 0px 2.5px var(--color-brand-orange) !important;
+  background-color: var(--glass-orange-bg) !important;
+  background-image: radial-gradient(rgba(255, 170, 0, 0.15) 1.2px, transparent 1.2px) !important;
+  background-size: 10px 10px !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000, inset 0px 0px 0px 2px var(--color-brand-orange) !important;
   backdrop-filter: none !important;
+  border-radius: 1.25rem !important;
 }
 
 /* ── Cel-Shaded Panel System ───────────────────────────── */
 .panel {
-  background: var(--panel-bg) !important;
-  border: 3.5px solid #000000 !important;
-  box-shadow: 6px 6px 0px 0px #000000 !important;
-  border-radius: 2rem !important;
+  background-color: var(--panel-bg) !important;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.22) 1.2px, transparent 1.2px) !important;
+  background-size: 10px 10px !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  border-radius: 1.25rem !important;
+  padding: 1.25rem !important;
 }
 
 .panel-interactive {
@@ -259,14 +300,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .panel-interactive:hover {
   border-color: #000000 !important;
-  background: var(--panel-bg-hover) !important;
-  box-shadow: 10px 10px 0px 0px #000000 !important;
-  transform: translate(-4px, -4px) !important;
+  background-color: var(--panel-bg-hover) !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+  transform: translate(-2px, -2px) !important;
 }
 
 /* ── Glow Effects Overridden for 2D Comic flat shadows ── */
 .neon-glow-orange {
-  box-shadow: 6px 6px 0px 0px #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
 }
 
 .text-neon-orange {
@@ -276,7 +317,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .border-neon-orange {
   border-color: #000000 !important;
-  box-shadow: 4px 4px 0px 0px #000000 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
 }
 
 /* ── Typography ────────────────────────────── */
@@ -292,29 +333,33 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 1rem;
-  border-radius: 12px;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 8px !important;
   background: var(--kicker-bg);
-  border: 3px solid #000000;
+  border: 2.5px solid #000000 !important;
   color: var(--color-brand-orange);
   font-family: var(--font-outfit);
-  font-size: 0.75rem;
+  font-size: 0.65rem !important;
   font-weight: 900;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  box-shadow: 3px 3px 0px 0px #000000;
+  box-shadow: 2.5px 2.5px 0px 0px #000000 !important;
+  transform: rotate(-1.5deg);
 }
 
 /* ── Flat Gaming Button overrides ────────────────────────── */
 .btn-gaming {
   background: var(--color-brand-orange) !important;
   color: #000000 !important;
-  border: 3.5px solid #000000 !important;
-  box-shadow: 4px 4px 0px 0px #000000 !important;
-  border-radius: 1rem !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+  border-radius: 0.75rem !important;
   font-weight: 900;
   text-transform: uppercase;
   transition: all 0.1s ease !important;
+  padding: 0.5rem 1.25rem !important;
+  height: 2.75rem !important;
+  font-size: 0.75rem !important;
   z-index: 1;
 }
 
@@ -324,45 +369,70 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-gaming:hover {
   background: var(--color-brand-orange) !important;
-  opacity: 0.9 !important;
-  transform: translate(-3px, -3px) !important;
-  box-shadow: 7px 7px 0px 0px #000000 !important;
+  opacity: 0.95 !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 5px 5px 0px 0px #000000 !important;
 }
 
 .btn-gaming:active {
   transform: translate(2px, 2px) !important;
-  box-shadow: 2px 2px 0px 0px #000000 !important;
+  box-shadow: 1px 1px 0px 0px #000000 !important;
 }
 
 /* ── Global 2D Cel-Shaded overrides on standard buttons ── */
 button:not(.btn-gaming):not([disabled]) {
-  border: 3.5px solid #000000 !important;
-  box-shadow: 4px 4px 0px 0px #000000 !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
   transition: all 0.1s ease-in-out !important;
   cursor: pointer;
 }
 button:not(.btn-gaming):not([disabled]):hover {
-  transform: translate(-2.5px, -2.5px) !important;
-  box-shadow: 6.5px 6.5px 0px 0px #000000 !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 5px 5px 0px 0px #000000 !important;
 }
 button:not(.btn-gaming):not([disabled]):active {
-  transform: translate(1.5px, 1.5px) !important;
-  box-shadow: 2px 2px 0px 0px #000000 !important;
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0px 0px #000000 !important;
 }
 
 /* ── Cel-Shaded Input overrides ── */
 input[type="text"], input[type="password"], input[type="email"], select, textarea {
-  border: 3.5px solid #000000 !important;
+  border: 3px solid #000000 !important;
   background: var(--input-bg) !important;
   color: var(--input-color) !important;
-  box-shadow: 3px 3px 0px 0px #000000 !important;
-  border-radius: 1rem !important;
+  box-shadow: 2.5px 2.5px 0px 0px #000000 !important;
+  border-radius: 0.75rem !important;
   font-weight: 800 !important;
+  padding: 0.5rem 1rem !important;
+  height: 2.75rem !important;
+  font-size: 0.75rem !important;
 }
 input[type="text"]:focus, select:focus, textarea:focus {
   border-color: var(--color-brand-orange) !important;
-  box-shadow: 5px 5px 0px 0px #000000, inset 0px 0px 0px 2px var(--color-brand-orange) !important;
+  box-shadow: 4px 4px 0px 0px #000000, inset 0px 0px 0px 2px var(--color-brand-orange) !important;
   outline: none !important;
+}
+
+/* ── Text Shadow Overrides for Light Theme ── */
+html.light h1 {
+  text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6) !important;
+}
+html.light h2 {
+  text-shadow: 1.75px 1.75px 0px rgba(255, 255, 255, 0.5) !important;
+}
+html.light h3 {
+  text-shadow: 1.5px 1.5px 0px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* ── Text Shadow Overrides for Gaming Theme ── */
+html.gaming h1 {
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
+}
+html.gaming h2 {
+  text-shadow: 1.75px 1.75px 0px rgba(0, 0, 0, 0.4) !important;
+}
+html.gaming h3 {
+  text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.35) !important;
 }
 
 /* ── Text Color Overrides for Light Theme Readability ── */
@@ -412,14 +482,14 @@ html.gaming .text-slate-300 {
 
 /* ── Spacing made tighter (congested, medium spacing) ── */
 .section-padding {
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
 }
 
 @media (min-width: 1024px) {
   .section-padding {
-    padding-top: 2.5rem !important;
-    padding-bottom: 2.5rem !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
   }
 }
 
@@ -463,6 +533,13 @@ html.gaming .text-slate-300 {
 .border-white,
 [class*="border-white/"] {
   border-color: #000000 !important;
+}
+
+/* ── Desktop Scale-Down Container Limit ── */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1100px !important;
+  }
 }
 
 /* ── Mobile Scale-Down Overrides ────────────────────────── */

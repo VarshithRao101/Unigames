@@ -117,40 +117,61 @@ export default function ChatPage() {
           </aside>
 
           {/* Chat Node */}
-          <section className="glass overflow-hidden flex flex-col h-[800px] relative">
+          <section className="glass border-[4px] border-black rounded-[2.5rem] shadow-[8px_8px_0px_#000000] overflow-hidden flex flex-col h-[800px] relative">
              {/* Chat Background Decor */}
-             <div className="absolute inset-0 opacity-5 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-full bg-mesh rotate-12" />
-             </div>
+             <div className="absolute inset-0 opacity-[0.08] pointer-events-none z-0 bg-[radial-gradient(#000000_1.5px,transparent_1.5px)] [background-size:16px_16px]" />
 
              {/* Messages Area */}
              <div 
-               ref={scrollRef}
-               className="flex-1 p-8 md:p-12 overflow-y-auto scrollbar-hide space-y-8 relative z-10"
+                ref={scrollRef}
+                className="flex-1 p-8 md:p-12 overflow-y-auto scrollbar-hide space-y-8 relative z-10 flex flex-col"
              >
                 <AnimatePresence initial={false}>
-                   {messages.map((message, i) => (
-                     <motion.div 
-                       key={message.id}
-                       initial={{ opacity: 0, x: message.sender === 'You' ? 20 : -20 }}
-                       animate={{ opacity: 1, x: 0 }}
-                       className={`flex flex-col ${message.sender === 'You' ? 'items-end' : 'items-start'}`}
-                     >
-                        <div className="flex items-center gap-3 mb-2">
-                           <span className={`text-[10px] font-black uppercase tracking-widest ${message.sender === 'You' ? 'text-brand-orange' : 'text-slate-500'}`}>
-                              {message.sender}
-                           </span>
-                           <span className="text-[8px] font-black text-slate-600 tracking-[0.2em]">{message.time}</span>
-                        </div>
-                        <div className={`max-w-[80%] p-6 rounded-[2rem] border-3 border-black transition-all duration-300 ${
-                          message.sender === 'You' 
-                            ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-slate-50 shadow-[3px_3px_0px_#000000]' 
-                            : 'bg-slate-900/60 rounded-tl-none text-slate-300 shadow-[3px_3px_0px_#000000]'
-                        }`}>
-                           <p className="text-sm font-medium leading-relaxed">{message.text}</p>
-                        </div>
-                     </motion.div>
-                   ))}
+                   {messages.map((message, i) => {
+                     const isSelf = message.sender === 'You';
+                     return (
+                       <motion.div 
+                         key={message.id}
+                         initial={{ opacity: 0, x: isSelf ? 20 : -20 }}
+                         animate={{ opacity: 1, x: 0 }}
+                         className={`flex gap-4 items-start w-fit max-w-[85%] ${isSelf ? 'flex-row-reverse self-end' : 'self-start'}`}
+                       >
+                         {/* Player Avatar Sticker */}
+                         <div className={`h-10 w-10 rounded-full border-3 border-black flex items-center justify-center font-black text-sm shrink-0 shadow-[2px_2px_0px_#000000] relative ${
+                           isSelf ? 'bg-brand-orange text-slate-950' : 'bg-slate-900 text-slate-400'
+                         }`}>
+                           {message.sender.charAt(0).toUpperCase()}
+                           {!isSelf && <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-success rounded-full border-2 border-black animate-pulse" />}
+                         </div>
+
+                         {/* Speech Bubble Content */}
+                         <div className={`flex flex-col ${isSelf ? 'items-end' : 'items-start'}`}>
+                            <div className="flex items-center gap-2 mb-1">
+                               <span className={`text-[10px] font-black uppercase tracking-widest ${isSelf ? 'text-brand-orange' : 'text-slate-400'}`}>
+                                  {message.sender}
+                               </span>
+                               <span className="text-[8px] font-black text-slate-600 tracking-[0.2em]">{message.time}</span>
+                            </div>
+                            
+                            <div className="relative">
+                               <div className={`p-5 rounded-[1.8rem] border-3 border-black transition-all duration-300 relative text-sm shadow-[4px_4px_0px_#000000] ${
+                                 isSelf 
+                                   ? 'bg-brand-orange text-slate-950 font-bold rounded-tr-none' 
+                                   : 'bg-slate-900 text-slate-100 font-medium rounded-tl-none'
+                               }`}>
+                                  <p className="leading-relaxed">{message.text}</p>
+                               </div>
+                               {/* Comic Speech Bubble Tail */}
+                               {isSelf ? (
+                                 <div className="absolute top-[3px] right-[-5px] w-3 h-3 bg-brand-orange border-r-3 border-t-3 border-black rotate-[45deg] z-10" />
+                               ) : (
+                                 <div className="absolute top-[3px] left-[-5px] w-3 h-3 bg-slate-900 border-l-3 border-t-3 border-black rotate-[-45deg] z-10" />
+                               )}
+                            </div>
+                         </div>
+                       </motion.div>
+                     );
+                   })}
                 </AnimatePresence>
              </div>
 

@@ -10,7 +10,7 @@ import { useAuth } from "@/context/auth-context";
 
 const navItems = [
   { label: "Games", href: "/games", icon: Gamepad2 },
-  { label: "Community", href: "/community", icon: MessageSquareText },
+  { label: "Community", href: "/", icon: MessageSquareText },
   { label: "Leaderboard", href: "/leaderboards", icon: Trophy },
   { label: "Lobbies", href: "/rooms", icon: DoorOpen },
 ];
@@ -32,19 +32,19 @@ export function Navbar() {
     <header
       className={`fixed inset-x-0 top-0 z-[100] transition-all duration-300 ${
         scrolled
-          ? "py-3 bg-slate-950/80 backdrop-blur-md border-b-3 border-black"
-          : "py-6 bg-transparent"
+          ? "py-2.5 bg-slate-950/80 backdrop-blur-md border-b-3 border-black"
+          : "py-3 bg-transparent"
       }`}
     >
       <div className="container mx-auto flex items-center justify-between px-6 max-w-7xl">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-gradient-to-br from-brand-orange to-brand-neon p-px group-hover:shadow-[0_0_20px_rgba(255,107,0,0.4)] transition-all">
-            <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-slate-950 border border-black">
-               <span className="font-outfit text-xl font-black text-brand-orange">U</span>
+        <Link href="/" className="group flex items-center gap-2">
+          <div className="relative h-8 w-8 overflow-hidden rounded-lg bg-gradient-to-br from-brand-orange to-brand-neon p-px group-hover:shadow-[0_0_15px_rgba(255,107,0,0.4)] transition-all">
+            <div className="flex h-full w-full items-center justify-center rounded-[7px] bg-slate-950 border border-black">
+               <span className="font-outfit text-sm font-black text-brand-orange">U</span>
             </div>
           </div>
-          <span className="font-outfit text-2xl font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">
+          <span className="font-outfit text-base font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">
             UniGame
           </span>
         </Link>
@@ -118,9 +118,9 @@ export function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden h-10 w-10 flex items-center justify-center rounded-xl bg-slate-900/40 border-2 border-black text-slate-50 cursor-pointer shadow-[1.5px_1.5px_0px_#000000]"
+            className="lg:hidden h-8.5 w-8.5 flex items-center justify-center rounded-lg bg-slate-900/40 border-2 border-black text-slate-50 cursor-pointer shadow-[1.5px_1.5px_0px_#000000]"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>

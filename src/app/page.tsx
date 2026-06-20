@@ -1,5 +1,888 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useMemo, useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  Play,
+  Trophy,
+  Zap,
+  Globe,
+  Users,
+  ChevronRight,
+  Gamepad2,
+  Star,
+  Activity,
+  Timer,
+  Swords,
+  Medal,
+  Target,
+  ArrowUpRight,
+  Crown,
+  Bell,
+  CheckCircle2,
+  Users2,
+  Clock,
+  Flame,
+  Search,
+  User,
+  DoorOpen,
+  Send,
+  Terminal,
+  MessageSquare
+} from "lucide-react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { Navbar } from "@/components/common/navbar";
+import { Footer } from "@/components/common/footer";
+import { Button } from "@/components/ui/button";
+import {
+  LEADERBOARD_DATA,
+  PLATFORM_GAMES,
+  PLATFORM_METRICS,
+  ROOMS_AVAILABLE,
+  ONLINE_SQUAD,
+  GLOBAL_CHAT_SEED,
+} from "@/data/platform";
+
+/* ── REUSABLE ANIMATED COMPONENTS ── */
+
+function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (!inView) return;
+    const num = parseFloat(target.replace(/[^0-9.]/g, ""));
+    const isDecimal = target.includes(".");
+    const duration = 2000;
+    const steps = 60;
+    const increment = num / steps;
+    let current = 0;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      current = Math.min(current + increment, num);
+      if (isDecimal) {
+        setDisplay(current.toFixed(1));
+      } else {
+        setDisplay(Math.round(current).toString());
+      }
+      if (step >= steps) clearInterval(timer);
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [inView, target]);
+
+  const unit = target.replace(/[0-9.]/g, "");
+
+  return (
+    <span ref={ref} className="font-space">
+      {display}
+      {unit}
+      {suffix}
+    </span>
+  );
+}
+
+function SectionHeading({ kicker, title, center = false, description }: { kicker: string; title: string; center?: boolean; description?: string }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+
+  return (
+    <div ref={ref} className={`mb-5 ${center ? "text-center" : ""}`}>
+      <motion.span
+        initial={{ opacity: 0, y: 10 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        className="kicker mb-1.5 text-[9px]"
+      >
+        {kicker}
+      </motion.span>
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.1 }}
+        className="text-xl md:text-2xl font-black mb-2 tracking-tighter uppercase"
+      >
+        {title}
+      </motion.h2>
+      {description && (
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.2 }}
+          className="text-slate-455 text-[11px] md:text-xs max-w-xl mx-auto font-medium"
+        >
+          {description}
+        </motion.p>
+      )}
+    </div>
+  );
+}
 
 export default function RootPage() {
-  redirect("/games");
+  const router = useRouter();
+
+  const [activeChannel, setActiveChannel] = useState("global");
+  const [chatFeeds, setChatFeeds] = useState<{ [key: string]: Array<{ id: string; sender: string; text: string; time: string }> }>({
+    global: GLOBAL_CHAT_SEED,
+    VARSHITH: [
+      { id: "v1", sender: "VARSHITH", text: "Hey bro! Ready to play Tic-Tac-Toe? I am waiting in lobby TIC881.", time: "19:35" },
+      { id: "v2", sender: "You", text: "Just finalizing the operational setup, will join in 2 minutes!", time: "19:37" },
+      { id: "v3", sender: "VARSHITH", text: "Awesome! Let me know when you hit ready.", time: "19:38" },
+    ],
+    NOVA: [
+      { id: "n1", sender: "NOVA", text: "Is the new leaderboard updated? I want to see if I made the top 3 weekly.", time: "19:40" },
+      { id: "n2", sender: "You", text: "Yes, looks like you are Rank #3 right below Boardking!", time: "19:41" },
+    ],
+    BOARDKING: [
+      { id: "b1", sender: "BOARDKING", text: "Yo, I need one more player for a Chess lobby. You up?", time: "19:42" },
+    ],
+    LUNA: [
+      { id: "l1", sender: "LUNA", text: "GG on the match earlier! Your strategy was amazing.", time: "19:30" },
+      { id: "l2", sender: "You", text: "Thanks LUNA! That was a close game. Let's run a rematch soon.", time: "19:32" },
+    ]
+  });
+
+  const tickerEvents = useMemo(() => [
+    "NIGHT BLITZ ROOM IS OPEN — CHESS ARENA · MUMBAI",
+    "NOVA CREATED LOBBY TIC442 — TIC-TAC-TOE · SINGAPORE",
+    "BOARDKING LAUNCHED PRIVATE ARENA LDO777 — LDO RUSH · MUMBAI",
+    "LUNA ACQUIRED WEEKLY LEADERBOARD DIVISION #4 — TIC-TAC-TOE",
+    "GARRY JOINED ACTIVE ROOM CHS901 — CHESS ARENA · MUMBAI",
+  ], []);
+
+  const [currentEventIdx, setCurrentEventIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentEventIdx((prev) => (prev + 1) % tickerEvents.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [tickerEvents]);
+
+  const [chatText, setChatText] = useState("");
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  const currentMessages = useMemo(() => {
+    return chatFeeds[activeChannel] || [];
+  }, [chatFeeds, activeChannel]);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [currentMessages]);
+
+  const handleChatSend = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!chatText.trim()) return;
+
+    const newMessage = {
+      id: `${Date.now()}`,
+      sender: "You",
+      text: chatText.trim(),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setChatFeeds((prev) => ({
+      ...prev,
+      [activeChannel]: [...(prev[activeChannel] || []), newMessage]
+    }));
+    setChatText("");
+  };
+
+  return (
+    <div className="bg-transparent text-slate-50 min-h-screen">
+      <Navbar />
+
+      <main suppressHydrationWarning>
+        {/* ── 1. READY TO DOMINATE? (HERO) ── */}
+        <section className="relative min-h-[38vh] md:min-h-[44vh] py-6 md:py-8 flex items-center justify-center pt-14 overflow-hidden">
+          {/* Hero Background */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="/images/hero.png" 
+              alt="Gaming Background" 
+              className="w-full h-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/80 to-slate-950" />
+          </div>
+
+          {/* Floating 2D Cartoon Game Decors */}
+          <motion.div 
+            animate={{ y: [0, -8, 0], rotate: [0, 2, -2, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-[12%] md:left-[18%] top-1/3 w-10 h-10 md:w-14 md:h-14 z-10 pointer-events-none opacity-[0.05] md:opacity-[0.07]"
+          >
+            <img src="/images/cartoon_gamepad.png" alt="Gamepad Deco" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
+          </motion.div>
+          <motion.div 
+            animate={{ y: [0, 8, 0], rotate: [0, -2, 2, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute right-[12%] md:right-[18%] bottom-1/3 w-10 h-10 md:w-14 md:h-14 z-10 pointer-events-none opacity-[0.05] md:opacity-[0.07]"
+          >
+            <img src="/images/cartoon_shield.png" alt="Shield Deco" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
+          </motion.div>
+
+          <div className="container mx-auto px-6 relative z-10 max-w-7xl">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h1 className="text-3xl md:text-4xl font-black mb-2.5 leading-[0.9] tracking-tighter uppercase">
+                  READY TO <br />
+                  <span className="gradient-text">DOMINATE?</span>
+                </h1>
+
+                <p className="text-[11px] md:text-xs text-slate-450 mb-4 max-w-xl mx-auto font-medium leading-relaxed">
+                  The arena is live, the stakes have never been higher. 
+                  Your global legacy starts with a single decisive move.
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Link href="/rooms/create">
+                    <Button className="btn-gaming h-10 px-6 rounded-lg text-xs shadow-neon-orange">
+                      Start Playing
+                    </Button>
+                  </Link>
+                  <Link href="/rooms">
+                    <Button variant="outline" className="h-10 px-6 rounded-lg border-2 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 transition-all text-xs backdrop-blur-md shadow-[2px_2px_0px_#000]">
+                      Explore Lobbies
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 1.5. LIVE EVENT TICKER MARQUEE ── */}
+        <section className="relative overflow-hidden py-2 bg-slate-950/20 border-y-2 border-black">
+          <div className="container mx-auto px-6 max-w-7xl">
+            {/* The Outer Bar */}
+            <div className="glass py-1.5 px-3 rounded-lg flex items-center gap-2.5 bg-slate-950/80 relative overflow-hidden">
+              
+              {/* LIVE indicator badge */}
+              <div className="flex-shrink-0 flex items-center gap-1 rounded-md border border-brand-orange/45 bg-brand-orange/10 px-1.5 py-0.5 select-none">
+                <span className="h-1 w-1 rounded-full bg-brand-orange animate-pulse" />
+                <span className="font-space text-[7px] font-black uppercase tracking-wider text-brand-orange">LIVE</span>
+              </div>
+
+              {/* Lightning icon */}
+              <Zap className="w-3.5 h-3.5 text-brand-orange fill-current animate-pulse flex-shrink-0" />
+
+              {/* Ticker alert text */}
+              <div className="flex-1 overflow-hidden relative h-4 flex items-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentEventIdx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.35 }}
+                    className="font-space text-[8.5px] font-black uppercase tracking-[0.12em] text-slate-300 truncate"
+                  >
+                    {tickerEvents[currentEventIdx]}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* ── 2. TACTICAL ACTIONS ── */}
+        <section className="py-8 md:py-10 bg-slate-950/30 border-b-2 border-black">
+           <div className="container mx-auto px-6 max-w-7xl">
+              <SectionHeading 
+                center 
+                kicker="Briefing" 
+                title="Tactical Onboarding" 
+                description="Enter the UniGame ecosystem in under 60 seconds with our high-performance integration process." 
+              />
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 {[
+                   { 
+                     icon: User, 
+                     title: "Create Profile", 
+                     desc: "Build your unique gamer profile, customize your identity, and track your persistent stats.",
+                     href: "/profile" 
+                   },
+                   { 
+                     icon: DoorOpen, 
+                     title: "Join Rooms", 
+                     desc: "Browse the live lobby directory, scan active battle sectors, or sync via room code.",
+                     href: "/rooms" 
+                   },
+                   { 
+                     icon: Gamepad2, 
+                     title: "Create Rooms", 
+                     desc: "Deploy custom lobbies, configure arena parameters, and authorize friends to join.",
+                     href: "/rooms/create" 
+                   }
+                 ].map((step, i) => (
+                   <motion.div 
+                     key={i}
+                     initial={{ opacity: 0, y: 15 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     transition={{ delay: i * 0.08 }}
+                     className="glass p-3.5 transition-all text-center group cursor-pointer border-2"
+                   >
+                     <Link href={step.href}>
+                       <div>
+                          <div className="w-9 h-9 rounded-lg bg-brand-orange/10 flex items-center justify-center mx-auto mb-2.5 border border-brand-orange/20 group-hover:scale-105 group-hover:bg-brand-orange transition-all duration-300 shadow-orange/10">
+                             <step.icon className="w-4 h-4 text-brand-orange group-hover:text-slate-950 transition-colors" />
+                          </div>
+                          <h3 className="text-sm font-black mb-1 uppercase tracking-tight">{step.title}</h3>
+                          <p className="text-[10px] text-slate-500 font-bold leading-relaxed">{step.desc}</p>
+                       </div>
+                     </Link>
+                   </motion.div>
+                 ))}
+              </div>
+           </div>
+        </section>
+
+        {/* ── 3. COMMUNICATION UPLINK (CHAT & SQUAD) ── */}
+        <section className="py-8 md:py-10 bg-slate-950/30 border-b-2 border-black relative overflow-hidden" id="chat">
+          {/* Floating 2D Cartoon Game Decors */}
+          <motion.div 
+            animate={{ rotate: [0, 3, -3, 0], y: [0, -6, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute right-4 md:right-24 top-6 w-10 h-10 md:w-14 md:h-14 z-0 pointer-events-none opacity-[0.05] md:opacity-[0.07]"
+          >
+            <img src="/images/cartoon_trophy.png" alt="Trophy Deco" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
+          </motion.div>
+
+           <div className="container mx-auto px-6 max-w-7xl relative z-10">
+             <div className="flex flex-col md:flex-row md:items-end justify-between mb-4.5 gap-4">
+                 <div className="max-w-2xl">
+                    <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
+                       <Terminal className="w-3 h-3" /> {activeChannel === "global" ? "Global Comms" : "Direct Comms"}
+                    </span>
+                    <h2 className="text-2xl md:text-3xl font-black mb-1.5 tracking-tighter uppercase leading-[0.9]">
+                       {activeChannel === "global" ? (
+                          <>COMMUNICATION <span className="gradient-text">UPLINK</span></>
+                        ) : (
+                          <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
+                        )}
+                    </h2>
+                    <p className="text-[11px] text-slate-455 font-medium">
+                       {activeChannel === "global" 
+                         ? "Coordinate tactical maneuvers, share access keys, and maintain synchronization with the global squad in real-time."
+                         : `Secure point-to-point connection established with operator ${activeChannel}.`}
+                    </p>
+                 </div>
+                 <div className="flex bg-slate-900/40 border-2 border-black rounded-lg p-1.5 items-center gap-3 shadow-[2px_2px_0px_#000000]">
+                    <div className="flex items-center gap-1">
+                       <span className="h-1 w-1 rounded-full bg-success animate-pulse" />
+                       <span className="text-[7.5px] font-black uppercase tracking-widest text-success">Node Online</span>
+                    </div>
+                    <div className="h-4 w-[1px] bg-slate-800" />
+                    <div className="flex items-center gap-1">
+                       <Users className="w-3 h-3 text-brand-orange" />
+                       <span className="text-xs font-space font-black text-slate-50">482</span>
+                    </div>
+                 </div>
+             </div>
+
+             <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
+               {/* Active Members Sidebar */}
+               <aside className="space-y-4">
+                  <div className="glass p-3 border-2 rounded-xl">
+                     <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50">Active Squad</h4>
+                        <Activity className="w-3 h-3 text-brand-orange animate-pulse" />
+                     </div>
+                     
+                     <div className="space-y-2 max-h-[180px] overflow-y-auto scrollbar-hide pr-1">
+                        {/* Global Lobby Chat */}
+                        <div 
+                          onClick={() => setActiveChannel("global")}
+                          className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
+                            activeChannel === "global" 
+                              ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
+                              : "border-black bg-slate-900/40 hover:bg-slate-900/80"
+                          }`}
+                        >
+                           <div className="flex items-center gap-2">
+                              <div className={`h-6 w-6 rounded-md flex items-center justify-center font-black text-[9px] shadow-[1px_1px_0px_#000] relative transition-all ${
+                                activeChannel === "global" ? "bg-brand-orange text-slate-950" : "bg-slate-950 border border-black text-brand-orange"
+                              }`}>
+                                 G
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                 <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
+                                   activeChannel === "global" ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
+                                 }`}>Global Comms</p>
+                                 <p className="text-[6.5px] font-black text-slate-500 uppercase tracking-widest truncate">Public Lobby Chat</p>
+                              </div>
+                              <Globe className={`w-2.5 h-2.5 ${activeChannel === "global" ? "text-brand-orange animate-pulse" : "text-slate-500"}`} />
+                           </div>
+                        </div>
+
+                        {ONLINE_SQUAD.map((member) => {
+                          const isSelected = activeChannel === member.name;
+                          return (
+                            <div 
+                              key={member.id} 
+                              onClick={() => setActiveChannel(member.name)}
+                              className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
+                                isSelected 
+                                  ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
+                                  : "border-black bg-slate-900/40 hover:bg-slate-900/80"
+                              }`}
+                            >
+                               <div className="flex items-center gap-2">
+                                  <div className="h-6 w-6 rounded-full bg-slate-950 border border-black flex items-center justify-center font-black text-[9px] text-slate-500 shadow-[1px_1px_0px_#000] relative">
+                                     {member.name.charAt(0)}
+                                     <span className="absolute bottom-0 right-0 h-1 w-1 bg-success rounded-full border border-black" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                     <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
+                                       isSelected ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
+                                     }`}>{member.name}</p>
+                                     <p className="text-[6.5px] font-black text-slate-500 uppercase tracking-widest truncate">{member.activity}</p>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                     <Zap className={`w-2.5 h-2.5 ${isSelected ? "text-brand-orange" : "text-slate-700"}`} />
+                                  </div>
+                               </div>
+                            </div>
+                          );
+                        })}
+                     </div>
+                  </div>
+               </aside>
+
+               {/* Chat Node */}
+               <section className="glass overflow-hidden flex flex-col h-[260px] relative border-2 rounded-xl">
+                  {/* Chat Background Decor */}
+                  <div className="absolute inset-0 opacity-5 pointer-events-none">
+                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-full bg-mesh rotate-12" />
+                  </div>
+
+                  {/* Messages Area */}
+                  <div 
+                    ref={chatScrollRef}
+                    className="flex-1 p-2.5 md:p-3 overflow-y-auto scrollbar-hide space-y-2 relative z-10"
+                  >
+                     <AnimatePresence initial={false}>
+                        {currentMessages.length > 0 ? (
+                           currentMessages.map((message, i) => (
+                              <motion.div 
+                                key={message.id}
+                                initial={{ opacity: 0, x: message.sender === 'You' ? 15 : -15 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className={`flex flex-col ${message.sender === 'You' ? 'items-end' : 'items-start'}`}
+                              >
+                                 <div className="flex items-center gap-1 mb-0.5">
+                                    <span className={`text-[8.5px] font-black uppercase tracking-widest ${message.sender === 'You' ? 'text-brand-orange' : 'text-slate-500'}`}>
+                                       {message.sender}
+                                    </span>
+                                    <span className="text-[6.5px] font-black text-slate-500 tracking-[0.2em]">{message.time}</span>
+                                 </div>
+                                 <div className="relative">
+                                    <div className={`max-w-[85%] p-2 py-1.5 rounded-lg border-2 transition-all duration-300 relative ${
+                                      message.sender === 'You' 
+                                        ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-slate-555 shadow-[1.5px_1.5px_0px_#000]' 
+                                        : 'bg-slate-900/60 border-black rounded-tl-none text-slate-350 shadow-[1.5px_1.5px_0px_#000]'
+                                    }`}>
+                                       <p className="text-[11px] font-medium leading-relaxed">{message.text}</p>
+                                    </div>
+                                    {/* Comic Speech Bubble Tail */}
+                                    {message.sender === 'You' ? (
+                                      <div className="absolute top-[2px] right-[-3px] w-2 h-2 border-r-2 border-t-2 border-black rotate-[45deg] z-10" style={{ backgroundColor: '#2f2010' }} />
+                                    ) : (
+                                      <div className="absolute top-[2px] left-[-3px] w-2 h-2 bg-slate-900 border-l-2 border-t-2 border-black rotate-[-45deg] z-10" />
+                                    )}
+                                 </div>
+                              </motion.div>
+                           ))
+                        ) : (
+                           <div className="h-full flex items-center justify-center text-slate-500 text-[10px] font-bold uppercase tracking-widest select-none">
+                              No messages in direct channel
+                           </div>
+                        )}
+                     </AnimatePresence>
+                  </div>
+
+                  {/* Input Area */}
+                  <div className="p-2 md:p-3 bg-slate-900/20 border-t-2 border-black relative z-20 backdrop-blur-xl">
+                     <form onSubmit={handleChatSend} className="flex flex-col sm:flex-row gap-2">
+                        <div className="relative flex-1">
+                           <MessageSquare className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-550" />
+                           <input 
+                             value={chatText}
+                             onChange={(e) => setChatText(e.target.value)}
+                             type="text" 
+                             placeholder={activeChannel === "global" ? "INPUT TRANSMISSION..." : `SEND MESSAGE TO ${activeChannel}...`}
+                             className="w-full h-8.5 bg-slate-900 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-555 focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
+                           />
+                        </div>
+                        <Button type="submit" className="btn-gaming h-8.5 px-4 rounded-lg text-[10px]">
+                           Transmit
+                        </Button>
+                     </form>
+                  </div>
+               </section>
+             </div>
+           </div>
+        </section>
+
+        {/* ── 4. QUICK RUSH ── */}
+        <section className="relative overflow-hidden py-3">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1/2 bg-brand-orange/5 blur-[120px] -rotate-12" />
+          
+          <div className="container mx-auto px-6 max-w-7xl relative z-10">
+            <div className="panel p-0.5 border-2 rounded-xl">
+              <div className="bg-slate-950/40 rounded-[0.8rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-1">
+                  <span className="kicker mb-2 border-brand-orange bg-brand-orange/10 text-brand-orange text-[9px]">Turbo Matchmaking</span>
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-[0.9] tracking-tighter uppercase">
+                    INSTANT <span className="gradient-text">QUICK RUSH</span>
+                  </h2>
+                  <p className="text-[11px] text-slate-455 mb-4 font-medium leading-relaxed max-w-sm">
+                    Zero waiting. Zero lag. Our proprietary rush engine matches you with players 
+                    at your exact skill level in under 5 seconds. Ready?
+                  </p>
+                  <Button className="btn-gaming h-10 px-6 rounded-lg text-xs shadow-neon-orange">
+                    Start Quick Rush
+                  </Button>
+                </div>
+
+                <div className="flex-1 relative">
+                  <div className="relative w-36 h-36 md:w-44 md:h-44 mx-auto">
+                    {/* Animated Timer Graphic */}
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 rounded-full border border-dashed border-brand-orange/40" 
+                    />
+                    <motion.div 
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-2.5 rounded-full border border-dashed border-slate-850" 
+                    />
+                    <div className="absolute inset-5 rounded-full glass border-2 flex flex-col items-center justify-center text-center">
+                      <Timer className="w-6 h-6 text-brand-orange mb-1.5 animate-pulse" />
+                      <span className="text-3xl font-space font-black tracking-tighter text-slate-50">04.2s</span>
+                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Avg Match Wait</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. ROOMS AVAILABLE ── */}
+        <section className="py-8 md:py-10" id="rooms">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              
+              {/* Left Column: LIVE ROOM LIST */}
+              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 rounded-xl">
+                <div className="flex items-center justify-between mb-4.5">
+                  <div>
+                    <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
+                      <Clock className="w-3 h-3" /> Rooms Available
+                    </span>
+                    <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">Live Rooms</h2>
+                  </div>
+                  <Link href="/rooms">
+                    <Button variant="outline" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest border-2 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 rounded-lg shadow-[1.5px_1.5px_0px_#000]">
+                      Browse All
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="space-y-3.5 flex-1">
+                  {[
+                    {
+                      id: "room-mock-1",
+                      name: "NIGHT BLITZ",
+                      code: "CHS901",
+                      gameName: "Chess Arena",
+                      currentPlayers: 1,
+                      maxPlayers: 2,
+                      region: "Mumbai",
+                      note: "Quick ranked match. Join if you want a fast duel.",
+                      status: "open",
+                      isPrivate: false,
+                    },
+                    {
+                      id: "room-mock-2",
+                      name: "QUICK WARMUP",
+                      code: "TIC442",
+                      gameName: "Tic-Tac-Toe",
+                      currentPlayers: 2,
+                      maxPlayers: 2,
+                      region: "Singapore",
+                      note: "Fast rematches and short rounds.",
+                      status: "live",
+                      isPrivate: false,
+                    },
+                    {
+                      id: "room-mock-3",
+                      name: "FRIENDS TABLE",
+                      code: "LDO777",
+                      gameName: "Ludo Rush",
+                      currentPlayers: 3,
+                      maxPlayers: 4,
+                      region: "Mumbai",
+                      note: "Private room. Use passcode 1234 for the demo preview.",
+                      status: "open",
+                      isPrivate: true,
+                    },
+                    {
+                      id: "room-mock-4",
+                      name: "WEEKEND CASUAL",
+                      code: "SNK220",
+                      gameName: "Snakes and Ladders",
+                      currentPlayers: 6,
+                      maxPlayers: 6,
+                      region: "Dubai",
+                      note: "Full room. Good example of a packed casual lobby.",
+                      status: "full",
+                      isPrivate: false,
+                    }
+                  ].map((room, i) => (
+                    <div 
+                      key={room.id}
+                      className="p-3 bg-slate-900/40 rounded-xl border-2 border-black hover:border-brand-orange/45 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group shadow-[1.5px_1.5px_0px_#000000]"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                          <h3 className="text-sm font-black tracking-tight text-slate-50">{room.name}</h3>
+                          <span className="text-[7.5px] bg-slate-950 border-2 border-black px-1.5 py-0.5 rounded text-slate-400 font-bold uppercase shadow-[1px_1px_0px_#000]">{room.code}</span>
+                          {room.isPrivate && (
+                            <span className="text-[7px] bg-danger/10 border border-black text-danger px-1 py-0.5 rounded font-black flex items-center gap-0.5 shadow-[1px_1px_0px_#000]">
+                              <span className="w-1.5 h-1.5 bg-danger rounded-full" /> Private
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[9px] text-slate-455 font-bold uppercase tracking-wider mb-1">
+                          {room.gameName} · {room.currentPlayers}/{room.maxPlayers} Players · {room.region}
+                        </p>
+                        <p className="text-[8px] text-slate-500 font-semibold line-clamp-1 group-hover:text-brand-orange transition-colors">
+                          {room.note}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 justify-end sm:justify-start">
+                        {room.status === "open" && (
+                          <span className="text-[7.5px] font-black text-success uppercase tracking-widest border-2 border-black px-1.5 py-0.5 rounded bg-success/5 shadow-[1px_1px_0px_#000]">
+                            Open
+                          </span>
+                        )}
+                        {room.status === "live" && (
+                          <span className="text-[7.5px] font-black text-brand-orange uppercase tracking-widest border-2 border-black px-1.5 py-0.5 rounded bg-brand-orange/5 shadow-[1px_1px_0px_#000]">
+                            Live
+                          </span>
+                        )}
+                        {room.status === "full" && (
+                          <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest border-2 border-black px-1.5 py-0.5 rounded bg-slate-955 shadow-[1px_1px_0px_#000]">
+                            Full
+                          </span>
+                        )}
+
+                        <Link href={`/rooms/${room.code}`}>
+                          <Button className="btn-gaming h-7.5 px-3 rounded-md font-black uppercase text-[9px]">
+                            {room.status === "full" ? "View" : "Join"}
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: SLEEK BATTLE LOOP */}
+              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 rounded-xl">
+                <div className="mb-4.5">
+                  <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
+                    <Target className="w-3 h-3" /> How it Works
+                  </span>
+                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">Battle Loop</h2>
+                </div>
+
+                <div className="space-y-3.5 flex-1 flex flex-col justify-between">
+                  {[
+                    {
+                      step: "01",
+                      title: "CHOOSE YOUR BATTLE",
+                      desc: "Select from classic strategy board games fully redesigned with a cybernetic aesthetic.",
+                      icon: Swords,
+                    },
+                    {
+                      step: "02",
+                      title: "SYNC INTO LOBBIES",
+                      desc: "Connect using room codes, join active open rooms, or launch your own passcode-secured lobby.",
+                      icon: DoorOpen,
+                    },
+                    {
+                      step: "03",
+                      title: "CLAIM YOUR RANK",
+                      desc: "Conquer opponents, earn XP, and secure your place on the global leaderboard.",
+                      icon: Trophy,
+                    }
+                  ].map((step, idx) => (
+                    <div 
+                      key={idx}
+                      className="p-3.5 bg-slate-900/40 rounded-xl border-2 border-black hover:border-brand-orange/15 transition-all flex items-start gap-3.5 shadow-[1.5px_1.5px_0px_#000000]"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-brand-orange/10 border-2 border-black flex items-center justify-center text-brand-orange flex-shrink-0">
+                        <step.icon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-[10px] font-black text-brand-orange uppercase tracking-widest mb-1">
+                          {step.step} {step.title}
+                        </h3>
+                        <p className="text-[10px] text-slate-455 font-bold leading-relaxed">
+                          {step.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* ── 6. LEVEL UP YOUR GAMING LEGACY ── */}
+        <section className="py-8 md:py-10">
+           <div className="container mx-auto px-6 max-w-7xl">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                className="relative h-[280px] rounded-2xl overflow-hidden border-2 border-black shadow-[3.5px_3.5px_0px_#000000] group"
+              >
+                 <img src="/images/hero.png" alt="Gaming Legacy" className="absolute inset-0 w-full h-full object-cover grayscale opacity-[0.03] group-hover:opacity-[0.06] transition-all duration-[4000ms]" />
+                 <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-950/95 to-slate-950" />
+
+                 {/* Floating 2D Cartoon Game Decors */}
+                 <motion.div 
+                   animate={{ y: [0, -6, 0], rotate: [0, 2, -2, 0] }}
+                   transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                   className="absolute left-6 top-6 w-12 h-12 pointer-events-none opacity-[0.05] group-hover:opacity-[0.08] transition-opacity"
+                 >
+                   <img src="/images/cartoon_gamepad.png" alt="Gamepad Deco" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
+                 </motion.div>
+                 <motion.div 
+                   animate={{ y: [0, 6, 0], rotate: [0, -2, 2, 0] }}
+                   transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+                   className="absolute right-6 bottom-6 w-12 h-12 pointer-events-none opacity-[0.05] group-hover:opacity-[0.08] transition-opacity"
+                 >
+                   <img src="/images/cartoon_shield.png" alt="Shield Deco" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
+                 </motion.div>
+                 
+                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 md:p-6">
+                    <div className="flex justify-center mb-3">
+                       <span className="px-2.5 py-0.5 rounded-full glass-orange text-brand-orange border-2 border-black font-black text-[8.5px] uppercase tracking-[0.2em] flex items-center gap-1">
+                          <Flame className="w-2.5 h-2.5" /> The Ultimate Gaming Arena
+                       </span>
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-black mb-3 leading-[0.9] tracking-tighter uppercase">
+                       LEVEL UP YOUR <br />
+                       <span className="gradient-text">GAMING LEGACY</span>
+                    </h2>
+                    <p className="text-[11.5px] md:text-xs text-slate-455 mb-4 max-w-xl mx-auto font-medium leading-relaxed">
+                       Join the premier destination for competitive strategy and pulse-pounding rewards. 
+                       Real-time rooms, exclusive tournaments, and an elite community waiting for you.
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-3">
+                       <Link href="/rooms/create">
+                          <Button className="btn-gaming h-9.5 px-6 rounded-lg text-xs shadow-neon-orange">
+                             Start Playing
+                          </Button>
+                       </Link>
+                    </div>
+                 </div>
+              </motion.div>
+           </div>
+        </section>
+
+        {/* ── 7. GLOBAL LEADERBOARD ── */}
+        <section className="py-8 md:py-10 bg-mesh" id="leaderboard">
+           <div className="container mx-auto px-6 max-w-7xl">
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-4">
+                <SectionHeading kicker="Rankings" title="Leaderboard" description="The definitive record of strategic dominance. Earn XP in match rooms to ascend." />
+                <Link href="/leaderboards">
+                  <Button variant="outline" className="h-8 px-4 rounded-lg border-2 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 font-black uppercase text-[8.5px] tracking-widest shadow-[1.5px_1.5px_0px_#000]">
+                    View Full Standings
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                 {/* Pavilion / Top Rank */}
+                 <motion.div 
+                   whileHover={{ scale: 1.01 }}
+                   className="lg:col-span-2 relative h-[280px] overflow-hidden glass border-2 rounded-xl"
+                 >
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-950/90 to-slate-950" />
+                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                       <span className="px-2.5 py-0.5 rounded-full bg-brand-orange text-slate-950 border border-black font-black text-[8px] uppercase tracking-[0.2em] w-fit mb-3">CURRENT CHAMPION</span>
+                       <div className="flex items-center gap-3.5 mb-3">
+                          <div className="h-12 w-12 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center text-xl font-black text-brand-orange shadow-[2px_2px_0px_#000]">
+                             {LEADERBOARD_DATA.weekly[0].name.charAt(0)}
+                          </div>
+                          <div>
+                             <h3 className="text-2xl md:text-3.5xl font-black uppercase tracking-tighter leading-[0.85] text-slate-50">{LEADERBOARD_DATA.weekly[0].name}</h3>
+                             <p className="text-[11px] font-space font-black text-brand-orange mt-1 uppercase tracking-widest">LVL 99 • {LEADERBOARD_DATA.weekly[0].favorite} Specialist</p>
+                          </div>
+                       </div>
+                       <div className="flex items-center gap-8 text-slate-50 font-black text-[9px] uppercase tracking-[0.15em]">
+                          <div className="flex flex-col gap-0.5">
+                             <span className="text-slate-500">Season XP</span>
+                             <span className="text-lg md:text-xl font-space text-brand-orange">{LEADERBOARD_DATA.weekly[0].xp}</span>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                             <span className="text-slate-500">Win Rate</span>
+                             <span className="text-lg md:text-xl font-space uppercase">94.2%</span>
+                          </div>
+                       </div>
+                    </div>
+                 </motion.div>
+
+                 {/* Top Challengers */}
+                 <div className="flex flex-col gap-3">
+                    {LEADERBOARD_DATA.weekly.slice(1, 4).map((player, i) => (
+                      <div key={i} className="panel p-3 border-2 rounded-xl hover:bg-slate-900/10 transition-all flex flex-col justify-between group shadow-[2px_2px_0px_#000]">
+                         <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2.5">
+                               <div className="h-6.5 w-6.5 rounded-full bg-slate-900 border border-black flex items-center justify-center font-black text-[10px] text-slate-500 shadow-[1px_1px_0px_#000]">
+                                  {player.name.charAt(0)}
+                               </div>
+                               <div>
+                                  <h4 className="text-sm font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">{player.name}</h4>
+                                  <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Rank #{i + 2}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                               <p className="text-sm font-space font-black text-brand-orange leading-none">{player.xp}</p>
+                               <p className="text-[6.5px] font-black text-slate-500 uppercase">XP</p>
+                            </div>
+                         </div>
+                         <div className="h-1.5 w-full bg-slate-950 border border-black rounded-full overflow-hidden shadow-[0.5px_0.5px_0px_#000]">
+                            <div className="h-full bg-slate-800 group-hover:bg-brand-orange transition-colors" style={{ width: `${85 - i * 15}%` }} />
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+           </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }

@@ -281,16 +281,16 @@ export default function ProfilePage() {
         <img src="/images/cartoon_trophy.png" alt="Trophy" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
       </motion.div>
 
-      <main suppressHydrationWarning className="pt-32 pb-20 px-6 container mx-auto max-w-7xl relative z-10">
-        <div className="grid gap-8 lg:grid-cols-3">
+      <main suppressHydrationWarning className="pt-20 pb-12 px-5 container mx-auto max-w-6xl relative z-10">
+        <div className="grid gap-4 lg:grid-cols-3">
           
           {/* ── LEFT COLUMN: PROFILE CARD & SUB-TABS ── */}
-          <div className="space-y-6 lg:col-span-1">
+          <div className="space-y-3 lg:col-span-1">
             {/* PROFILE CARD */}
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass p-6 rounded-3xl border-2 border-black shadow-card flex flex-col items-center text-center relative overflow-hidden bg-white/2"
+              className="glass p-4 rounded-2xl border-2 border-black shadow-card flex flex-col items-center text-center relative overflow-hidden bg-white/2"
             >
               {/* Role badge */}
               <span className="absolute top-4 right-4 px-2.5 py-1 rounded-lg border-2 border-black text-[8px] font-black uppercase tracking-wider bg-brand-orange text-slate-950 shadow-[1.5px_1.5px_0px_#000]">
@@ -298,94 +298,108 @@ export default function ProfilePage() {
               </span>
 
               {/* Dynamic Gradient Avatar */}
-              <div className={`w-24 h-24 flex-shrink-0 aspect-square rounded-full bg-gradient-to-tr ${currentPreset.gradients} border-4 border-black flex items-center justify-center font-space text-4xl font-black ${currentPreset.textColor} shadow-[4px_4px_0px_#000] relative mb-6 mt-4 transition-all duration-300`}>
+              <div className={`w-16 h-16 flex-shrink-0 aspect-square rounded-full bg-gradient-to-tr ${currentPreset.gradients} border-3 border-black flex items-center justify-center font-space text-2xl font-black ${currentPreset.textColor} shadow-[3px_3px_0px_#000] relative mb-4 mt-2 transition-all duration-300`}>
                 {user.username.slice(0, 2).toUpperCase()}
-                <span className="absolute bottom-1 right-1 h-5 w-5 bg-success rounded-full border-4 border-black animate-pulse" />
+                <span className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 bg-success rounded-full border-2 border-black animate-pulse" />
               </div>
 
               {/* Preset Avatar Selector when editing */}
               {isEditingProfile && (
-                <div className="w-full mb-4">
-                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Preset Cosmetics</p>
-                  <div className="flex gap-2 justify-center flex-wrap">
-                    {AVATAR_PRESETS.map(preset => (
-                      <button
-                        key={preset.id}
-                        onClick={() => setSelectedAvatarPreset(preset.id)}
-                        className={`w-7 h-7 rounded-full bg-gradient-to-tr ${preset.gradients} border-2 transition-all ${selectedAvatarPreset === preset.id ? "border-white scale-110 shadow-md" : "border-black hover:scale-105"}`}
-                        title={preset.name}
-                      />
-                    ))}
+                <div className="w-full mb-4 p-3 border-2 border-black bg-slate-900/60 rounded-xl shadow-[inset_2px_2px_0px_rgba(0,0,0,0.3)]">
+                  <p className="text-[8px] font-black text-brand-orange uppercase tracking-widest mb-3 select-none">SELECT GAME CARTRIDGE SKIN</p>
+                  <div className="flex gap-3 justify-center flex-wrap">
+                    {AVATAR_PRESETS.map(preset => {
+                      const isSelected = selectedAvatarPreset === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          onClick={() => setSelectedAvatarPreset(preset.id)}
+                          className={`w-10 h-12 flex flex-col justify-between p-1 rounded bg-slate-950 border-2 transition-all shadow-[2px_2px_0px_#000000] active:translate-y-px active:shadow-[1px_1px_0px_#000000] ${
+                            isSelected 
+                              ? "border-brand-orange scale-105 shadow-[3px_3px_0px_#000000]" 
+                              : "border-black hover:border-brand-orange/40"
+                          }`}
+                          title={preset.name}
+                        >
+                          {/* Cartridge top ridge notch */}
+                          <div className="w-full h-1 bg-slate-800 rounded-sm border border-black/40" />
+                          {/* Color label label sticker */}
+                          <div className={`w-full flex-1 rounded-sm bg-gradient-to-tr ${preset.gradients} border border-black flex items-center justify-center font-space text-[9px] font-black text-slate-950`}>
+                            {preset.id.toUpperCase()}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Editable Name & Bio */}
               {isEditingProfile ? (
-                <div className="w-full space-y-3 mb-4">
+                <div className="w-full space-y-2 mb-3">
                   <input
                     type="text"
                     value={tempUsername}
                     onChange={(e) => setTempUsername(e.target.value)}
-                    className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-3 text-center text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
+                    className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-center text-[10px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
                     placeholder="USERNAME"
                   />
                   <textarea
                     value={tempBio}
                     onChange={(e) => setTempBio(e.target.value)}
-                    className="w-full h-20 bg-slate-900 border-2 border-black rounded-xl p-3 text-center text-xs font-bold text-slate-400 focus:outline-none focus:border-brand-orange resize-none"
+                    className="w-full h-16 bg-slate-900 border-2 border-black rounded-lg p-2.5 text-center text-[10px] font-bold text-slate-400 focus:outline-none focus:border-brand-orange resize-none"
                     placeholder="Casually competitive..."
                   />
                   <div className="flex gap-2 justify-center">
-                    <Button onClick={handleSaveProfile} className="h-9 px-4 rounded-lg bg-brand-orange hover:bg-brand-dark text-slate-950 border-2 border-black font-black uppercase text-[9px] tracking-wider">
-                      <Save className="w-3.5 h-3.5 mr-1" /> Save
+                    <Button onClick={handleSaveProfile} className="h-8 px-3 rounded-lg bg-brand-orange hover:bg-brand-dark text-slate-950 border-2 border-black font-black uppercase text-[8px] tracking-wider">
+                      <Save className="w-3 h-3 mr-1" /> Save
                     </Button>
-                    <Button onClick={() => { setIsEditingProfile(false); setTempUsername(user.username); setTempBio(user.bio || ""); }} className="h-9 px-4 rounded-lg bg-slate-700 hover:bg-slate-650 text-white border-2 border-black font-black uppercase text-[9px] tracking-wider">
+                    <Button onClick={() => { setIsEditingProfile(false); setTempUsername(user.username); setTempBio(user.bio || ""); }} className="h-8 px-3 rounded-lg bg-slate-700 hover:bg-slate-650 text-white border-2 border-black font-black uppercase text-[8px] tracking-wider">
                       Cancel
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="w-full mb-6">
-                  <h2 className="text-2xl font-black uppercase tracking-tighter text-white mb-2 flex items-center justify-center gap-2">
+                <div className="w-full mb-4">
+                  <h2 className="text-lg font-black uppercase tracking-tighter text-white mb-1 flex items-center justify-center gap-2">
                     {user.username}
                     <button 
                       onClick={() => setIsEditingProfile(true)} 
                       className="text-slate-500 hover:text-brand-orange transition-colors"
                       title="Edit Profile"
                     >
-                      <Edit3 className="w-4 h-4" />
+                      <Edit3 className="w-3.5 h-3.5" />
                     </button>
                   </h2>
-                  <p className="text-[11px] font-bold text-slate-400 leading-relaxed max-w-xs mx-auto italic mb-4">
+                  <p className="text-[10px] font-bold text-slate-400 leading-relaxed max-w-xs mx-auto italic mb-3">
                     "{user.bio || "Casually competitive..."}"
                   </p>
                 </div>
               )}
 
               {/* Log out */}
-              <Button onClick={handleLogout} className="w-full h-11 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[10px] tracking-widest border-2 border-black rounded-xl transition-all">
-                <LogOut className="w-4 h-4 mr-2" /> Sever Terminal
+              <Button onClick={handleLogout} className="w-full h-9 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[9px] tracking-widest border-2 border-black rounded-lg transition-all">
+                <LogOut className="w-3.5 h-3.5 mr-1.5" /> Sever Terminal
               </Button>
             </motion.div>
 
             {/* APPEARANCE MODULES CARD */}
-            <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-              <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                <Eye className="w-4 h-4 text-brand-orange" /> Appearance Modules
+            <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+              <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
+                <Eye className="w-3.5 h-3.5 text-brand-orange" /> Appearance Modules
               </h4>
 
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Interface Theme Mode</span>
-                  <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-3">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Interface Theme Mode</span>
+                  <div className="grid grid-cols-3 gap-2">
                     {["dark", "light", "gaming"].map(thm => (
                       <button
                         key={thm}
                         onClick={() => updateAppearanceSettings({ theme: thm as any })}
-                        className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${appearanceSettings.theme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                        className={`h-9 rounded-lg text-[7px] font-black uppercase tracking-wider transition-all border-2 border-black ${appearanceSettings.theme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
                       >
-                        {thm} theme
+                        {thm}
                       </button>
                     ))}
                   </div>
@@ -409,26 +423,26 @@ export default function ProfilePage() {
             </div>
 
             {/* TAB SELECTOR */}
-            <div className="glass p-2 rounded-2xl border-2 border-black shadow-card flex flex-col gap-2 bg-white/2">
+            <div className="glass p-1.5 rounded-xl border-2 border-black shadow-card flex flex-col gap-1.5 bg-white/2">
               <button
                 onClick={() => setActiveTab("combat")}
-                className={`w-full h-11 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-4 ${activeTab === "combat" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                className={`w-full h-9 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-3 ${activeTab === "combat" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
               >
                 <span>Combat Files</span>
-                <Gamepad2 className="w-4 h-4" />
+                <Gamepad2 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`w-full h-11 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-4 ${activeTab === "settings" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                className={`w-full h-9 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-3 ${activeTab === "settings" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
               >
                 <span>Terminal Settings</span>
-                <Shield className="w-4 h-4" />
+                <Shield className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           {/* ── RIGHT COLUMN: DYNAMIC CONTENT PANELS ── */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-4 lg:col-span-2">
             
             {/* TAB 1: COMBAT FILES */}
             <AnimatePresence mode="wait">
@@ -441,26 +455,26 @@ export default function ProfilePage() {
                   className="space-y-6"
                 >
                   {/* LEVEL & RADAR CHART HEADER PANEL */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <div className="grid gap-6 md:grid-cols-5 items-center">
+                  <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+                    <div className="grid gap-4 md:grid-cols-5 items-center">
                       
                       {/* Left: Stats & Level Details */}
-                      <div className="md:col-span-3 space-y-4">
+                      <div className="md:col-span-3 space-y-3">
                         <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="px-2 py-0.5 bg-slate-950 border-2 border-black rounded text-[8px] font-black text-brand-orange tracking-widest leading-none">SECTOR LEVEL</span>
-                            <span className="text-xs font-space font-black text-slate-400">CLASS OPERATOR</span>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">SECTOR LEVEL</span>
+                            <span className="text-[9px] font-space font-black text-slate-400">CLASS OPERATOR</span>
                           </div>
-                          <h3 className="text-3xl font-black uppercase tracking-tighter">Combat Level 18</h3>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">148,500 Total XP Earned</p>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Combat Level 18</h3>
+                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">148,500 Total XP Earned</p>
                         </div>
                         
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-brand-orange">
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-brand-orange">
                             <span>PROGRESSION UPLINK</span>
                             <span>85% TO LVL 19</span>
                           </div>
-                          <div className="h-4 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
+                          <div className="h-2.5 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: "85%" }}
@@ -470,19 +484,19 @@ export default function ProfilePage() {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-3 pt-2">
-                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
-                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Victories</p>
-                            <p className="text-xl font-space font-black text-white">92</p>
+                        <div className="grid grid-cols-3 gap-2 pt-1">
+                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Victories</p>
+                            <p className="text-sm font-space font-black text-white">92</p>
                           </div>
-                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
-                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Ratio</p>
-                            <p className="text-xl font-space font-black text-brand-orange">64.7%</p>
+                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Ratio</p>
+                            <p className="text-sm font-space font-black text-brand-orange">64.7%</p>
                           </div>
-                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
-                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Streak</p>
-                            <p className="text-xl font-space font-black text-white flex items-center justify-center gap-1.5 leading-none">
-                              4 <Flame className="w-4 h-4 text-brand-orange fill-current" />
+                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Streak</p>
+                            <p className="text-sm font-space font-black text-white flex items-center justify-center gap-1 leading-none">
+                              4 <Flame className="w-3.5 h-3.5 text-brand-orange fill-current" />
                             </p>
                           </div>
                         </div>
@@ -490,12 +504,12 @@ export default function ProfilePage() {
 
                       {/* Right: SVG Radar Attributes Chart */}
                       <div className="md:col-span-2 flex flex-col items-center justify-center">
-                        <div className="relative w-44 h-44 bg-slate-950/40 rounded-full border-2 border-black flex items-center justify-center shadow-[inset_0_0_15px_rgba(0,0,0,0.8)] overflow-hidden">
+                        <div className="relative w-36 h-36 bg-slate-900 border-3 border-black flex items-center justify-center shadow-[inset_3px_3px_0px_#000000] overflow-hidden rounded-[1.5rem]">
                           <svg className="w-full h-full" viewBox="0 0 200 200">
                             {/* Inner web concentric pentagons */}
-                            <polygon points="100,65 129,86 118,121 82,121 71,86" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                            <polygon points="100,50 142,80 126,130 74,130 58,80" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                            <polygon points="100,35 156,76 135,140 65,140 44,76" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                            <polygon points="100,65 129,86 118,121 82,121 71,86" fill="none" stroke="#000000" strokeWidth="2.5" />
+                            <polygon points="100,50 142,80 126,130 74,130 58,80" fill="none" stroke="#000000" strokeWidth="2.5" />
+                            <polygon points="100,35 156,76 135,140 65,140 44,76" fill="none" stroke="#000000" strokeWidth="2.5" />
                             
                             {/* Web axes */}
                             {Array.from({ length: 5 }).map((_, idx) => {
@@ -503,24 +517,23 @@ export default function ProfilePage() {
                               const x = 100 + 70 * Math.cos(angle);
                               const y = 105 + 70 * Math.sin(angle);
                               return (
-                                <line key={idx} x1="100" y1="105" x2={x} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                                <line key={idx} x1="100" y1="105" x2={x} y2={y} stroke="#000000" strokeWidth="2.5" />
                               );
                             })}
 
                             {/* Polygon filled stats */}
                             <polygon 
                               points={radarPoints} 
-                              fill="rgba(255, 107, 0, 0.18)" 
-                              stroke="#FFC107" 
-                              strokeWidth="2" 
-                              className="filter drop-shadow-[0_0_4px_rgba(255,107,0,0.5)]"
+                              fill="rgba(255, 170, 0, 0.35)" 
+                              stroke="#000000" 
+                              strokeWidth="3.5" 
                             />
 
                             {/* Vertices indicator bullets */}
                             {radarPoints.split(" ").map((pt, idx) => {
                               const [x, y] = pt.split(",");
                               return (
-                                <circle key={idx} cx={x} cy={y} r="3" fill="#FFC107" stroke="#212529" strokeWidth="1" />
+                                <circle key={idx} cx={x} cy={y} r="4.5" fill="#ffaa00" stroke="#000000" strokeWidth="2" />
                               );
                             })}
                           </svg>
@@ -534,33 +547,31 @@ export default function ProfilePage() {
                       </div>
 
                     </div>
-                  </div>
-
-                  {/* ACHIEVEMENT BADGES SHOWCASE */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6">
-                      <Trophy className="w-4 h-4 text-brand-orange" /> Combat Badges
+                             {/* ACHIEVEMENT BADGES SHOWCASE */}
+                  <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
+                    <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
+                      <Trophy className="w-3 h-3 text-brand-orange" /> Combat Badges
                     </h4>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                       {ACHIEVEMENT_BADGES.map(badge => {
                         const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
                         return (
                           <div 
                             key={badge.id} 
-                            className={`flex flex-col items-center text-center p-3 rounded-2xl border-2 border-black transition-all group relative cursor-pointer ${badge.unlocked ? badge.color + " hover:scale-105 shadow-[2px_2px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
+                            className={`flex flex-col items-center text-center p-2 rounded-xl border-2 border-black transition-all group relative cursor-pointer ${badge.unlocked ? badge.color + " hover:scale-105 shadow-[1.5px_1.5px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
                             onClick={() => {
                               if (badge.unlocked) toast(`Selected Badge: ${badge.title}`, "info");
                               else toast(`Locked Badge: ${badge.title} (${badge.desc})`, "warning");
                             }}
                           >
-                            <div className="text-2xl mb-2 filter drop-shadow-[1px_1px_0px_#000]">
-                              <BadgeIcon className="w-6 h-6 stroke-[1.8]" />
+                            <div className="mb-1 filter drop-shadow-[1px_1px_0px_#000]">
+                              <BadgeIcon className="w-5 h-5 stroke-[1.8]" />
                             </div>
-                            <span className="text-[8px] font-black uppercase tracking-wider text-white truncate max-w-full">{badge.title}</span>
+                            <span className="text-[7px] font-black uppercase tracking-wider text-white truncate max-w-full">{badge.title}</span>
                             
                             {/* Tooltip detail */}
-                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-44 p-3 rounded-2xl bg-slate-950 border-2 border-black text-[9.5px] font-bold text-slate-300 leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-2xl">
+                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-40 p-2.5 rounded-xl bg-slate-950 border-2 border-black text-[8.5px] font-bold text-slate-300 leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-2xl">
                               <p className="font-black text-brand-orange uppercase mb-1">{badge.title}</p>
                               <p className="text-slate-400">{badge.desc}</p>
                               {!badge.unlocked && <p className="text-danger font-black uppercase mt-1.5 flex items-center justify-center gap-1"><Lock className="w-3 h-3" /> Locked</p>}
@@ -571,39 +582,42 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
+                </div>
+
+
                   {/* BOTTOM SECTORS: MATCH HISTORY & SQUAD */}
-                  <div className="grid gap-6 md:grid-cols-3">
+                  <div className="grid gap-3 md:grid-cols-3">
                     
                     {/* Matches log */}
-                    <div className="glass p-6 rounded-3xl border-2 border-black shadow-card md:col-span-2 bg-white/2">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6">
-                        <Activity className="w-4 h-4 text-brand-orange" /> Combat History Logs
+                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-2 bg-white/2">
+                      <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
+                        <Activity className="w-3 h-3 text-brand-orange" /> Combat History Logs
                       </h4>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-1.5">
                         {MOCK_MATCH_HISTORY.map(match => (
                           <div 
                             key={match.id} 
-                            className="p-3 bg-slate-900/50 border-2 border-black rounded-2xl flex items-center justify-between hover:border-brand-orange/40 transition-all duration-250 shadow-[2px_2px_0px_#000]"
+                            className="p-2 bg-slate-900/50 border border-black rounded-lg flex items-center justify-between hover:border-brand-orange/40 transition-all duration-200 shadow-[1px_1px_0px_#000]"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-xl bg-slate-950 border-2 border-black flex items-center justify-center text-xs font-black text-brand-orange shadow-[1px_1px_0px_#000]">
+                            <div className="flex items-center gap-2">
+                              <div className="h-6 w-6 rounded bg-slate-950 border border-black flex items-center justify-center text-[8px] font-black text-brand-orange">
                                 {match.game.slice(0, 2).toUpperCase()}
                               </div>
                               <div>
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="text-[10px] font-black uppercase tracking-wider text-white">{match.game}</span>
-                                  <span className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest">{match.mode}</span>
+                                <div className="flex items-center gap-1.5 mb-0">
+                                  <span className="text-[9px] font-black uppercase tracking-wider text-white">{match.game}</span>
+                                  <span className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">{match.mode}</span>
                                 </div>
-                                <p className="text-[8px] font-bold text-slate-550 uppercase tracking-widest">VS Operator: {match.opponent}</p>
+                                <p className="text-[7px] font-bold text-slate-550 uppercase tracking-widest">VS: {match.opponent}</p>
                               </div>
                             </div>
 
                             <div className="text-right">
-                              <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border-2 border-black shadow-[1px_1px_0px_#000] inline-block mb-1 ${match.outcome === "won" ? "bg-success/20 text-success border-success/40" : "bg-danger/20 text-danger border-danger/40"}`}>
-                                {match.outcome === "won" ? "Victory" : "Defeat"}
+                              <span className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider border border-black inline-block mb-0.5 ${match.outcome === "won" ? "bg-success/20 text-success border-success/40" : "bg-danger/20 text-danger border-danger/40"}`}>
+                                {match.outcome === "won" ? "Win" : "Loss"}
                               </span>
-                              <p className="text-[9px] font-space font-black text-slate-400">+{match.xp} XP • {match.time}</p>
+                              <p className="text-[7.5px] font-space font-black text-slate-400">+{match.xp} XP</p>
                             </div>
                           </div>
                         ))}
@@ -611,27 +625,27 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Active Squad (Friends) */}
-                    <div className="glass p-6 rounded-3xl border-2 border-black shadow-card md:col-span-1 bg-white/2">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6">
-                        <Users className="w-4 h-4 text-brand-orange" /> Operational Squad
+                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-1 bg-white/2">
+                      <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
+                        <Users className="w-3 h-3 text-brand-orange" /> Operational Squad
                       </h4>
 
-                      <div className="space-y-3.5">
+                      <div className="space-y-2">
                         {MOCK_FRIENDS.map(friend => (
                           <div 
                             key={friend.id}
                             className="flex items-center justify-between group relative"
                           >
-                            <div className="flex items-center gap-2.5">
+                            <div className="flex items-center gap-2">
                               <div className="relative">
-                                <div className="h-8 w-8 rounded-full bg-slate-900 border border-black flex items-center justify-center font-space text-[10px] font-black text-slate-400">
+                                <div className="h-6 w-6 rounded-full bg-slate-900 border border-black flex items-center justify-center font-space text-[8px] font-black text-slate-400">
                                   {friend.name.slice(0, 2).toUpperCase()}
                                 </div>
-                                <span className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-slate-950 ${friend.status === "online" ? "bg-success" : "bg-slate-700"}`} />
+                                <span className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-slate-950 ${friend.status === "online" ? "bg-success" : "bg-slate-700"}`} />
                               </div>
                               <div>
-                                <p className="text-[10px] font-black uppercase tracking-tight text-white">{friend.name}</p>
-                                <p className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest">
+                                <p className="text-[9px] font-black uppercase tracking-tight text-white">{friend.name}</p>
+                                <p className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">
                                   {friend.status === "online" ? `In: ${friend.game}` : "offline"}
                                 </p>
                               </div>
@@ -640,7 +654,7 @@ export default function ProfilePage() {
                             {friend.status === "online" && (
                               <button 
                                 onClick={() => handleInviteFriend(friend.name)}
-                                className="h-7 px-2.5 rounded-md bg-brand-orange hover:bg-brand-orange/90 text-slate-950 font-black uppercase text-[8px] tracking-wider border-2 border-black shadow-[1.5px_1.5px_0px_#000] cursor-pointer active:translate-y-px transition-all"
+                                className="h-6 px-2 rounded bg-brand-orange hover:bg-brand-orange/90 text-slate-950 font-black uppercase text-[7px] tracking-wider border border-black shadow-[1px_1px_0px_#000] cursor-pointer transition-all"
                               >
                                 Invite
                               </button>
@@ -648,7 +662,7 @@ export default function ProfilePage() {
 
                             {/* Offline last active details */}
                             {friend.status === "offline" && (
-                              <div className="absolute bottom-full mb-1 right-0 p-1.5 rounded-lg bg-slate-950 border-2 border-black text-[8px] font-bold text-slate-400 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+                              <div className="absolute bottom-full mb-1 right-0 p-1.5 rounded-lg bg-slate-950 border border-black text-[7.5px] font-bold text-slate-400 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl">
                                 Last sync: {friend.lastActive}
                               </div>
                             )}
@@ -673,16 +687,16 @@ export default function ProfilePage() {
                   exit={{ opacity: 0, x: -15 }}
                   className="space-y-6"
                 >
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-2">
                     
                     {/* Private Details & Credentials */}
-                    <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2 flex flex-col justify-between">
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2 flex flex-col justify-between">
                       <div>
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                          <User className="w-4 h-4 text-brand-orange" /> Private Details & credentials
+                        <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
+                          <User className="w-3.5 h-3.5 text-brand-orange" /> Private Details & credentials
                         </h4>
 
-                        <div className="flex flex-col gap-3 text-[10px] font-black text-slate-450 uppercase tracking-widest bg-slate-900/50 border-2 border-black rounded-2xl p-4 mb-6 shadow-[2px_2px_0px_#000]">
+                        <div className="flex flex-col gap-2.5 text-[9px] font-black text-slate-450 uppercase tracking-widest bg-slate-900/50 border-2 border-black rounded-xl p-3 mb-4 shadow-[2px_2px_0px_#000]">
                           <div className="flex justify-between items-center gap-2">
                             <span className="text-slate-550">Email Address</span>
                             <span className="text-white truncate max-w-[190px]">{user.email}</span>
@@ -698,49 +712,49 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <form onSubmit={handlePasswordChange} className="space-y-4">
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Current Password</label>
+                      <form onSubmit={handlePasswordChange} className="space-y-3">
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Current Password</label>
                           <input 
                             type="password" 
                             value={oldPassword}
                             onChange={(e) => setOldPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">New Password</label>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">New Password</label>
                           <input 
                             type="password" 
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Confirm Password</label>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Confirm Password</label>
                           <input 
                             type="password" 
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
-                        <Button type="submit" className="w-full h-11 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[10px] tracking-widest border-2 border-black rounded-xl transition-all">
+                        <Button type="submit" className="w-full h-9 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[9px] tracking-widest border-2 border-black rounded-lg transition-all">
                           Update Password Credentials
                         </Button>
                       </form>
                     </div>
 
                     {/* System Preference Registry */}
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                       {/* Notifications settings */}
-                      <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                          <Bell className="w-4 h-4 text-brand-orange" /> Notification Preferences
+                      <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+                        <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
+                          <Bell className="w-3.5 h-3.5 text-brand-orange" /> Notification Preferences
                         </h4>
                         
                         <div className="space-y-4">
@@ -784,20 +798,20 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Privacy registry */}
-                      <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                          <Shield className="w-4 h-4 text-brand-orange" /> Privacy Registry
+                      <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+                        <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
+                          <Shield className="w-3.5 h-3.5 text-brand-orange" /> Privacy Registry
                         </h4>
 
                         <div className="space-y-4">
                           <div className="flex flex-col gap-2">
                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Profile Visibility</span>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-3 gap-2">
                               {["public", "friends", "private"].map(vis => (
                                 <button
                                   key={vis}
                                   onClick={() => updatePrivacySettings({ profileVisibility: vis as any })}
-                                  className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${privacySettings.profileVisibility === vis ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                                  className={`h-9 rounded-lg text-[7px] font-black uppercase tracking-wider transition-all border-2 border-black ${privacySettings.profileVisibility === vis ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
                                 >
                                   {vis}
                                 </button>
@@ -838,10 +852,10 @@ export default function ProfilePage() {
                   </div>
 
                   {/* ACTIVE TERMINAL SESSION LIST */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <div className="flex items-center justify-between mb-6 border-b border-black pb-4">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
-                        <Laptop className="w-4 h-4 text-brand-orange" /> Authenticated System Uplinks
+                  <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+                    <div className="flex items-center justify-between mb-4 border-b border-black pb-3">
+                      <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
+                        <Laptop className="w-3.5 h-3.5 text-brand-orange" /> Authenticated System Uplinks
                       </h4>
                       {sessions.length > 1 && (
                         <button 
@@ -853,11 +867,11 @@ export default function ProfilePage() {
                       )}
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-3">
+                    <div className="grid gap-3 md:grid-cols-3">
                       {sessions.map(session => (
                         <div 
                           key={session.id}
-                          className={`p-4 bg-slate-900/50 border-2 rounded-2xl flex flex-col justify-between h-40 shadow-[2px_2px_0px_#000] ${session.isCurrent ? "border-brand-orange" : "border-black"}`}
+                          className={`p-3 bg-slate-900/50 border-2 rounded-xl flex flex-col justify-between h-32 shadow-[2px_2px_0px_#000] ${session.isCurrent ? "border-brand-orange" : "border-black"}`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2.5">
@@ -894,9 +908,9 @@ export default function ProfilePage() {
                   </div>
 
                   {/* SECURITY SIGNALS LOG (LOGIN HISTORY) */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6">
-                      <Clock className="w-4 h-4 text-brand-orange" /> Authentication History Logs
+                  <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
+                    <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4">
+                      <Clock className="w-3.5 h-3.5 text-brand-orange" /> Authentication History Logs
                     </h4>
                     
                     <div className="overflow-x-auto">

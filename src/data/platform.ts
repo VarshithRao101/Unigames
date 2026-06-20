@@ -150,19 +150,65 @@ export const ROOMS_AVAILABLE: LobbyRoom[] = [
 export const LEADERBOARD_DATA: Record<"weekly" | "allTime", LeaderboardEntry[]> = {
   weekly: [
     { rank: 1, name: "Varshith", xp: 1840, wins: 18, streak: 6, favorite: "Tic-Tac-Toe" },
-    { rank: 2, name: "Nova", xp: 1660, wins: 16, streak: 5, favorite: "Tic-Tac-Toe" },
+    { rank: 2, name: "Nova", xp: 1660, wins: 16, streak: 5, favorite: "Chess Arena" },
     { rank: 3, name: "BoardKing", xp: 1410, wins: 14, streak: 4, favorite: "Tic-Tac-Toe" },
-    { rank: 4, name: "Luna", xp: 1295, wins: 12, streak: 4, favorite: "Tic-Tac-Toe" },
-    { rank: 5, name: "RookStar", xp: 1180, wins: 11, streak: 3, favorite: "Tic-Tac-Toe" },
+    { rank: 4, name: "Luna", xp: 1295, wins: 12, streak: 4, favorite: "Chess Arena" },
+    { rank: 5, name: "RookStar", xp: 1180, wins: 11, streak: 3, favorite: "Chess Arena" },
+    { rank: 6, name: "PixelFox", xp: 1040, wins: 9, streak: 2, favorite: "Tic-Tac-Toe" },
+    { rank: 7, name: "Zephyr", xp: 960, wins: 8, streak: 1, favorite: "Tic-Tac-Toe" },
   ],
   allTime: [
-    { rank: 1, name: "Garry", xp: 12640, wins: 126, streak: 14, favorite: "Tic-Tac-Toe" },
+    { rank: 1, name: "Garry", xp: 12640, wins: 126, streak: 14, favorite: "Chess Arena" },
     { rank: 2, name: "Varshith", xp: 9880, wins: 95, streak: 9, favorite: "Tic-Tac-Toe" },
     { rank: 3, name: "BoardKing", xp: 9320, wins: 88, streak: 8, favorite: "Tic-Tac-Toe" },
-    { rank: 4, name: "Luna", xp: 8615, wins: 81, streak: 6, favorite: "Tic-Tac-Toe" },
-    { rank: 5, name: "Nova", xp: 8040, wins: 78, streak: 5, favorite: "Tic-Tac-Toe" },
+    { rank: 4, name: "Luna", xp: 8615, wins: 81, streak: 6, favorite: "Chess Arena" },
+    { rank: 5, name: "Nova", xp: 8040, wins: 78, streak: 5, favorite: "Chess Arena" },
     { rank: 6, name: "PixelFox", xp: 7420, wins: 71, streak: 4, favorite: "Tic-Tac-Toe" },
+    { rank: 7, name: "RookStar", xp: 6880, wins: 65, streak: 3, favorite: "Chess Arena" },
+    { rank: 8, name: "Zephyr", xp: 6210, wins: 58, streak: 2, favorite: "Tic-Tac-Toe" },
   ],
+};
+
+// Per-game individual leaderboards
+export const GAME_LEADERBOARDS: Record<string, Record<"weekly" | "allTime", LeaderboardEntry[]>> = {
+  tictactoe: {
+    weekly: [
+      { rank: 1, name: "Varshith", xp: 1120, wins: 14, streak: 6, favorite: "Tic-Tac-Toe" },
+      { rank: 2, name: "BoardKing", xp: 980, wins: 12, streak: 4, favorite: "Tic-Tac-Toe" },
+      { rank: 3, name: "PixelFox", xp: 840, wins: 10, streak: 3, favorite: "Tic-Tac-Toe" },
+      { rank: 4, name: "Zephyr", xp: 700, wins: 8, streak: 2, favorite: "Tic-Tac-Toe" },
+      { rank: 5, name: "CipherX", xp: 580, wins: 6, streak: 1, favorite: "Tic-Tac-Toe" },
+      { rank: 6, name: "Spark", xp: 460, wins: 5, streak: 1, favorite: "Tic-Tac-Toe" },
+    ],
+    allTime: [
+      { rank: 1, name: "Varshith", xp: 8240, wins: 82, streak: 9, favorite: "Tic-Tac-Toe" },
+      { rank: 2, name: "BoardKing", xp: 7680, wins: 76, streak: 8, favorite: "Tic-Tac-Toe" },
+      { rank: 3, name: "PixelFox", xp: 6420, wins: 63, streak: 6, favorite: "Tic-Tac-Toe" },
+      { rank: 4, name: "Zephyr", xp: 5840, wins: 57, streak: 4, favorite: "Tic-Tac-Toe" },
+      { rank: 5, name: "CipherX", xp: 5120, wins: 50, streak: 3, favorite: "Tic-Tac-Toe" },
+      { rank: 6, name: "Spark", xp: 4380, wins: 43, streak: 2, favorite: "Tic-Tac-Toe" },
+      { rank: 7, name: "NightOwl", xp: 3740, wins: 36, streak: 2, favorite: "Tic-Tac-Toe" },
+    ],
+  },
+  chess: {
+    weekly: [
+      { rank: 1, name: "Garry", xp: 1340, wins: 11, streak: 7, favorite: "Chess Arena" },
+      { rank: 2, name: "Nova", xp: 1160, wins: 9, streak: 5, favorite: "Chess Arena" },
+      { rank: 3, name: "RookStar", xp: 980, wins: 8, streak: 4, favorite: "Chess Arena" },
+      { rank: 4, name: "Luna", xp: 820, wins: 6, streak: 3, favorite: "Chess Arena" },
+      { rank: 5, name: "IronBishop", xp: 660, wins: 5, streak: 2, favorite: "Chess Arena" },
+      { rank: 6, name: "Tempest", xp: 500, wins: 4, streak: 1, favorite: "Chess Arena" },
+    ],
+    allTime: [
+      { rank: 1, name: "Garry", xp: 11200, wins: 112, streak: 14, favorite: "Chess Arena" },
+      { rank: 2, name: "Nova", xp: 9100, wins: 91, streak: 9, favorite: "Chess Arena" },
+      { rank: 3, name: "RookStar", xp: 7840, wins: 78, streak: 7, favorite: "Chess Arena" },
+      { rank: 4, name: "Luna", xp: 6920, wins: 68, streak: 6, favorite: "Chess Arena" },
+      { rank: 5, name: "IronBishop", xp: 5840, wins: 57, streak: 4, favorite: "Chess Arena" },
+      { rank: 6, name: "Tempest", xp: 4960, wins: 48, streak: 3, favorite: "Chess Arena" },
+      { rank: 7, name: "Castler", xp: 4100, wins: 40, streak: 2, favorite: "Chess Arena" },
+    ],
+  },
 };
 
 export const ONLINE_SQUAD: ChatMember[] = [

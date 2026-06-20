@@ -54,54 +54,61 @@ export default function RoomsPage() {
           {/* Sidebar */}
           <aside className="space-y-6">
              <Link href="/rooms/create" className="block">
-                <Button className="btn-gaming w-full h-14 rounded-2xl text-base shadow-[4px_4px_0px_#000] font-black uppercase tracking-widest">
+                <Button className="btn-gaming w-full h-11 rounded-xl text-xs shadow-[3px_3px_0px_#000] font-black uppercase tracking-widest">
                    Create Room
                 </Button>
              </Link>
              
              {/* Search box */}
-             <div className="glass p-5 rounded-2xl border-2 border-black shadow-card">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white mb-4 flex items-center gap-2">
-                   <Search className="w-3.5 h-3.5 text-brand-orange" /> Filter Rooms
+             <div className="glass p-4 rounded-xl border-2 border-black shadow-card">
+                <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white mb-3 flex items-center gap-2">
+                   <Search className="w-3 h-3 text-brand-orange" /> Filter Rooms
                 </h4>
-                <div className="relative mb-4">
+                <div className="relative mb-3">
                    <input 
                      value={search}
                      onChange={(e) => setSearch(e.target.value)}
                      type="text" 
                      placeholder="Search Code/Host..."
-                     className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-[10px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
+                     className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3.5 text-[9px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
                    />
                 </div>
 
-                <div className="space-y-2 max-h-[300px] overflow-y-auto scrollbar-hide pr-1">
-                   {gameOptions.map(option => (
-                     <button 
-                       key={option.slug}
-                       onClick={() => setSelectedGame(option.slug)}
-                       className={`w-full h-11 rounded-xl flex items-center px-4 text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black ${selectedGame === option.slug ? 'bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]' : 'bg-white/5 text-slate-400 hover:border-brand-orange/30'}`}
-                     >
-                        {option.name}
-                     </button>
-                   ))}
+                <div className="space-y-1.5 max-h-[220px] overflow-y-auto scrollbar-hide pr-1">
+                   {gameOptions.map((option, idx) => {
+                     const isSelected = selectedGame === option.slug;
+                     const buttonLabel = idx === 0 ? "SEL" : idx === 1 ? "A" : idx === 2 ? "B" : idx === 3 ? "X" : idx === 4 ? "Y" : "RT";
+                     return (
+                       <button 
+                         key={option.slug}
+                         onClick={() => setSelectedGame(option.slug)}
+                         className={`w-full h-9 rounded-lg flex items-center justify-between px-3 text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black ${isSelected ? 'bg-brand-orange text-slate-950 shadow-[1.5px_1.5px_0px_#000000]' : 'bg-white/5 text-slate-400 hover:border-brand-orange/30'}`}
+                       >
+                          <span>{option.name}</span>
+                          <span className={`w-4 h-4 rounded-full border border-black flex items-center justify-center font-space text-[7px] shadow-[0.5px_0.5px_0px_#000000] ${isSelected ? 'bg-slate-950 text-brand-orange' : 'bg-slate-850 text-slate-500'}`}>
+                             {buttonLabel}
+                          </span>
+                       </button>
+                     );
+                   })}
                 </div>
              </div>
 
              {/* Quick Join */}
-             <div className="glass p-5 rounded-2xl border-2 border-black shadow-card bg-brand-orange/5">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white mb-4 flex items-center gap-2">
-                   <Shield className="w-3.5 h-3.5 text-brand-orange" /> Join Room
+             <div className="glass p-4 rounded-xl border-2 border-black shadow-card bg-brand-orange/5">
+                <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white mb-3 flex items-center gap-2">
+                   <Shield className="w-3.5 h-3 text-brand-orange" /> Join Room
                 </h4>
-                <form onSubmit={handleQuickJoin} className="space-y-3">
+                <form onSubmit={handleQuickJoin} className="space-y-2">
                    <input 
                      value={roomCode}
                      onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                      type="text" 
                      maxLength={6}
-                     placeholder="ENTER ROOM CODE"
-                     className="w-full h-12 bg-slate-900 border-2 border-black rounded-xl px-4 text-center text-base font-black uppercase tracking-[0.3em] text-brand-orange focus:outline-none focus:border-brand-orange"
+                     placeholder="ENTER CODE"
+                     className="w-full h-9.5 bg-slate-900 border-2 border-black rounded-lg px-3 text-center text-xs font-black uppercase tracking-[0.3em] text-brand-orange focus:outline-none focus:border-brand-orange"
                    />
-                   <button type="submit" className="w-full h-11 rounded-xl bg-white text-slate-950 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[10px] tracking-widest transition-all shadow-[2px_2px_0px_#000] cursor-pointer">
+                   <button type="submit" className="w-full h-9 rounded-lg bg-white text-slate-950 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer">
                       Join Room
                    </button>
                 </form>
@@ -109,71 +116,75 @@ export default function RoomsPage() {
           </aside>
 
           {/* Room List */}
-          <div className="space-y-4">
+          <div className="space-y-2">
              {filteredRooms.length > 0 ? (
                 filteredRooms.map((room, i) => (
                   <motion.article 
                     key={room.code}
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 10 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
+                    transition={{ delay: i * 0.03 }}
                     viewport={{ once: true }}
-                    className="group glass p-1.5 rounded-3xl border-2 border-black hover:border-brand-orange shadow-card transition-all duration-300"
+                    className="group glass border-2 border-black hover:border-brand-orange shadow-[2px_2px_0px_#000000] transition-all duration-200 rounded-lg"
                   >
-                     <div className="bg-slate-900/50 rounded-[1.4rem] p-5 flex flex-col xl:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-5 w-full md:w-auto">
-                           <div className="w-14 h-14 rounded-xl bg-slate-950 border-2 border-black flex items-center justify-center font-space text-2xl font-black text-brand-orange group-hover:scale-105 transition-transform shadow-[2px_2px_0px_#000]">
-                              {room.gameName.slice(0, 2).toUpperCase()}
+                     <div className="px-3 py-2 flex flex-row items-center justify-between gap-2">
+                        {/* Left: Name & meta */}
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                           <div className="shrink-0">
+                             <div className={`w-1.5 h-6 rounded-full ${
+                               room.status === 'open' ? 'bg-success' : 
+                               room.status === 'live' ? 'bg-brand-orange' : 
+                               'bg-slate-700'
+                             }`} />
                            </div>
-                           <div>
-                              <div className="flex items-center gap-3 mb-1.5">
-                                 <h3 className="text-lg font-black uppercase tracking-tight text-white">{room.name}</h3>
-                                 <span className="px-2 py-0.5 bg-slate-950 border-2 border-black rounded-md text-[8px] font-black text-slate-400 tracking-widest leading-none shadow-[1px_1px_0px_#000]">{room.code}</span>
-                                 {room.isPrivate && <Lock className="w-3.5 h-3.5 text-danger/60" />}
+                           <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                 <h3 className="text-[11px] font-black uppercase tracking-tight text-white truncate" style={{ textShadow: 'none' }}>{room.name}</h3>
+                                 <span className="shrink-0 px-1 py-0.5 bg-slate-950 border border-black rounded text-[7px] font-black text-slate-400 tracking-widest leading-none shadow-[0.5px_0.5px_0px_#000]">{room.code}</span>
+                                 {room.isPrivate && <Lock className="shrink-0 w-2 h-2 text-danger/60" />}
                               </div>
-                              <div className="flex items-center gap-2.5 text-[9.5px] font-black text-slate-500 uppercase tracking-widest">
-                                 <span className="text-brand-orange/80">{room.gameName} Room</span>
+                              <div className="flex items-center gap-1.5 text-[7px] font-black text-slate-500 uppercase tracking-widest mt-0.5">
+                                 <span className="text-brand-orange/70">{room.gameName}</span>
                                  <span className="text-slate-800">•</span>
                                  <span>Host: {room.host}</span>
                                  <span className="text-slate-800">•</span>
-                                 <span className="flex items-center gap-1"><Globe className="w-3 h-3" /> {room.region}</span>
+                                 <span className="flex items-center gap-0.5"><Globe className="w-2 h-2" /> {room.region}</span>
                               </div>
                            </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-6 justify-between md:justify-end w-full md:w-auto">
-                           <div className="text-center md:text-right">
-                              <p className="text-2xl font-space font-black leading-none mb-1 text-white">
-                                 {room.currentPlayers}<span className="text-slate-600"> / {room.maxPlayers}</span>
+                        {/* Right: Players + Status + Join */}
+                        <div className="flex items-center gap-2 shrink-0">
+                           <div className="text-right">
+                              <p className="text-[11px] font-space font-black leading-none text-white">
+                                 {room.currentPlayers}<span className="text-slate-600">/{room.maxPlayers}</span>
                               </p>
-                              <p className="text-[8px] font-black text-slate-550 uppercase tracking-widest">Players</p>
+                              <p className="text-[6.5px] font-black text-slate-600 uppercase tracking-widest mt-0.5">Players</p>
                            </div>
                            
-                           <div className="flex items-center gap-4">
-                              <div className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest border-2 border-black shadow-[2px_2px_0px_#000] ${
-                                room.status === 'open' ? 'bg-success/15 text-success' : 
-                                room.status === 'live' ? 'bg-brand-orange/15 text-brand-orange' : 
-                                'bg-slate-800 text-slate-500'
-                              }`}>
-                                 {room.status === 'open' ? 'Public' : room.status === 'live' ? 'Playing' : 'Locked'}
-                              </div>
-                              
-                              <Link href={`/rooms/${room.code}`}>
-                                 <button className="btn-gaming h-10 px-6 rounded-xl font-black uppercase text-[10px] cursor-pointer">
-                                    {room.status === 'full' ? 'Spectate' : 'Join Room'}
-                                 </button>
-                              </Link>
+                           <div className={`px-1.5 py-0.5 rounded text-[6.5px] font-black uppercase tracking-widest border border-black ${
+                             room.status === 'open' ? 'bg-success/15 text-success' : 
+                             room.status === 'live' ? 'bg-brand-orange/15 text-brand-orange' : 
+                             'bg-slate-800 text-slate-500'
+                           }`}>
+                              {room.status === 'open' ? 'Public' : room.status === 'live' ? 'Live' : 'Locked'}
                            </div>
+                           
+                           <Link href={`/rooms/${room.code}`}>
+                              <button className="btn-gaming h-7 px-3 rounded font-black uppercase text-[7.5px] cursor-pointer">
+                                 {room.status === 'full' ? 'Watch' : 'Join'}
+                              </button>
+                           </Link>
                         </div>
                      </div>
                   </motion.article>
                 ))
              ) : (
-                <div className="glass rounded-3xl p-12 text-center border-2 border-black shadow-card">
-                   <Users className="w-14 h-14 text-white/5 mx-auto mb-6" />
-                   <h3 className="text-xl font-black uppercase tracking-tighter mb-2">No Rooms Found</h3>
-                   <p className="text-[11px] text-slate-500 font-bold max-w-sm mx-auto mb-6">Adjust your filters or create a new room to start playing.</p>
-                   <button onClick={() => { setSearch(""); setSelectedGame("all"); }} className="btn-gaming h-11 px-8 rounded-xl font-black uppercase text-[10px] tracking-widest cursor-pointer">
+                <div className="glass rounded-xl p-8 text-center border-2 border-black shadow-card">
+                   <Users className="w-8 h-8 text-white/10 mx-auto mb-3" />
+                   <h3 className="text-sm font-black uppercase tracking-tighter mb-1">No Rooms Found</h3>
+                   <p className="text-[10px] text-slate-500 font-bold max-w-sm mx-auto mb-4">Adjust your filters or create a new room.</p>
+                   <button onClick={() => { setSearch(""); setSelectedGame("all"); }} className="btn-gaming h-8 px-6 rounded-lg font-black uppercase text-[9px] tracking-widest cursor-pointer">
                       Reset Filters
                    </button>
                 </div>

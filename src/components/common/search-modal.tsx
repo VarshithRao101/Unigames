@@ -109,13 +109,13 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
             exit={{ opacity: 0, scale: 0.96, y: -20 }}
             transition={{ duration: 0.2 }}
             ref={modalRef}
-            className="w-full max-w-xl bg-slate-950/90 border border-slate-900 rounded-3xl shadow-2xl relative z-10 overflow-hidden mx-4 text-white"
+            className="w-full max-w-xl bg-slate-950 border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] relative z-10 overflow-hidden mx-4 text-white"
             role="dialog"
             aria-modal="true"
             aria-label="Universal Search Lobbies and Users"
           >
             {/* Input Header */}
-            <div className="flex items-center border-b border-slate-900 px-5 py-4">
+            <div className="flex items-center border-b-3 border-black px-5 py-4 bg-slate-900/30">
               <Search className="w-5 h-5 text-slate-500 mr-3 shrink-0" />
               <input
                 autoFocus
@@ -123,26 +123,26 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 placeholder="Search games, crew, suggestions..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-white outline-none font-medium placeholder-slate-500"
+                className="flex-1 bg-transparent text-sm text-white outline-none font-medium placeholder-slate-500 uppercase tracking-wider text-[10px]"
               />
               <button
                 onClick={onClose}
-                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-black bg-[#ff4d4d] hover:bg-[#ff6666] text-black shadow-[2px_2px_0px_#000000] transition-all cursor-pointer shrink-0"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 stroke-[3]" />
               </button>
             </div>
 
             {/* Filter buttons */}
-            <div className="flex gap-2 px-5 py-3 border-b border-slate-900 bg-slate-950/40 text-[10px] font-bold font-outfit uppercase tracking-wider text-slate-400">
+            <div className="flex flex-wrap gap-2.5 px-5 py-4.5 border-b-3 border-black bg-slate-900/10 text-[9px] font-black font-outfit uppercase tracking-wider text-slate-500">
               {(["all", "game", "contributor", "post"] as const).map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilter(type)}
-                  className={`px-3 py-1 rounded-lg border transition-all cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-xl border-2 border-black transition-all cursor-pointer ${
                     filter === type
-                      ? "bg-brand-amber border-brand-dark/10 text-slate-950 shadow-sm"
-                      : "bg-slate-900 border-slate-800 hover:bg-slate-800"
+                      ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000000]"
+                      : "bg-slate-900 text-slate-400 hover:border-brand-orange/40 hover:text-slate-50 shadow-none"
                   }`}
                 >
                   {type === "post" ? "Community" : type === "contributor" ? "Contributors" : type}
@@ -151,14 +151,14 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
             </div>
 
             {/* Result list pane */}
-            <div className="max-h-[350px] overflow-y-auto p-4 flex flex-col gap-1.5">
+            <div className="max-h-[350px] overflow-y-auto p-4 flex flex-col gap-2">
               {loading ? (
                 <div className="py-12 flex flex-col items-center justify-center text-slate-400 text-xs gap-3">
-                  <svg className="animate-spin w-5 h-5 text-brand-amber" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  <span>Searching databases...</span>
+                  <span className="font-space uppercase text-[9px] font-black tracking-widest">Searching databases...</span>
                 </div>
               ) : query && results.length > 0 ? (
                 results.map((item) => {
@@ -172,16 +172,16 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     <button
                       key={item.id}
                       onClick={() => handleItemClick(item.url)}
-                      className="w-full flex items-center gap-3.5 p-3 rounded-2xl hover:bg-slate-900/60 transition-colors text-left group cursor-pointer border border-transparent hover:border-slate-800/30"
+                      className="w-full flex items-center gap-3.5 p-3.5 rounded-2.5xl bg-slate-900/40 hover:bg-slate-900/80 transition-all text-left group cursor-pointer border-2 border-black hover:border-brand-orange shadow-[2px_2px_0px_#000000] hover:shadow-[3px_3px_0px_#000000]"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-brand-amber/10 group-hover:text-brand-amber transition-all shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-slate-950 border-2 border-black flex items-center justify-center text-slate-500 group-hover:bg-brand-orange group-hover:text-slate-950 transition-all shrink-0 shadow-[1.5px_1.5px_0px_#000000]">
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-outfit text-sm font-bold text-slate-200 truncate pl-0.5">
+                        <p className="font-outfit text-sm font-black text-slate-50 uppercase tracking-tight group-hover:text-brand-orange transition-colors truncate">
                           {item.title}
                         </p>
-                        <p className="text-xs text-slate-500 font-medium truncate pl-0.5 mt-0.5">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mt-0.5">
                           {item.subtitle}
                         </p>
                       </div>
@@ -198,12 +198,12 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                       Search suggestion tags
                     </span>
-                    <div className="flex flex-wrap justify-center gap-2 mt-3.5 max-w-sm mx-auto">
+                    <div className="flex flex-wrap justify-center gap-2.5 mt-3.5 max-w-sm mx-auto">
                       {["Chess", "Tic-Tac-Toe", "Varshith", "Ludo", "Roadmap", "Tournaments"].map((tag) => (
                         <button
                           key={tag}
                           onClick={() => setQuery(tag)}
-                          className="px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl border-2 border-black bg-slate-900 hover:bg-slate-850 hover:border-brand-orange text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-50 shadow-[1.5px_1.5px_0px_#000000] hover:translate-y-[-0.5px] transition-all cursor-pointer"
                         >
                           {tag}
                         </button>
@@ -214,11 +214,11 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   <div className="border-t border-slate-900/80 pt-4.5 text-slate-400 max-w-sm mx-auto">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 text-center mb-3">Keyboard Shortcuts</p>
                     <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold font-mono px-4">
-                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + H</span> <span className="text-brand-amber">Home</span></div>
-                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + G</span> <span className="text-brand-amber">Games</span></div>
-                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + C</span> <span className="text-brand-amber">Community</span></div>
-                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + P</span> <span className="text-brand-amber">Profile</span></div>
-                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5 md:col-span-2"><span>ALT + S</span> <span className="text-brand-amber">Settings</span></div>
+                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + H</span> <span className="text-brand-orange">Home</span></div>
+                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + G</span> <span className="text-brand-orange">Games</span></div>
+                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + C</span> <span className="text-brand-orange">Community</span></div>
+                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5"><span>ALT + P</span> <span className="text-brand-orange">Profile</span></div>
+                      <div className="flex justify-between border-b border-slate-900/50 pb-1.5 md:col-span-2"><span>ALT + S</span> <span className="text-brand-orange">Settings</span></div>
                     </div>
                   </div>
                 </div>
@@ -226,7 +226,7 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
             </div>
 
             {/* Footer tips */}
-            <div className="px-5 py-3.5 border-t border-slate-900 bg-slate-950/60 flex items-center justify-between text-[10px] font-bold font-outfit text-slate-500 tracking-wider">
+            <div className="px-5 py-3.5 border-t-3 border-black bg-slate-950 flex items-center justify-between text-[10px] font-bold font-outfit text-slate-500 tracking-wider">
               <span>ESC TO CLOSE</span>
               <span>ENTER TO NAVIGATE</span>
             </div>
