@@ -165,15 +165,9 @@ export default function GamesPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
                 onClick={() => {
-                  if (!isComingSoon) {
-                    setSelectedGameSlug(game.slug);
-                  }
+                  setSelectedGameSlug(game.slug);
                 }}
-                className={`group relative rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 transition-all duration-300 ${
-                  isComingSoon 
-                    ? 'border-2 border-dashed border-slate-700 bg-white/2 cursor-not-allowed' 
-                    : 'border-2 border-black bg-slate-900/60 glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer'
-                }`}
+                className="group relative rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 transition-all duration-300 border-2 border-black bg-slate-900/60 glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer"
               >
                 {/* 2D Game Photo (Top part) */}
                 <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-black/40 bg-slate-900 shadow-[1.5px_1.5px_0px_#000000] sm:shadow-[3px_3px_0px_#000000]">
