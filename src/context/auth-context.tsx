@@ -180,6 +180,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  // Synchronize document root theme class list
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const doc = document.documentElement;
+      doc.classList.remove("light", "dark", "gaming");
+      doc.classList.add(appearanceSettings.theme);
+    }
+  }, [appearanceSettings.theme]);
+
   const saveUserToLocalStorage = (newUser: User | null) => {
     setUser(newUser);
     if (newUser) {

@@ -15,7 +15,7 @@ export default function LeaderboardsPage() {
   const rest = board.slice(3);
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-white min-h-screen">
       <Navbar />
 
       <main suppressHydrationWarning>
@@ -58,7 +58,7 @@ export default function LeaderboardsPage() {
                  </div>
 
                  <div className="flex items-center gap-6 mb-10">
-                    <div className="h-20 w-20 rounded-full bg-slate-dark border-2 border-black flex items-center justify-center text-slate-500 font-black text-3xl shadow-[3px_3px_0px_#000] relative">
+                    <div className="h-20 w-20 rounded-full bg-slate-900 border-2 border-black flex items-center justify-center text-slate-500 font-black text-3xl shadow-[3px_3px_0px_#000] relative">
                        {player.name.charAt(0)}
                        <span className="absolute bottom-1 right-1 h-4 w-4 bg-success rounded-full border-2 border-black animate-pulse" />
                     </div>
@@ -86,15 +86,15 @@ export default function LeaderboardsPage() {
                  </div>
 
                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-2.5 bg-slate-dark/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                    <div className="text-center p-2.5 bg-slate-900/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">XP</p>
                        <p className="text-lg font-space font-black text-brand-orange">{player.xp}</p>
                     </div>
-                    <div className="text-center p-2.5 bg-slate-dark/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                    <div className="text-center p-2.5 bg-slate-900/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Wins</p>
                        <p className="text-lg font-space font-black text-white">{player.wins}</p>
                     </div>
-                    <div className="text-center p-2.5 bg-slate-dark/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                    <div className="text-center p-2.5 bg-slate-900/40 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Streak</p>
                        <p className="text-lg font-space font-black text-white">{player.streak}</p>
                     </div>
@@ -105,7 +105,7 @@ export default function LeaderboardsPage() {
 
           {/* Global List */}
           <section className="glass rounded-[2.5rem] border-2 border-black shadow-card overflow-hidden">
-             <div className="bg-slate-dark/50 p-6 border-b-2 border-black flex items-center justify-between">
+             <div className="bg-slate-900/50 p-6 border-b-2 border-black flex items-center justify-between">
                 <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-3">
                    <Activity className="w-4 h-4 text-brand-orange" /> Operational Standings
                 </h4>

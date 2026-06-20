@@ -85,14 +85,14 @@ function CreateRoomForm() {
 
   if (!mounted) {
     return (
-      <div className="bg-[#161713] text-white min-h-screen flex items-center justify-center">
+      <div className="bg-slate-950 text-white min-h-screen flex items-center justify-center">
         <p className="font-outfit text-sm font-black uppercase tracking-[0.2em] animate-pulse">Initializing Arena...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-white min-h-screen">
       <Navbar />
 
       <main className="pt-32 pb-20 px-6 container mx-auto max-w-7xl">
@@ -102,7 +102,7 @@ function CreateRoomForm() {
         
         <section className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
             {/* Room Creation Form */}
-            <div className="bg-[#24261f] p-8 md:p-12 border-[4px] border-black rounded-[2.5rem] shadow-[8px_8px_0px_#000000] relative overflow-hidden">
+            <div className="bg-slate-800 p-8 md:p-12 border-[4px] border-black rounded-[2.5rem] shadow-[8px_8px_0px_#000000] relative overflow-hidden">
                <div className="relative z-10 mb-12">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-orange mb-3 block">Room Setup</span>
                   <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tighter uppercase text-white">
@@ -129,7 +129,7 @@ function CreateRoomForm() {
                               className={`p-5 rounded-2xl border-[3.5px] border-black text-left shadow-[4px_4px_0px_#000000] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-[2.5px_2.5px_0px_#000000] transition-all cursor-pointer ${
                                 selectedGame === item.slug 
                                   ? 'bg-brand-orange text-slate-950 font-black' 
-                                  : 'bg-[#1c1d18] text-slate-400 hover:text-white'
+                                  : 'bg-slate-900 text-slate-400 hover:text-white'
                               }`}
                             >
                                <div className="flex items-center justify-between mb-3">
@@ -154,7 +154,7 @@ function CreateRoomForm() {
                         <input 
                           value={roomName}
                           onChange={(e) => setRoomName(e.target.value.toUpperCase())}
-                          className="w-full h-14 px-6 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
+                          className="w-full h-14 px-6 bg-slate-900 border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
                         />
                      </div>
                      <div>
@@ -162,7 +162,7 @@ function CreateRoomForm() {
                         <select 
                           value={region}
                           onChange={(e) => setRegion(e.target.value)}
-                          className="w-full h-14 px-6 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all cursor-pointer appearance-none"
+                          className="w-full h-14 px-6 bg-slate-900 border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all cursor-pointer appearance-none"
                         >
                            <option>Mumbai Hub</option>
                            <option>Singapore Node</option>
@@ -179,7 +179,7 @@ function CreateRoomForm() {
                           value={maxPlayers}
                           onChange={(e) => setMaxPlayers(Number(e.target.value))}
                           disabled={allowedPlayerCounts.length <= 1}
-                          className="w-full h-14 px-6 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all cursor-pointer appearance-none disabled:opacity-70 disabled:cursor-not-allowed"
+                          className="w-full h-14 px-6 bg-slate-900 border-[3.5px] border-black rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all cursor-pointer appearance-none disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                            {allowedPlayerCounts.map(p => (
                              <option key={p} value={p}>{p} Players</option>
@@ -188,7 +188,7 @@ function CreateRoomForm() {
                      </div>
                      <div>
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Room Visibility</label>
-                        <div className="flex bg-[#1c1d18] p-1.5 rounded-2xl border-[3.5px] border-black shadow-[3px_3px_0px_#000000]">
+                        <div className="flex bg-slate-900 p-1.5 rounded-2xl border-[3.5px] border-black shadow-[3px_3px_0px_#000000]">
                            <button 
                              type="button" 
                              onClick={() => setIsPrivate(false)}
@@ -221,14 +221,14 @@ function CreateRoomForm() {
                                value={passcode}
                                onChange={(e) => setPasscode(e.target.value)}
                                placeholder="XXXX"
-                               className="w-full h-14 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl px-16 text-center text-base font-space font-black tracking-[0.5em] text-brand-orange shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
+                               className="w-full h-14 bg-slate-900 border-[3.5px] border-black rounded-2xl px-16 text-center text-base font-space font-black tracking-[0.5em] text-brand-orange shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
                              />
                           </div>
                        </motion.div>
                      )}
                   </AnimatePresence>
 
-                  <div className="flex items-center gap-4 p-5 rounded-2xl border-[3.5px] border-black bg-[#1c1d18] shadow-[3px_3px_0px_#000000]">
+                  <div className="flex items-center gap-4 p-5 rounded-2xl border-[3.5px] border-black bg-slate-900 shadow-[3px_3px_0px_#000000]">
                      <input 
                        type="checkbox"
                        id="allowSpectators"
@@ -249,18 +249,18 @@ function CreateRoomForm() {
 
             {/* Game Preview Panel */}
             <aside>
-               <div className="bg-[#24261f] p-8 md:p-12 border-[4px] border-black rounded-[2.5rem] shadow-[8px_8px_0px_#000000] relative overflow-hidden">
+               <div className="bg-slate-800 p-8 md:p-12 border-[4px] border-black rounded-[2.5rem] shadow-[8px_8px_0px_#000000] relative overflow-hidden">
                   <div className="relative z-10 flex items-center gap-6 mb-8">
-                      <div className="w-20 h-20 rounded-2xl bg-slate-950 border-[3.5px] border-black flex items-center justify-center font-space text-3xl font-black text-brand-orange shadow-[4px_4px_0px_#000000]">
-                         {game.shortCode}
-                      </div>
-                      <div>
-                         <span className="text-[8px] font-black uppercase tracking-widest text-brand-orange bg-[#1c1d18] border-2 border-black px-2 py-0.5 rounded-lg shadow-[2px_2px_0px_#000000] mb-1.5 inline-block">
-                            {game.category}
-                         </span>
-                         <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{game.name}</h3>
-                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1">{game.multiplayerType}</p>
-                      </div>
+                       <div className="w-20 h-20 rounded-2xl bg-slate-950 border-[3.5px] border-black flex items-center justify-center font-space text-3xl font-black text-brand-orange shadow-[4px_4px_0px_#000000]">
+                          {game.shortCode}
+                       </div>
+                       <div>
+                          <span className="text-[8px] font-black uppercase tracking-widest text-brand-orange bg-slate-900 border-2 border-black px-2 py-0.5 rounded-lg shadow-[2px_2px_0px_#000000] mb-1.5 inline-block">
+                             {game.category}
+                          </span>
+                          <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{game.name}</h3>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1">{game.multiplayerType}</p>
+                       </div>
                   </div>
 
                   <p className="text-xs text-slate-400 font-semibold leading-relaxed relative z-10 mb-8">
@@ -291,7 +291,7 @@ function CreateRoomForm() {
 export default function CreateRoomPage() {
   return (
     <Suspense fallback={
-      <div className="bg-[#161713] text-white min-h-screen flex items-center justify-center">
+      <div className="bg-slate-950 text-white min-h-screen flex items-center justify-center">
         <p className="font-outfit text-sm font-black uppercase tracking-[0.2em] animate-pulse">Loading parameters...</p>
       </div>
     }>

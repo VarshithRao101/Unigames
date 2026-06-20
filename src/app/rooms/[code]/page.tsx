@@ -553,7 +553,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
             key={player.id}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center justify-between p-4 bg-[#1c1d18] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]"
+            className="flex items-center justify-between p-4 bg-[var(--slate-900)] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]"
           >
             <div className="flex items-center gap-3">
               <div 
@@ -563,7 +563,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 {player.avatar}
               </div>
               <div>
-                <p className="font-outfit font-extrabold text-sm text-white flex items-center gap-1.5">
+                <p className="font-outfit font-extrabold text-sm text-slate-50 flex items-center gap-1.5">
                   {player.name}
                   {player.isHost && (
                     <span className="text-[8px] font-black uppercase tracking-wider bg-brand-orange/10 border-2 border-black text-brand-orange px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-[1px_1px_0px_#000000]">
@@ -605,7 +605,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         slots.push(
           <div
             key={`empty-${i}`}
-            className="flex items-center justify-between p-4 bg-[#161713]/40 border-[3px] border-dashed border-black/40 rounded-2xl"
+            className="flex items-center justify-between p-4 bg-[var(--slate-950)]/40 border-[3px] border-dashed border-black/40 rounded-2xl"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full border-[2.5px] border-dashed border-black/40 text-slate-700 flex items-center justify-center font-outfit font-extrabold text-xs">
@@ -636,11 +636,11 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       <>
         <Navbar />
         <Sidebar />
-        <main className="flex-1 pt-24 bg-[#161713] text-white min-h-screen pb-20 flex items-center justify-center">
+        <main className="flex-1 pt-24 bg-[var(--slate-950)] text-slate-50 min-h-screen pb-20 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md w-full bg-[#24261f] border-[4px] border-black p-8 rounded-[2.5rem] space-y-6 text-center shadow-[8px_8px_0px_#000000]"
+            className="max-w-md w-full bg-[var(--slate-800)] border-[4px] border-black p-8 rounded-[2.5rem] space-y-6 text-center shadow-[8px_8px_0px_#000000]"
           >
             <div className="w-16 h-16 bg-brand-orange border-[3.5px] border-black rounded-2xl flex items-center justify-center mx-auto text-slate-950 shadow-[3px_3px_0px_#000000]">
               <ShieldAlert className="w-8 h-8" />
@@ -650,7 +650,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               <span className="text-[10px] font-black uppercase tracking-[0.15em] bg-brand-orange text-slate-950 border-2 border-black px-3 py-1 rounded-lg shadow-[2px_2px_0px_#000000] mb-4 inline-block">
                 Private Room
               </span>
-              <h1 className="font-outfit font-black text-2xl uppercase tracking-wide mt-3 text-white">Lobby Code Required</h1>
+              <h1 className="font-outfit font-black text-2xl uppercase tracking-wide mt-3 text-slate-50">Lobby Code Required</h1>
               <p className="text-xs text-slate-400 mt-2 font-semibold leading-relaxed">Room #{roomCode} is passcode protected.</p>
             </div>
 
@@ -662,7 +662,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   maxLength={10}
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
-                  className="w-full h-14 bg-[#1c1d18] border-[3.5px] border-black rounded-2xl px-6 text-center text-base font-space font-black tracking-[0.4em] text-brand-orange shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
+                  className="w-full h-14 bg-[var(--slate-900)] border-[3.5px] border-black rounded-2xl px-6 text-center text-base font-space font-black tracking-[0.4em] text-brand-orange shadow-[3px_3px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[5px_5px_0px_#000000] transition-all"
                 />
                 {passwordError && (
                   <p className="text-[10px] text-danger font-black mt-2 uppercase tracking-wide">{passwordError}</p>
@@ -691,7 +691,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       <Navbar />
       <Sidebar />
 
-      <main className="flex-1 pt-24 bg-[#161713] text-white min-h-screen pb-20 selection:bg-brand-orange selection:text-slate-950">
+      <main className="flex-1 pt-24 bg-[var(--slate-950)] text-slate-50 min-h-screen pb-20 selection:bg-brand-orange selection:text-slate-950">
         <div className="max-w-7xl mx-auto px-6">
           
           <AnimatePresence mode="wait">
@@ -704,7 +704,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 className="space-y-8"
               >
                 {/* Header Lobby Navigation */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000]">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[var(--slate-800)] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000]">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-slate-950 border-[2.5px] border-black rounded-2xl flex items-center justify-center shadow-[2.5px_2.5px_0px_#000000]">
                       {getGameIcon(game.id)}
@@ -715,12 +715,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           Room Code: #{roomCode}
                         </span>
                         {isPrivate && (
-                          <span className="p-1 rounded bg-[#1c1d18] border-2 border-black text-brand-orange shadow-[1.5px_1.5px_0px_#000000]">
+                          <span className="p-1 rounded bg-[var(--slate-900)] border-2 border-black text-brand-orange shadow-[1.5px_1.5px_0px_#000000]">
                             <ShieldAlert className="w-3.5 h-3.5" />
                           </span>
                         )}
                       </div>
-                      <h1 className="font-outfit font-black text-xl uppercase tracking-wide mt-2.5 text-white">
+                      <h1 className="font-outfit font-black text-xl uppercase tracking-wide mt-2.5 text-slate-50">
                         {roomName}
                       </h1>
                     </div>
@@ -729,7 +729,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setIsInviteOpen(true)}
-                      className="h-10 px-4 border-[2.5px] border-black bg-[#1c1d18] text-white hover:text-brand-orange shadow-[3px_3px_0px_#000000] font-black text-[9.5px] uppercase tracking-widest active:translate-y-0.5 transition-all cursor-pointer rounded-xl flex items-center justify-center"
+                      className="h-10 px-4 border-[2.5px] border-black bg-[var(--slate-900)] text-slate-50 hover:text-brand-orange shadow-[3px_3px_0px_#000000] font-black text-[9.5px] uppercase tracking-widest active:translate-y-0.5 transition-all cursor-pointer rounded-xl flex items-center justify-center"
                     >
                       Invite Friends
                     </button>
@@ -754,7 +754,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <div className="lg:col-span-8 space-y-6">
                     
                     {/* Players slots system */}
-                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
                       <div className="flex justify-between items-center pb-2">
                         <h3 className="font-outfit font-black text-[10px] uppercase tracking-widest text-slate-400 flex items-center gap-2">
                           <Users className="w-4 h-4 text-brand-orange" />
@@ -763,7 +763,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         
                         <button
                           onClick={handleToggleSpectatorMode}
-                          className="flex items-center text-[8.5px] font-black uppercase tracking-widest text-brand-orange bg-[#1c1d18] border-2 border-black px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:text-white cursor-pointer"
+                          className="flex items-center text-[8.5px] font-black uppercase tracking-widest text-brand-orange bg-[var(--slate-900)] border-2 border-black px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:text-slate-50 cursor-pointer"
                         >
                           {isSpectatingOnly ? "Join as Player" : "Switch to Spectator"}
                         </button>
@@ -775,7 +775,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     </div>
 
                     {/* Game Rules panel */}
-                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-5">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-5">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-brand-orange" />
                         Rules & Details
@@ -799,7 +799,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         </div>
                       </div>
 
-                      <div className="bg-[#1c1d18] p-4 border-[3px] border-black rounded-2xl flex gap-3.5 items-start shadow-[3px_3px_0px_#000000]">
+                      <div className="bg-[var(--slate-900)] p-4 border-[3px] border-black rounded-2xl flex gap-3.5 items-start shadow-[3px_3px_0px_#000000]">
                         <HelpCircle className="w-5 h-5 text-brand-orange shrink-0 mt-0.5" />
                         <div>
                           <h4 className="font-outfit font-extrabold text-[10px] text-slate-200 uppercase tracking-wide">About Game</h4>
@@ -816,13 +816,13 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <div className="lg:col-span-4 space-y-6">
                     
                     {/* Chat Board */}
-                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] flex flex-col h-[380px]">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] flex flex-col h-[380px]">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 mb-3">
                         Room Chat
                       </h3>
 
                       {/* Messages scroll box */}
-                      <div className="flex-1 overflow-y-auto bg-[#1c1d18] border-[3px] border-black rounded-2xl p-4 flex flex-col gap-3 mb-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
+                      <div className="flex-1 overflow-y-auto bg-[var(--slate-900)] border-[3px] border-black rounded-2xl p-4 flex flex-col gap-3 mb-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
                         {chatMessages.map((msg, idx) => (
                           <div
                             key={idx}
@@ -849,7 +849,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                                   ? "bg-slate-900/30 text-slate-550 border border-slate-900/40 text-[9px] font-mono py-1 rounded-lg"
                                   : msg.sender === "You"
                                   ? "bg-brand-orange text-slate-950 border-[2.5px] border-black font-extrabold rounded-2xl rounded-tr-none shadow-[2px_2px_0px_#000000]"
-                                  : "bg-[#161713] text-white border-[2.5px] border-black font-bold rounded-2xl rounded-tl-none shadow-[2px_2px_0px_#000000]"
+                                  : "bg-[var(--slate-950)] text-slate-50 border-[2.5px] border-black font-bold rounded-2xl rounded-tl-none shadow-[2px_2px_0px_#000000]"
                               }`}
                             >
                               {msg.text}
@@ -866,7 +866,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           value={inputText}
                           onChange={(e) => setInputText(e.target.value)}
                           placeholder="Type message..."
-                          className="flex-1 bg-[#1c1d18] text-xs font-bold border-[3px] border-black rounded-xl px-4 py-2.5 outline-none focus:border-brand-orange placeholder:text-slate-500 text-white shadow-[2px_2px_0px_#000000]"
+                          className="flex-1 bg-[var(--slate-900)] text-xs font-bold border-[3px] border-black rounded-xl px-4 py-2.5 outline-none focus:border-brand-orange placeholder:text-slate-500 text-slate-50 shadow-[2px_2px_0px_#000000]"
                         />
                         <button type="submit" className="btn-gaming h-11 px-4 rounded-xl flex items-center justify-center">
                           <Send className="w-3.5 h-3.5 text-slate-950 stroke-[3]" />
@@ -875,7 +875,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     </div>
 
                     {/* Launch / Start Panel */}
-                    <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-slate-400 font-outfit font-black uppercase tracking-wider">Ready Check</span>
                         <span className="text-brand-orange font-mono font-black">
@@ -889,7 +889,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                             onClick={handleToggleReady}
                             className={`flex-1 h-12 uppercase font-black text-xs rounded-xl border-[3.5px] border-black shadow-[3px_3px_0px_#000000] cursor-pointer ${
                               players.find((p) => p.id === "p1")?.isReady 
-                                ? "bg-slate-800 text-white hover:bg-slate-700" 
+                                ? "bg-slate-800 text-slate-50 hover:bg-slate-700" 
                                 : "bg-brand-orange text-slate-950 hover:bg-brand-orange/90"
                             }`}
                           >
@@ -929,7 +929,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.05 }}
-                className="max-w-2xl mx-auto bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center flex flex-col justify-center items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative overflow-hidden"
+                className="max-w-2xl mx-auto bg-[var(--slate-800)] border-[4px] border-black text-slate-50 rounded-[2.5rem] p-12 text-center flex flex-col justify-center items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative overflow-hidden"
               >
                 <span className="text-[10px] font-black uppercase tracking-widest bg-brand-orange/15 text-brand-orange border-[2.5px] border-black px-4 py-1.5 rounded-xl shadow-[2px_2px_0px_#000000] z-10">
                   Starting Game
@@ -942,14 +942,14 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <div className="flex items-center gap-8 my-10 z-10">
                   {players.slice(0, 3).map((p) => (
                     <div key={p.id} className="relative flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full border-[3.5px] border-black bg-[#1c1d18] flex items-center justify-center font-outfit font-black text-lg relative shadow-[3px_3px_0px_#000000]">
+                      <div className="w-16 h-16 rounded-full border-[3.5px] border-black bg-[var(--slate-900)] flex items-center justify-center font-outfit font-black text-lg relative shadow-[3px_3px_0px_#000000]">
                         {p.avatar}
                       </div>
                       <span className="text-[10px] font-black text-slate-450 mt-3">{p.name}</span>
                     </div>
                   ))}
                   {players.length > 3 && (
-                    <div className="w-12 h-12 rounded-full border-[3px] border-dashed border-black/40 bg-[#1c1d18] flex items-center justify-center font-outfit font-bold text-xs text-slate-500">
+                    <div className="w-12 h-12 rounded-full border-[3px] border-dashed border-black/40 bg-[var(--slate-900)] flex items-center justify-center font-outfit font-bold text-xs text-slate-500">
                       +{players.length - 3}
                     </div>
                   )}
@@ -974,7 +974,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="max-w-2xl mx-auto bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-10 text-center flex flex-col justify-between items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative"
+                className="max-w-2xl mx-auto bg-[var(--slate-800)] border-[4px] border-black text-slate-50 rounded-[2.5rem] p-10 text-center flex flex-col justify-between items-center min-h-[500px] shadow-[8px_8px_0px_#000000] relative"
               >
                 <div className="w-full flex justify-between items-center border-b-[3px] border-black/40 pb-6">
                   <div className="flex items-center gap-3">
@@ -990,7 +990,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 </div>
 
                 <div className="my-10 space-y-6 max-w-lg">
-                  <div className="p-4 bg-[#1c1d18] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
+                  <div className="p-4 bg-[var(--slate-900)] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
                     <span className="font-outfit font-black text-[9px] uppercase tracking-widest text-brand-orange flex items-center justify-center gap-1">
                       <HelpCircle className="w-3.5 h-3.5" /> Loading Tips & Advice
                     </span>
@@ -1005,7 +1005,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     <span>Loading game...</span>
                     <span>{loadingProgress}%</span>
                   </div>
-                  <div className="w-full h-4 bg-[#1c1d18] border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0px_#000000]">
+                  <div className="w-full h-4 bg-[var(--slate-900)] border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0px_#000000]">
                     <motion.div 
                       className="h-full bg-brand-orange"
                       animate={{ width: `${loadingProgress}%` }}
@@ -1048,12 +1048,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 className="max-w-4xl mx-auto space-y-8"
               >
                 {/* Result header banner */}
-                <div className="bg-[#24261f] border-[4px] border-black rounded-[2.5rem] p-8 text-center relative overflow-hidden shadow-[8px_8px_0px_#000000] flex flex-col items-center">
+                <div className="bg-[var(--slate-800)] border-[4px] border-black rounded-[2.5rem] p-8 text-center relative overflow-hidden shadow-[8px_8px_0px_#000000] flex flex-col items-center">
                   <div className="w-16 h-16 bg-brand-orange border-[3.5px] border-black text-slate-950 rounded-2xl flex items-center justify-center mb-4 shadow-[4px_4px_0px_#000000]">
                     <Trophy className="w-8 h-8 fill-current" />
                   </div>
 
-                  <h1 className="font-outfit font-black text-3xl uppercase tracking-wider text-white">
+                  <h1 className="font-outfit font-black text-3xl uppercase tracking-wider text-slate-50">
                     Match Completed!
                   </h1>
                   <p className="text-xs text-slate-400 font-bold mt-1.5">Results calculated for Room #{roomCode}.</p>
@@ -1069,11 +1069,11 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     </div>
                     <div>
                       <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Duration</span>
-                      <p className="font-outfit font-black text-lg text-white mt-0.5">8m 42s</p>
+                      <p className="font-outfit font-black text-lg text-slate-50 mt-0.5">8m 42s</p>
                     </div>
                     <div>
                       <span className="text-[9px] font-black text-slate-550 uppercase tracking-widest">Achievements</span>
-                      <p className="font-outfit font-black text-lg text-white mt-0.5">1 Unlocked</p>
+                      <p className="font-outfit font-black text-lg text-slate-50 mt-0.5">1 Unlocked</p>
                     </div>
                   </div>
                 </div>
@@ -1082,7 +1082,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                   
                   {/* Standings table */}
-                  <div className="md:col-span-8 bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+                  <div className="md:col-span-8 bg-[var(--slate-800)] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
                     <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400">Leaderboard Standings</h3>
 
                     <div className="overflow-x-auto">
@@ -1097,7 +1097,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         </thead>
                         <tbody className="divide-y-[2px] divide-black/20">
                           {players.map((p, idx) => (
-                            <tr key={p.id} className="text-white hover:bg-black/10">
+                            <tr key={p.id} className="text-slate-50 hover:bg-black/10">
                               <td className="py-3 font-outfit font-black text-brand-orange">#{idx + 1}</td>
                               <td className="py-3 flex items-center gap-2">
                                 <div className="w-7 h-7 rounded-full bg-slate-950 border-[2px] border-black flex items-center justify-center font-outfit font-black text-[10px] shadow-[1.5px_1.5px_0px_#000000]">
@@ -1116,23 +1116,23 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                   {/* Achievements and stats column */}
                   <div className="md:col-span-4 space-y-6">
-                    <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
                       <h3 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                         <Award className="w-4 h-4 text-brand-orange" /> Achievements
                       </h3>
 
-                      <div className="bg-[#1c1d18] border-[3px] border-black p-3.5 rounded-2xl flex gap-3 items-center shadow-[3px_3px_0px_#000000]">
+                      <div className="bg-[var(--slate-900)] border-[3px] border-black p-3.5 rounded-2xl flex gap-3 items-center shadow-[3px_3px_0px_#000000]">
                         <div className="p-2 bg-brand-orange/15 text-brand-orange border-2 border-black rounded-xl shadow-[1.5px_1.5px_0px_#000000]">
                           <Zap className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="font-outfit font-black text-[10px] text-white uppercase tracking-wider">Challenger</h4>
+                          <h4 className="font-outfit font-black text-[10px] text-slate-50 uppercase tracking-wider">Challenger</h4>
                           <p className="text-[9px] font-bold text-slate-550 mt-0.5">Win a custom match room.</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+                    <div className="bg-[var(--slate-800)] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
                       <div className="flex gap-3">
                         <button 
                           onClick={handlePlayAgain}
@@ -1170,7 +1170,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="max-w-md w-full bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-6 space-y-5 shadow-[8px_8px_0px_#000000] relative"
+              className="max-w-md w-full bg-[var(--slate-800)] border-[4px] border-black text-slate-50 rounded-[2.5rem] p-6 space-y-5 shadow-[8px_8px_0px_#000000] relative"
             >
               <button
                 onClick={() => setIsInviteOpen(false)}
@@ -1188,7 +1188,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               <div className="space-y-2">
                 <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Room Code</span>
                 <div className="flex gap-2">
-                  <div className="flex-grow bg-[#1c1d18] border-[3px] border-black px-4 py-2.5 rounded-xl text-xs font-mono font-black tracking-widest text-brand-orange flex items-center justify-between shadow-[2px_2px_0px_#000000]">
+                  <div className="flex-grow bg-[var(--slate-900)] border-[3px] border-black px-4 py-2.5 rounded-xl text-xs font-mono font-black tracking-widest text-brand-orange flex items-center justify-between shadow-[2px_2px_0px_#000000]">
                     <span>#{roomCode}</span>
                     <span className="text-[9px] text-slate-550 font-sans tracking-normal uppercase font-bold">Expires in 2 hrs</span>
                   </div>
@@ -1205,15 +1205,15 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               <div className="space-y-3 pt-2">
                 <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Online Friends</span>
                 
-                <div className="max-h-[180px] overflow-y-auto space-y-2 bg-[#1c1d18] p-2.5 rounded-xl border-[3px] border-black shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
+                <div className="max-h-[180px] overflow-y-auto space-y-2 bg-[var(--slate-900)] p-2.5 rounded-xl border-[3px] border-black shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
                   {ONLINE_FRIENDS.map((friend) => (
                     <div key={friend.id} className="flex items-center justify-between p-2 hover:bg-black/20 rounded-xl transition-all">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-white shadow-[1px_1px_0px_#000000]">
+                        <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-slate-50 shadow-[1px_1px_0px_#000000]">
                           {friend.avatar}
                         </div>
                         <div>
-                          <p className="font-outfit font-black text-xs text-white leading-none">{friend.name}</p>
+                          <p className="font-outfit font-black text-xs text-slate-50 leading-none">{friend.name}</p>
                           <span className={`text-[8px] font-bold uppercase tracking-wider ${
                             friend.status === "Online" ? "text-green-400" : friend.status === "Playing" ? "text-brand-orange" : "text-slate-650"
                           }`}>

@@ -41,7 +41,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   // Loading Screen
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] bg-[#24261f] border-[4px] border-black rounded-[2.5rem] p-8 text-center space-y-4 shadow-[8px_8px_0px_#000000]">
+      <div className="flex flex-col items-center justify-center min-h-[500px] bg-slate-800 border-[4px] border-black rounded-[2.5rem] p-8 text-center space-y-4 shadow-[8px_8px_0px_#000000]">
         <svg className="animate-spin h-10 w-10 text-brand-orange" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -56,8 +56,8 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   // Graceful Error Screen - Missing Game
   if (error === "missing" || !entry) {
     return (
-      <div className="bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center max-w-lg mx-auto shadow-[8px_8px_0px_#000000] space-y-6">
-        <div className="w-16 h-16 bg-[#ff4d4d]/15 border-[3px] border-black rounded-2xl flex items-center justify-center mx-auto text-[#ff4d4d] shadow-[3px_3px_0px_#000000]">
+      <div className="bg-slate-800 border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center max-w-lg mx-auto shadow-[8px_8px_0px_#000000] space-y-6">
+        <div className="w-16 h-16 bg-danger/15 border-[3px] border-black rounded-2xl flex items-center justify-center mx-auto text-danger shadow-[3px_3px_0px_#000000]">
           <ShieldAlert className="w-8 h-8" />
         </div>
         <div>
@@ -81,7 +81,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   // Graceful Error Screen - Unsupported Version
   if (error === "unsupported") {
     return (
-      <div className="bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center max-w-lg mx-auto shadow-[8px_8px_0px_#000000] space-y-6">
+      <div className="bg-slate-800 border-[4px] border-black text-white rounded-[2.5rem] p-12 text-center max-w-lg mx-auto shadow-[8px_8px_0px_#000000] space-y-6">
         <div className="w-16 h-16 bg-brand-orange/15 border-[3px] border-black text-brand-orange rounded-2xl flex items-center justify-center mx-auto shadow-[3px_3px_0px_#000000]">
           <AlertTriangle className="w-8 h-8" />
         </div>
@@ -91,7 +91,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
             Game module <span className="text-brand-orange font-bold">"{entry.metadata.name}"</span> version <span className="text-brand-orange font-mono font-bold">{entry.metadata.version}</span> is deprecated. Platform dynamic loader requires game components configured with SDK version <span className="text-white font-mono font-bold">&gt;= 0.5.0</span>.
           </p>
         </div>
-        <div className="bg-[#1c1d18] p-4 rounded-xl border-2 border-black text-left shadow-[2px_2px_0px_#000]">
+        <div className="bg-slate-900 p-4 rounded-xl border-2 border-black text-left shadow-[2px_2px_0px_#000]">
           <span className="text-[9px] font-black text-brand-orange uppercase tracking-widest block">Submitter Info</span>
           <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
             Developer Team: <span className="text-white font-bold">{entry.metadata.developerTeam.teamName}</span>. Contact developer lead to push a new SDK build version.
@@ -109,14 +109,14 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
     const devProgress = entry.metadata.status === "development" ? 45 : entry.metadata.status === "alpha" ? 65 : 85;
 
     return (
-      <div className="bg-[#24261f] border-[4px] border-black text-white rounded-[2.5rem] p-10 max-w-2xl mx-auto shadow-[8px_8px_0px_#000000] space-y-8 relative overflow-hidden">
+      <div className="bg-slate-800 border-[4px] border-black text-white rounded-[2.5rem] p-10 max-w-2xl mx-auto shadow-[8px_8px_0px_#000000] space-y-8 relative overflow-hidden">
         {/* Decorative corner tag */}
         <div className="absolute top-0 right-0 bg-brand-orange/15 border-l-2 border-b-2 border-black px-4 py-1.5 rounded-bl-2xl text-[9px] font-black uppercase tracking-widest text-brand-orange shadow-[1px_1px_0px_#000]">
           {entry.metadata.status} status
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-[#1c1d18] border-[3px] border-black rounded-2xl flex items-center justify-center text-4xl shadow-[3px_3px_0px_#000000]">
+          <div className="w-16 h-16 bg-slate-900 border-[3px] border-black rounded-2xl flex items-center justify-center text-4xl shadow-[3px_3px_0px_#000000]">
             {entry.metadata.thumbnail}
           </div>
           <div>
@@ -125,7 +125,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
           </div>
         </div>
 
-        <p className="text-xs text-slate-350 leading-relaxed bg-[#1c1d18] p-4 border-[3px] border-black rounded-2xl shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
+        <p className="text-xs text-slate-350 leading-relaxed bg-slate-900 p-4 border-[3px] border-black rounded-2xl shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
           {entry.metadata.description}
         </p>
 
@@ -135,7 +135,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
             <span>Development Integration Progress</span>
             <span className="text-brand-orange font-mono font-black">{devProgress}%</span>
           </div>
-          <div className="w-full h-3 bg-[#1c1d18] border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0px_#000]">
+          <div className="w-full h-3 bg-slate-900 border-[3px] border-black rounded-full overflow-hidden shadow-[2px_2px_0px_#000]">
             <div className="h-full bg-brand-orange transition-all duration-500" style={{ width: `${devProgress}%` }} />
           </div>
         </div>
@@ -242,7 +242,7 @@ function GameWorkspaceWrapper({
       <div className="lg:col-span-8 space-y-6">
         
         {/* Game Render Frame Container */}
-        <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 shadow-[6px_6px_0px_#000000] relative overflow-hidden">
+        <div className="bg-slate-800 border-[3.5px] border-black rounded-[2rem] p-6 shadow-[6px_6px_0px_#000000] relative overflow-hidden">
           
           {/* Header Info HUD */}
           <div className="flex justify-between items-center border-b-[3px] border-black/45 pb-4 mb-6">
@@ -268,7 +268,7 @@ function GameWorkspaceWrapper({
           </div>
 
           {/* Load component inside standard container */}
-          <div className="min-h-[350px] flex items-center justify-center bg-[#1c1d18] rounded-2xl border-[3px] border-black p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
+          <div className="min-h-[350px] flex items-center justify-center bg-slate-900 rounded-2xl border-[3px] border-black p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
             {lifecycleState === "waiting" ? (
               <div className="text-center space-y-4 max-w-sm py-12">
                 <span className="text-5xl inline-block">{metadata.thumbnail}</span>
@@ -304,7 +304,7 @@ function GameWorkspaceWrapper({
         </div>
 
         {/* Dynamic Rules Engine panel */}
-        <div className="bg-[#24261f] border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
+        <div className="bg-slate-800 border-[3.5px] border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_#000000] space-y-4">
           <h4 className="font-outfit font-black text-xs uppercase tracking-wider text-slate-400 flex items-center gap-2">
             <Info className="w-4 h-4 text-brand-orange" /> Rules Specification
           </h4>
@@ -323,7 +323,7 @@ function GameWorkspaceWrapper({
       <div className="lg:col-span-4 space-y-6">
         
         {/* Settings Hub Drawer */}
-        <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+        <div className="bg-slate-800 border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
           <button 
             onClick={() => setSettingsOpen(!settingsOpen)}
             className="w-full flex justify-between items-center text-xs font-black font-outfit uppercase tracking-wider text-slate-400 hover:text-white cursor-pointer"
@@ -350,7 +350,7 @@ function GameWorkspaceWrapper({
                   type="number" 
                   value={settings.turnTimer || 30}
                   onChange={(e) => setSettings(prev => ({ ...prev, turnTimer: parseInt(e.target.value) }))}
-                  className="w-full bg-[#1c1d18] border-[3px] border-black rounded-xl px-3 py-2 text-white outline-none focus:border-brand-orange shadow-[2px_2px_0px_#000]"
+                  className="w-full bg-slate-900 border-[3px] border-black rounded-xl px-3 py-2 text-white outline-none focus:border-brand-orange shadow-[2px_2px_0px_#000]"
                   min={10}
                   max={120}
                 />
@@ -360,7 +360,7 @@ function GameWorkspaceWrapper({
         </div>
 
         {/* Developer Metadata Panel */}
-        <div className="bg-[#24261f] border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
+        <div className="bg-slate-800 border-[3.5px] border-black rounded-[2rem] p-6 space-y-4 shadow-[6px_6px_0px_#000000]">
           <button 
             onClick={() => setDeveloperInfoOpen(!developerInfoOpen)}
             className="w-full flex justify-between items-center text-xs font-black font-outfit uppercase tracking-wider text-slate-400 hover:text-white cursor-pointer"

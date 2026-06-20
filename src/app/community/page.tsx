@@ -111,7 +111,7 @@ function SectionHeading({ kicker, title, center = false, description }: { kicker
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2 }}
-          className="text-slate-400 text-xs md:text-sm max-w-xl mx-auto font-medium"
+          className="text-slate-450 text-xs md:text-sm max-w-xl mx-auto font-medium"
         >
           {description}
         </motion.p>
@@ -147,7 +147,7 @@ export default function CommunityPage() {
   const tickerEvents = useMemo(() => [
     "NIGHT BLITZ ROOM IS OPEN — CHESS ARENA · MUMBAI",
     "NOVA CREATED LOBBY TIC442 — TIC-TAC-TOE · SINGAPORE",
-    "BOARDKING LAUNCHED PRIVATE ARENA LDO777 — LUDO RUSH · MUMBAI",
+    "BOARDKING LAUNCHED PRIVATE ARENA LDO777 — LDO RUSH · MUMBAI",
     "LUNA ACQUIRED WEEKLY LEADERBOARD DIVISION #4 — TIC-TAC-TOE",
     "GARRY JOINED ACTIVE ROOM CHS901 — CHESS ARENA · MUMBAI",
   ], []);
@@ -193,7 +193,7 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-slate-50 min-h-screen">
       <Navbar />
 
       <main suppressHydrationWarning>
@@ -206,7 +206,7 @@ export default function CommunityPage() {
               alt="Gaming Background" 
               className="w-full h-full object-cover opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-dark/20 via-slate-dark/80 to-slate-dark" />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/80 to-slate-950" />
           </div>
 
           {/* Floating 2D Cartoon Game Decors (Highly Transparent & Centered Placements) */}
@@ -237,7 +237,7 @@ export default function CommunityPage() {
                   <span className="gradient-text">DOMINATE?</span>
                 </h1>
 
-                <p className="text-xs md:text-sm text-slate-400 mb-6 max-w-xl mx-auto font-medium leading-relaxed">
+                <p className="text-xs md:text-sm text-slate-450 mb-6 max-w-xl mx-auto font-medium leading-relaxed">
                   The arena is live, the stakes have never been higher. 
                   Your global legacy starts with a single decisive move.
                 </p>
@@ -249,7 +249,7 @@ export default function CommunityPage() {
                     </Button>
                   </Link>
                   <Link href="/rooms">
-                    <Button variant="outline" className="h-12 px-8 rounded-xl border-white/10 hover:bg-white/10 transition-all text-sm backdrop-blur-md">
+                    <Button variant="outline" className="h-12 px-8 rounded-xl border-3 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 transition-all text-sm backdrop-blur-md shadow-[3px_3px_0px_#000]">
                       Explore Lobbies
                     </Button>
                   </Link>
@@ -260,13 +260,13 @@ export default function CommunityPage() {
         </section>
 
         {/* ── 1.5. LIVE EVENT TICKER MARQUEE ── */}
-        <section className="relative overflow-hidden py-3 bg-slate-dark/20 border-y border-white/5">
+        <section className="relative overflow-hidden py-3 bg-slate-950/20 border-y-3 border-black">
           <div className="container mx-auto px-6 max-w-7xl">
             {/* The Outer Bar */}
-            <div className="glass py-2 px-4 rounded-xl flex items-center gap-3 bg-slate-dark/80 relative overflow-hidden">
+            <div className="glass py-2 px-4 rounded-xl flex items-center gap-3 bg-slate-950/80 relative overflow-hidden">
               
               {/* LIVE indicator badge */}
-              <div className="flex-shrink-0 flex items-center gap-1.5 rounded-lg border border-brand-orange/45 bg-[#ffaa00]/10 px-2 py-0.5 select-none">
+              <div className="flex-shrink-0 flex items-center gap-1.5 rounded-lg border border-brand-orange/45 bg-brand-orange/10 px-2 py-0.5 select-none">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-orange animate-pulse" />
                 <span className="font-space text-[8px] font-black uppercase tracking-wider text-brand-orange">LIVE</span>
               </div>
@@ -295,7 +295,7 @@ export default function CommunityPage() {
         </section>
 
         {/* ── 2. TACTICAL ACTIONS ── */}
-        <section className="section-padding bg-slate-dark/30 border-y border-white/5">
+        <section className="section-padding bg-slate-950/30 border-b-3 border-black">
            <div className="container mx-auto px-6 max-w-7xl">
               <SectionHeading 
                 center 
@@ -330,15 +330,15 @@ export default function CommunityPage() {
                      initial={{ opacity: 0, y: 15 }}
                      whileInView={{ opacity: 1, y: 0 }}
                      transition={{ delay: i * 0.08 }}
-                     className="glass p-5 rounded-2xl border border-white/5 hover:border-brand-orange/20 transition-all text-center group cursor-pointer"
+                     className="glass p-5 transition-all text-center group cursor-pointer"
                    >
                      <Link href={step.href}>
                        <div>
-                         <div className="w-11 h-11 rounded-xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-4 border border-brand-orange/20 group-hover:scale-105 group-hover:bg-brand-orange transition-all duration-300 shadow-orange/10">
-                            <step.icon className="w-5 h-5 text-brand-orange group-hover:text-slate-950 transition-colors" />
-                         </div>
-                         <h3 className="text-base font-black mb-2 uppercase tracking-tight">{step.title}</h3>
-                         <p className="text-[11px] text-slate-500 font-bold leading-relaxed">{step.desc}</p>
+                          <div className="w-11 h-11 rounded-xl bg-brand-orange/10 flex items-center justify-center mx-auto mb-4 border border-brand-orange/20 group-hover:scale-105 group-hover:bg-brand-orange transition-all duration-300 shadow-orange/10">
+                             <step.icon className="w-5 h-5 text-brand-orange group-hover:text-slate-950 transition-colors" />
+                          </div>
+                          <h3 className="text-base font-black mb-2 uppercase tracking-tight">{step.title}</h3>
+                          <p className="text-[11px] text-slate-500 font-bold leading-relaxed">{step.desc}</p>
                        </div>
                      </Link>
                    </motion.div>
@@ -348,7 +348,7 @@ export default function CommunityPage() {
         </section>
 
         {/* ── 3. COMMUNICATION UPLINK (CHAT & SQUAD) ── */}
-        <section className="section-padding bg-slate-dark/30 border-y border-white/5 relative overflow-hidden" id="chat">
+        <section className="section-padding bg-slate-950/30 border-b-3 border-black relative overflow-hidden" id="chat">
           {/* Floating 2D Cartoon Game Decors (More Transparent) */}
           <motion.div 
             animate={{ rotate: [0, 3, -3, 0], y: [0, -6, 0] }}
@@ -366,26 +366,26 @@ export default function CommunityPage() {
                    </span>
                    <h2 className="text-3xl md:text-4xl font-black mb-2 tracking-tighter uppercase leading-[0.9]">
                       {activeChannel === "global" ? (
-                        <>COMMUNICATION <span className="gradient-text">UPLINK</span></>
-                      ) : (
-                        <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
-                      )}
+                         <>COMMUNICATION <span className="gradient-text">UPLINK</span></>
+                       ) : (
+                         <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
+                       )}
                    </h2>
-                   <p className="text-xs md:text-sm text-slate-400 font-medium">
+                   <p className="text-xs md:text-sm text-slate-455 font-medium">
                       {activeChannel === "global" 
                         ? "Coordinate tactical maneuvers, share access keys, and maintain synchronization with the global squad in real-time."
                         : `Secure point-to-point connection established with operator ${activeChannel}. Transmit encrypted messages below.`}
                    </p>
                 </div>
-                <div className="flex bg-white/5 border border-white/10 rounded-xl p-2.5 items-center gap-4 backdrop-blur-xl">
+                <div className="flex bg-slate-900/40 border-3 border-black rounded-xl p-2.5 items-center gap-4 shadow-[3px_3px_0px_#000000]">
                    <div className="flex items-center gap-1.5">
                       <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
                       <span className="text-[8px] font-black uppercase tracking-widest text-success">Node Online</span>
                    </div>
-                   <div className="h-6 w-[1px] bg-white/10" />
+                   <div className="h-6 w-[1.5px] bg-slate-800" />
                    <div className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-brand-orange" />
-                      <span className="text-sm font-space font-black text-white">482</span>
+                      <span className="text-sm font-space font-black text-slate-50">482</span>
                    </div>
                 </div>
              </div>
@@ -393,9 +393,9 @@ export default function CommunityPage() {
              <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
                {/* Active Members Sidebar */}
                <aside className="space-y-6">
-                  <div className="glass p-4 rounded-2xl border border-white/5 shadow-2xl">
+                  <div className="glass p-4">
                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Active Squad</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-50">Active Squad</h4>
                         <Activity className="w-3.5 h-3.5 text-brand-orange animate-pulse" />
                      </div>
                      
@@ -403,25 +403,25 @@ export default function CommunityPage() {
                         {/* Global Lobby Link */}
                         <div 
                           onClick={() => setActiveChannel("global")}
-                          className={`group p-2 rounded-xl border cursor-pointer transition-all ${
+                          className={`group p-2 rounded-xl border-3 cursor-pointer transition-all ${
                             activeChannel === "global" 
                               ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                              : "border-white/5 bg-white/2 hover:border-brand-orange/30 hover:bg-white/5"
+                              : "border-black bg-slate-900/40 hover:bg-slate-900/80"
                           }`}
                         >
                            <div className="flex items-center gap-2">
-                              <div className={`h-7 w-7 rounded-lg flex items-center justify-center font-black text-[10px] shadow-2xl relative transition-all ${
-                                activeChannel === "global" ? "bg-brand-orange text-slate-950" : "bg-slate-dark border border-white/10 text-brand-orange"
+                              <div className={`h-7 w-7 rounded-lg flex items-center justify-center font-black text-[10px] shadow-[1.5px_1.5px_0px_#000] relative transition-all ${
+                                activeChannel === "global" ? "bg-brand-orange text-slate-950" : "bg-slate-950 border border-black text-brand-orange"
                               }`}>
                                  G
                               </div>
                               <div className="flex-1 min-w-0">
                                  <p className={`text-[11px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                   activeChannel === "global" ? "text-brand-orange" : "text-white group-hover:text-brand-orange"
+                                   activeChannel === "global" ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
                                  }`}>Global Comms</p>
                                  <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest truncate">Public Lobby Chat</p>
                               </div>
-                              <Globe className={`w-3 h-3 ${activeChannel === "global" ? "text-brand-orange animate-pulse" : "text-slate-700"}`} />
+                              <Globe className={`w-3 h-3 ${activeChannel === "global" ? "text-brand-orange animate-pulse" : "text-slate-500"}`} />
                            </div>
                         </div>
 
@@ -431,25 +431,25 @@ export default function CommunityPage() {
                             <div 
                               key={member.id} 
                               onClick={() => setActiveChannel(member.name)}
-                              className={`group p-2 rounded-xl border cursor-pointer transition-all ${
+                              className={`group p-2 rounded-xl border-3 cursor-pointer transition-all ${
                                 isSelected 
                                   ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                                  : "border-white/5 bg-white/2 hover:border-brand-orange/30 hover:bg-white/5"
+                                  : "border-black bg-slate-900/40 hover:bg-slate-900/80"
                               }`}
                             >
                                <div className="flex items-center gap-2">
-                                  <div className="h-7 w-7 rounded-full bg-slate-dark border border-white/10 flex items-center justify-center font-black text-[10px] text-slate-500 shadow-2xl relative">
+                                  <div className="h-7 w-7 rounded-full bg-slate-950 border border-black flex items-center justify-center font-black text-[10px] text-slate-500 shadow-[1.5px_1.5px_0px_#000] relative">
                                      {member.name.charAt(0)}
-                                     <span className="absolute bottom-0 right-0 h-1.5 w-1.5 bg-success rounded-full border border-slate-950" />
+                                     <span className="absolute bottom-0 right-0 h-1.5 w-1.5 bg-success rounded-full border border-black" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                      <p className={`text-[11px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                       isSelected ? "text-brand-orange" : "text-white group-hover:text-brand-orange"
+                                       isSelected ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
                                      }`}>{member.name}</p>
-                                     <p className="text-[7px] font-black text-slate-600 uppercase tracking-widest truncate">{member.activity}</p>
+                                     <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest truncate">{member.activity}</p>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                     <Zap className={`w-3 h-3 ${isSelected ? "text-brand-orange" : "text-slate-800"}`} />
+                                     <Zap className={`w-3 h-3 ${isSelected ? "text-brand-orange" : "text-slate-700"}`} />
                                   </div>
                                </div>
                             </div>
@@ -460,7 +460,7 @@ export default function CommunityPage() {
                </aside>
 
                {/* Chat Node */}
-               <section className="glass rounded-2xl border border-white/5 overflow-hidden flex flex-col h-[320px] shadow-2xl relative">
+               <section className="glass overflow-hidden flex flex-col h-[320px] relative">
                   {/* Chat Background Decor */}
                   <div className="absolute inset-0 opacity-5 pointer-events-none">
                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-full bg-mesh rotate-12" />
@@ -473,47 +473,47 @@ export default function CommunityPage() {
                   >
                      <AnimatePresence initial={false}>
                         {currentMessages.length > 0 ? (
-                          currentMessages.map((message, i) => (
-                             <motion.div 
-                               key={message.id}
-                               initial={{ opacity: 0, x: message.sender === 'You' ? 15 : -15 }}
-                               animate={{ opacity: 1, x: 0 }}
-                               className={`flex flex-col ${message.sender === 'You' ? 'items-end' : 'items-start'}`}
-                             >
-                                <div className="flex items-center gap-1.5 mb-0.5">
-                                   <span className={`text-[9px] font-black uppercase tracking-widest ${message.sender === 'You' ? 'text-brand-orange' : 'text-slate-500'}`}>
-                                      {message.sender}
-                                   </span>
-                                   <span className="text-[7px] font-black text-slate-850 tracking-[0.2em]">{message.time}</span>
-                                </div>
-                                <div className={`max-w-[80%] p-2.5 py-2 rounded-xl border transition-all duration-300 ${
-                                  message.sender === 'You' 
-                                    ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-white' 
-                                    : 'bg-white/5 border-white/5 rounded-tl-none text-slate-300'
-                                }`}>
-                                   <p className="text-xs font-medium leading-relaxed">{message.text}</p>
-                                </div>
-                             </motion.div>
-                          ))
+                           currentMessages.map((message, i) => (
+                              <motion.div 
+                                key={message.id}
+                                initial={{ opacity: 0, x: message.sender === 'You' ? 15 : -15 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className={`flex flex-col ${message.sender === 'You' ? 'items-end' : 'items-start'}`}
+                              >
+                                 <div className="flex items-center gap-1.5 mb-0.5">
+                                    <span className={`text-[9px] font-black uppercase tracking-widest ${message.sender === 'You' ? 'text-brand-orange' : 'text-slate-500'}`}>
+                                       {message.sender}
+                                    </span>
+                                    <span className="text-[7px] font-black text-slate-500 tracking-[0.2em]">{message.time}</span>
+                                 </div>
+                                 <div className={`max-w-[80%] p-2.5 py-2 rounded-xl border-3 border-black transition-all duration-300 ${
+                                   message.sender === 'You' 
+                                     ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-slate-555 shadow-[2px_2px_0px_#000]' 
+                                     : 'bg-slate-900/60 rounded-tl-none text-slate-350 shadow-[2px_2px_0px_#000]'
+                                 }`}>
+                                    <p className="text-xs font-medium leading-relaxed">{message.text}</p>
+                                 </div>
+                              </motion.div>
+                           ))
                         ) : (
-                          <div className="h-full flex items-center justify-center text-slate-650 text-xs font-bold uppercase tracking-widest select-none">
-                             No messages in direct channel
-                          </div>
+                           <div className="h-full flex items-center justify-center text-slate-500 text-xs font-bold uppercase tracking-widest select-none">
+                              No messages in direct channel
+                           </div>
                         )}
                      </AnimatePresence>
                   </div>
 
                   {/* Input Area */}
-                  <div className="p-3 md:p-4 bg-white/2 border-t border-white/5 relative z-20 backdrop-blur-xl">
+                  <div className="p-3 md:p-4 bg-slate-900/20 border-t-3 border-black relative z-20 backdrop-blur-xl">
                      <form onSubmit={handleChatSend} className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
-                           <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
+                           <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-550" />
                            <input 
                              value={chatText}
                              onChange={(e) => setChatText(e.target.value)}
                              type="text" 
                              placeholder={activeChannel === "global" ? "INPUT TRANSMISSION..." : `SEND MESSAGE TO ${activeChannel}...`}
-                             className="w-full h-10 bg-slate-dark/80 border border-white/10 rounded-xl px-12 text-[9px] font-black uppercase tracking-[0.25em] text-white focus:outline-none focus:border-brand-orange/50"
+                             className="w-full h-10 bg-slate-900 border-3 border-black rounded-xl px-12 text-[9px] font-black uppercase tracking-[0.25em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[2px_2px_0px_#000]"
                            />
                         </div>
                         <Button type="submit" className="btn-gaming h-10 px-6 rounded-xl text-xs">
@@ -531,14 +531,14 @@ export default function CommunityPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1/2 bg-brand-orange/5 blur-[120px] -rotate-12" />
           
           <div className="container mx-auto px-6 max-w-7xl relative z-10">
-            <div className="glass rounded-3xl border border-brand-orange/20 p-0.5">
-              <div className="bg-slate-dark/40 rounded-[1.4rem] p-6 md:p-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="panel p-0.5">
+              <div className="bg-slate-950/40 rounded-[1.4rem] p-6 md:p-10 flex flex-col md:flex-row items-center gap-10">
                 <div className="flex-1">
                   <span className="kicker mb-4 border-brand-orange bg-brand-orange/10 text-brand-orange">Turbo Matchmaking</span>
                   <h2 className="text-3xl md:text-4xl font-black mb-4 leading-[0.9] tracking-tighter uppercase">
                     INSTANT <span className="gradient-text">QUICK RUSH</span>
                   </h2>
-                  <p className="text-xs md:text-sm text-slate-400 mb-6 font-medium leading-relaxed max-w-sm">
+                  <p className="text-xs md:text-sm text-slate-455 mb-6 font-medium leading-relaxed max-w-sm">
                     Zero waiting. Zero lag. Our proprietary rush engine matches you with players 
                     at your exact skill level in under 5 seconds. Ready?
                   </p>
@@ -553,16 +553,16 @@ export default function CommunityPage() {
                     <motion.div 
                       animate={{ rotate: 360 }}
                       transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 rounded-full border border-dashed border-brand-orange/40" 
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-brand-orange/40" 
                     />
                     <motion.div 
                       animate={{ rotate: -360 }}
                       transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-3 rounded-full border border-dashed border-white/10" 
+                      className="absolute inset-3 rounded-full border-2 border-dashed border-slate-850" 
                     />
-                    <div className="absolute inset-6 rounded-full glass border border-brand-orange/20 flex flex-col items-center justify-center text-center">
+                    <div className="absolute inset-6 rounded-full glass flex flex-col items-center justify-center text-center">
                       <Timer className="w-8 h-8 text-brand-orange mb-2 animate-pulse" />
-                      <span className="text-4xl font-space font-black tracking-tighter">04.2s</span>
+                      <span className="text-4xl font-space font-black tracking-tighter text-slate-50">04.2s</span>
                       <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1">Avg Match Wait</span>
                     </div>
                   </div>
@@ -578,7 +578,7 @@ export default function CommunityPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
               {/* Left Column: LIVE ROOM LIST */}
-              <div className="glass p-6 md:p-8 rounded-[2.5rem] flex flex-col h-full">
+              <div className="glass p-6 md:p-8 flex flex-col h-full">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <span className="kicker mb-2 inline-flex items-center gap-1.5">
@@ -587,7 +587,7 @@ export default function CommunityPage() {
                     <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight">Live Room List</h2>
                   </div>
                   <Link href="/rooms">
-                    <Button variant="outline" className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-white/10 hover:bg-white/5 rounded-xl">
+                    <Button variant="outline" className="h-9 px-4 text-[10px] font-black uppercase tracking-widest border-3 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 rounded-xl shadow-[2px_2px_0px_#000]">
                       Browse All
                     </Button>
                   </Link>
@@ -646,39 +646,39 @@ export default function CommunityPage() {
                   ].map((room, i) => (
                     <div 
                       key={room.id}
-                      className="p-4 bg-slate-dark/60 rounded-2xl border border-white/5 hover:border-brand-orange/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                      className="p-4 bg-slate-900/40 rounded-2xl border-3 border-black hover:border-brand-orange/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-[2.5px_2.5px_0px_#000000]"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-base font-black tracking-tight text-white">{room.name}</h3>
-                          <span className="text-[8px] bg-slate-dark border border-white/10 px-2 py-0.5 rounded text-slate-500 font-bold uppercase">{room.code}</span>
+                          <h3 className="text-base font-black tracking-tight text-slate-50">{room.name}</h3>
+                          <span className="text-[8px] bg-slate-950 border-2 border-black px-2 py-0.5 rounded text-slate-500 font-bold uppercase shadow-[1px_1px_0px_#000]">{room.code}</span>
                           {room.isPrivate && (
-                            <span className="text-[8px] bg-danger/10 border border-danger/20 text-danger px-1.5 py-0.5 rounded font-black flex items-center gap-1">
+                            <span className="text-[8px] bg-danger/10 border-2 border-black text-danger px-1.5 py-0.5 rounded font-black flex items-center gap-1 shadow-[1px_1px_0px_#000]">
                               <span className="w-1.5 h-1.5 bg-danger rounded-full" /> Private
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">
+                        <p className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mb-1">
                           {room.gameName} · {room.currentPlayers}/{room.maxPlayers} players · {room.region}
                         </p>
-                        <p className="text-[9px] text-slate-650 font-medium line-clamp-1 group-hover:text-slate-500 transition-colors">
+                        <p className="text-[9px] text-slate-500 font-semibold line-clamp-1 group-hover:text-brand-orange transition-colors">
                           {room.note}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-3 justify-end sm:justify-start">
                         {room.status === "open" && (
-                          <span className="text-[8px] font-black text-success uppercase tracking-widest border border-success/30 px-2 py-0.5 rounded bg-success/5">
+                          <span className="text-[8px] font-black text-success uppercase tracking-widest border-2 border-black px-2 py-0.5 rounded bg-success/5 shadow-[1px_1px_0px_#000]">
                             Open
                           </span>
                         )}
                         {room.status === "live" && (
-                          <span className="text-[8px] font-black text-brand-orange uppercase tracking-widest border border-brand-orange/30 px-2 py-0.5 rounded bg-brand-orange/5">
+                          <span className="text-[8px] font-black text-brand-orange uppercase tracking-widest border-2 border-black px-2 py-0.5 rounded bg-brand-orange/5 shadow-[1px_1px_0px_#000]">
                             Live
                           </span>
                         )}
                         {room.status === "full" && (
-                          <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded bg-white/5">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest border-2 border-black px-2 py-0.5 rounded bg-slate-950 shadow-[1px_1px_0px_#000]">
                             Full
                           </span>
                         )}
@@ -695,7 +695,7 @@ export default function CommunityPage() {
               </div>
 
               {/* Right Column: SLEEK BATTLE LOOP */}
-              <div className="glass p-6 md:p-8 rounded-[2.5rem] flex flex-col h-full">
+              <div className="glass p-6 md:p-8 flex flex-col h-full">
                 <div className="mb-6">
                   <span className="kicker mb-2 inline-flex items-center gap-1.5">
                     <Target className="w-3.5 h-3.5" /> How it Works
@@ -726,16 +726,16 @@ export default function CommunityPage() {
                   ].map((step, idx) => (
                     <div 
                       key={idx}
-                      className="p-4 md:p-5 bg-slate-dark/60 rounded-2xl border border-white/5 hover:border-brand-orange/10 transition-all flex items-start gap-4"
+                      className="p-4 md:p-5 bg-slate-900/40 rounded-2xl border-3 border-black hover:border-brand-orange/15 transition-all flex items-start gap-4 shadow-[2.5px_2.5px_0px_#000000]"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-brand-orange flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-brand-orange/10 border-2 border-black flex items-center justify-center text-brand-orange flex-shrink-0">
                         <step.icon className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-xs font-black text-brand-orange uppercase tracking-widest mb-1">
                           {step.step} {step.title}
                         </h3>
-                        <p className="text-[11px] text-slate-400 font-bold leading-relaxed">
+                        <p className="text-[11px] text-slate-455 font-bold leading-relaxed">
                           {step.desc}
                         </p>
                       </div>
@@ -754,10 +754,10 @@ export default function CommunityPage() {
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="relative h-[360px] rounded-3xl overflow-hidden border border-brand-orange/30 group"
+                className="relative h-[360px] rounded-3xl overflow-hidden border-4 border-black shadow-[6px_6px_0px_#000000] group"
               >
                  <img src="/images/hero.png" alt="Gaming Legacy" className="absolute inset-0 w-full h-full object-cover grayscale opacity-[0.03] group-hover:opacity-[0.06] transition-all duration-[4000ms]" />
-                 <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-dark/95 to-slate-dark" />
+                 <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-950/95 to-slate-950" />
 
                  {/* Floating 2D Cartoon Game Decors (Subtle Watermarks) */}
                  <motion.div 
@@ -777,7 +777,7 @@ export default function CommunityPage() {
                  
                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 md:p-8">
                     <div className="flex justify-center mb-4">
-                       <span className="px-3 py-1 rounded-full glass-orange border border-brand-orange/30 text-brand-orange font-black text-[9px] uppercase tracking-[0.25em] flex items-center gap-1.5">
+                       <span className="px-3 py-1 rounded-full glass-orange text-brand-orange font-black text-[9px] uppercase tracking-[0.25em] flex items-center gap-1.5">
                           <Flame className="w-3 h-3" /> The Ultimate Gaming Arena
                        </span>
                     </div>
@@ -785,7 +785,7 @@ export default function CommunityPage() {
                        LEVEL UP YOUR <br />
                        <span className="gradient-text">GAMING LEGACY</span>
                     </h2>
-                    <p className="text-xs md:text-sm text-slate-400 mb-6 max-w-xl mx-auto font-medium leading-relaxed">
+                    <p className="text-xs md:text-sm text-slate-455 mb-6 max-w-xl mx-auto font-medium leading-relaxed">
                        Join the premier destination for competitive strategy and pulse-pounding rewards. 
                        Real-time rooms, exclusive tournaments, and an elite community waiting for you.
                     </p>
@@ -807,7 +807,7 @@ export default function CommunityPage() {
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
                 <SectionHeading kicker="Rankings" title="Global Leaderboard" description="The definitive record of strategic dominance. Earn XP in match rooms to ascend the divisions." />
                 <Link href="/leaderboards">
-                  <Button variant="outline" className="h-10 px-6 rounded-lg border-white/10 hover:bg-white/5 font-black uppercase text-[9px] tracking-widest">
+                  <Button variant="outline" className="h-10 px-6 rounded-lg border-3 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 font-black uppercase text-[9px] tracking-widest shadow-[2px_2px_0px_#000]">
                     View Full Standings
                   </Button>
                 </Link>
@@ -817,21 +817,21 @@ export default function CommunityPage() {
                  {/* Podium / Top Rank */}
                  <motion.div 
                    whileHover={{ scale: 1.01 }}
-                   className="lg:col-span-2 relative h-[360px] rounded-[2.5rem] overflow-hidden border border-brand-orange/40 glass shadow-neon-orange"
+                   className="lg:col-span-2 relative h-[360px] overflow-hidden glass"
                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-dark/90 to-slate-dark" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-950/90 to-slate-950" />
                     <div className="absolute inset-0 p-8 flex flex-col justify-end">
                        <span className="px-3 py-1 rounded-full bg-brand-orange text-slate-950 font-black text-[9px] uppercase tracking-[0.25em] w-fit mb-4">CURRENT CHAMPION</span>
                        <div className="flex items-center gap-4 mb-4">
-                          <div className="h-16 w-16 rounded-full bg-slate-950 border-2 border-brand-orange flex items-center justify-center text-2xl font-black text-brand-orange shadow-neon-orange">
+                          <div className="h-16 w-16 rounded-full bg-slate-950 border-3 border-black flex items-center justify-center text-2xl font-black text-brand-orange shadow-[3px_3px_0px_#000]">
                              {LEADERBOARD_DATA.weekly[0].name.charAt(0)}
                           </div>
                           <div>
-                             <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-[0.85]">{LEADERBOARD_DATA.weekly[0].name}</h3>
+                             <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-[0.85] text-slate-50">{LEADERBOARD_DATA.weekly[0].name}</h3>
                              <p className="text-xs md:text-sm font-space font-black text-brand-orange mt-1 uppercase tracking-widest">LVL 99 • {LEADERBOARD_DATA.weekly[0].favorite} Specialist</p>
                           </div>
                        </div>
-                       <div className="flex items-center gap-10 text-white font-black text-[10px] uppercase tracking-[0.2em]">
+                       <div className="flex items-center gap-10 text-slate-50 font-black text-[10px] uppercase tracking-[0.2em]">
                           <div className="flex flex-col gap-1">
                              <span className="text-slate-500">Season XP</span>
                              <span className="text-xl md:text-2xl font-space text-brand-orange">{LEADERBOARD_DATA.weekly[0].xp}</span>
@@ -847,24 +847,24 @@ export default function CommunityPage() {
                  {/* Top Challengers */}
                  <div className="flex flex-col gap-4">
                     {LEADERBOARD_DATA.weekly.slice(1, 4).map((player, i) => (
-                      <div key={i} className="glass p-4 rounded-2xl border border-white/10 hover:border-brand-orange/20 transition-all flex flex-col justify-between group">
+                      <div key={i} className="panel p-4 hover:bg-slate-900/10 transition-all flex flex-col justify-between group">
                          <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
-                               <div className="h-8 w-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-black text-[11px] text-slate-500">
+                               <div className="h-8 w-8 rounded-full bg-slate-900 border-2 border-black flex items-center justify-center font-black text-[11px] text-slate-500 shadow-[1.5px_1.5px_0px_#000]">
                                   {player.name.charAt(0)}
                                </div>
                                <div>
-                                  <h4 className="text-base font-black uppercase tracking-tighter group-hover:text-brand-orange transition-colors">{player.name}</h4>
-                                  <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Rank #{i + 2}</p>
+                                  <h4 className="text-base font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">{player.name}</h4>
+                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Rank #{i + 2}</p>
                                </div>
                             </div>
                             <div className="text-right">
                                <p className="text-base font-space font-black text-brand-orange leading-none">{player.xp}</p>
-                               <p className="text-[7px] font-black text-slate-700 uppercase">XP</p>
+                               <p className="text-[7px] font-black text-slate-500 uppercase">XP</p>
                             </div>
                          </div>
-                         <div className="h-1 w-full bg-slate-950 rounded-full overflow-hidden">
-                            <div className="h-full bg-white/20 group-hover:bg-brand-orange transition-colors" style={{ width: `${85 - i * 15}%` }} />
+                         <div className="h-2 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden shadow-[1px_1px_0px_#000]">
+                            <div className="h-full bg-slate-800 group-hover:bg-brand-orange transition-colors" style={{ width: `${85 - i * 15}%` }} />
                          </div>
                       </div>
                     ))}

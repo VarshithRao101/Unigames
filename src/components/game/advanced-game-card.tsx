@@ -48,7 +48,7 @@ export function AdvancedGameCard({ game, isFavorited = false, onToggleFavorite }
     >
       {/* Top Bar: Category & Status */}
       <div className="flex justify-between items-start z-10">
-        <span className="text-[9px] font-bold uppercase tracking-widest bg-slate-dark border border-grey-border/30 px-2.5 py-1 rounded-full text-slate-300">
+        <span className="text-[9px] font-bold uppercase tracking-widest bg-slate-900 border border-grey-border/30 px-2.5 py-1 rounded-full text-slate-300">
           {game.category}
         </span>
         <GameStatusBadge status={game.status} />
@@ -57,13 +57,13 @@ export function AdvancedGameCard({ game, isFavorited = false, onToggleFavorite }
       {/* Middle: Game representation placeholder & Info */}
       <div className="my-5 flex-1 flex flex-col justify-center text-center">
         {/* Animated Letter circle */}
-        <div className="w-20 h-20 mx-auto rounded-2xl bg-slate-dark border border-grey-border/30 flex items-center justify-center text-slate-400 mb-3.5 font-outfit font-extrabold text-2xl group-hover:scale-105 group-hover:bg-brand-amber/10 group-hover:text-brand-light transition-all duration-300 relative">
+        <div className="w-20 h-20 mx-auto rounded-2xl bg-slate-900 border border-grey-border/30 flex items-center justify-center text-slate-400 mb-3.5 font-outfit font-extrabold text-2xl group-hover:scale-105 group-hover:bg-brand-amber/10 group-hover:text-brand-light transition-all duration-300 relative">
           <span>{game.name.charAt(0)}</span>
           
           {/* Heart/Favorite toggle overlays */}
           <button
             onClick={toggleFavorite}
-            className="absolute -top-1.5 -right-1.5 p-1.5 rounded-full bg-slate-dark/95 border border-grey-border/40 shadow-sm hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+            className="absolute -top-1.5 -right-1.5 p-1.5 rounded-full bg-slate-900/95 border border-grey-border/40 shadow-sm hover:scale-110 active:scale-95 transition-transform cursor-pointer"
             aria-label="Toggle Favorite"
           >
             <motion.div animate={{ scale: fav ? [1, 1.2, 1] : 1 }} transition={{ duration: 0.2 }}>
@@ -72,7 +72,7 @@ export function AdvancedGameCard({ game, isFavorited = false, onToggleFavorite }
           </button>
         </div>
 
-        <h3 className="font-outfit font-extrabold text-lg text-white leading-snug truncate group-hover:text-brand-amber transition-colors px-2">
+        <h3 className="font-outfit font-extrabold text-lg text-slate-50 leading-snug truncate group-hover:text-brand-amber transition-colors px-2">
           {game.name}
         </h3>
         
@@ -88,7 +88,7 @@ export function AdvancedGameCard({ game, isFavorited = false, onToggleFavorite }
             <span>{game.status === "coming_soon" ? "COMMUNITY REQUESTS" : "ENGINE PROGRESS"}</span>
             <span>{game.status === "coming_soon" ? `${game.votes || 0} Votes` : `${game.progressPercent}%`}</span>
           </div>
-          <div className="w-full h-1.5 bg-slate-dark rounded-full overflow-hidden border border-grey-border/30">
+          <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-grey-border/30">
             <div
               className={`h-full rounded-full transition-all duration-500 ${getStatusColor(game.status)}`}
               style={{ width: `${game.status === "coming_soon" ? Math.min(((game.votes || 0) / 300) * 100, 100) : game.progressPercent}%` }}

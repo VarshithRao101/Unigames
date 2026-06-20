@@ -7,7 +7,7 @@ import { Footer } from "@/components/common/footer";
 
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-dark text-white selection:bg-brand-orange selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 text-slate-50 selection:bg-brand-orange selection:text-slate-950">
       <Navbar />
       <Sidebar />
       <div className="pt-20">{children}</div>

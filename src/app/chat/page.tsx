@@ -37,7 +37,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-slate-50 min-h-screen">
       <Navbar />
 
       <main className="pt-32 pb-20 px-6 container mx-auto max-w-7xl">
@@ -56,15 +56,15 @@ export default function ChatPage() {
                     Coordinate tactical maneuvers, share access keys, and maintain synchronization with the global squad.
                  </p>
               </div>
-              <div className="flex bg-white/5 border border-white/10 rounded-2xl p-4 items-center gap-6 backdrop-blur-xl">
+              <div className="flex bg-slate-900/40 border-3 border-black rounded-2xl p-4 items-center gap-6 shadow-[3px_3px_0px_#000000]">
                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-success animate-pulse" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-success">Node Online</span>
                  </div>
-                 <div className="h-8 w-[1px] bg-white/10" />
+                 <div className="h-8 w-[1.5px] bg-slate-800" />
                  <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-brand-orange" />
-                    <span className="text-lg font-space font-black text-white">482</span>
+                    <span className="text-lg font-space font-black text-slate-50">482</span>
                  </div>
               </div>
            </div>
@@ -73,51 +73,51 @@ export default function ChatPage() {
         <section className="grid gap-10 lg:grid-cols-[380px_1fr]">
           {/* Active Members Sidebar */}
           <aside className="space-y-8">
-             <div className="glass p-8 rounded-[3rem] border border-white/5 shadow-2xl">
+             <div className="glass p-8">
                 <div className="flex items-center justify-between mb-8">
-                   <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white">Active Squad</h4>
+                   <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-50">Active Squad</h4>
                    <Activity className="w-4 h-4 text-brand-orange animate-pulse" />
                 </div>
                 
                 <div className="space-y-4 max-h-[600px] overflow-y-auto scrollbar-hide pr-2">
                    {ONLINE_SQUAD.map((member) => (
-                     <div key={member.id} className="group p-4 rounded-[1.8rem] border border-white/5 bg-white/2 hover:border-brand-orange/30 hover:bg-white/5 transition-all">
+                     <div key={member.id} className="group p-4 rounded-[1.8rem] border-3 border-black bg-slate-900/40 hover:bg-slate-900/80 transition-all shadow-[2.5px_2.5px_0px_#000000]">
                         <div className="flex items-center gap-4">
-                           <div className="h-12 w-12 rounded-full bg-slate-dark border border-white/10 flex items-center justify-center font-black text-slate-500 shadow-2xl relative">
+                           <div className="h-12 w-12 rounded-full bg-slate-900 border-2 border-black flex items-center justify-center font-black text-slate-400 shadow-[2px_2px_0px_#000000] relative">
                               {member.name.charAt(0)}
-                              <span className="absolute bottom-0 right-0 h-3 w-3 bg-success rounded-full border-2 border-slate-950" />
+                              <span className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-success rounded-full border-2 border-black" />
                            </div>
                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-black uppercase tracking-tighter text-white group-hover:text-brand-orange transition-colors truncate">{member.name}</p>
-                              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest truncate">{member.activity}</p>
+                              <p className="text-sm font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors truncate">{member.name}</p>
+                              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest truncate">{member.activity}</p>
                            </div>
-                           <Zap className="w-3 h-3 text-slate-800" />
+                           <Zap className="w-3.5 h-3.5 text-slate-650" />
                         </div>
                      </div>
                    ))}
                 </div>
 
                  <Link href="/rooms" className="mt-8 block">
-                    <Button variant="outline" className="w-full h-14 rounded-2xl border-white/10 hover:bg-white/5 font-black uppercase text-[10px] tracking-widest">
+                    <Button variant="outline" className="w-full h-14 rounded-2xl border-3 border-black bg-slate-900 text-slate-555 hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest shadow-[3px_3px_0px_#000000]">
                        Tactical Lobbies
                     </Button>
                  </Link>
              </div>
              
              {/* Security Note */}
-             <div className="glass p-8 rounded-[3rem] border border-brand-orange/20 bg-brand-orange/5">
+             <div className="panel p-8 bg-brand-orange/5">
                 <div className="flex items-center gap-4 mb-4">
                    <Shield className="w-5 h-5 text-brand-orange" />
                    <h4 className="text-[10px] font-black uppercase tracking-widest">Protocol Header</h4>
                 </div>
-                <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-slate-450 leading-relaxed uppercase tracking-widest">
                    End-to-end synchronization established. All data packets are encrypted via UniGame core security.
                 </p>
              </div>
           </aside>
 
           {/* Chat Node */}
-          <section className="glass rounded-[4rem] border border-white/5 overflow-hidden flex flex-col h-[800px] shadow-2xl relative">
+          <section className="glass overflow-hidden flex flex-col h-[800px] relative">
              {/* Chat Background Decor */}
              <div className="absolute inset-0 opacity-5 pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-full bg-mesh rotate-12" />
@@ -140,12 +140,12 @@ export default function ChatPage() {
                            <span className={`text-[10px] font-black uppercase tracking-widest ${message.sender === 'You' ? 'text-brand-orange' : 'text-slate-500'}`}>
                               {message.sender}
                            </span>
-                           <span className="text-[8px] font-black text-slate-800 tracking-[0.2em]">{message.time}</span>
+                           <span className="text-[8px] font-black text-slate-600 tracking-[0.2em]">{message.time}</span>
                         </div>
-                        <div className={`max-w-[80%] p-6 rounded-[2rem] border transition-all duration-300 ${
+                        <div className={`max-w-[80%] p-6 rounded-[2rem] border-3 border-black transition-all duration-300 ${
                           message.sender === 'You' 
-                            ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-white' 
-                            : 'bg-white/5 border-white/5 rounded-tl-none text-slate-300'
+                            ? 'bg-brand-orange/10 border-brand-orange/30 rounded-tr-none text-slate-50 shadow-[3px_3px_0px_#000000]' 
+                            : 'bg-slate-900/60 rounded-tl-none text-slate-300 shadow-[3px_3px_0px_#000000]'
                         }`}>
                            <p className="text-sm font-medium leading-relaxed">{message.text}</p>
                         </div>
@@ -155,16 +155,16 @@ export default function ChatPage() {
              </div>
 
              {/* Input Area */}
-             <div className="p-8 md:p-12 bg-white/2 border-t border-white/5 relative z-20 backdrop-blur-xl">
+             <div className="p-8 md:p-12 bg-slate-900/20 border-t-3 border-black relative z-20 backdrop-blur-xl">
                 <form onSubmit={handleSend} className="flex flex-col sm:flex-row gap-4">
                    <div className="relative flex-1">
-                      <MessageSquare className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-600" />
+                      <MessageSquare className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                       <input 
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         type="text" 
                         placeholder="INPUT TRANSMISSION..."
-                        className="w-full h-16 bg-slate-dark/80 border border-white/10 rounded-2xl px-16 text-[10px] font-black uppercase tracking-[0.3em] text-white focus:outline-none focus:border-brand-orange/50"
+                        className="w-full h-16 bg-slate-900 border-3 border-black rounded-2xl px-16 text-[10px] font-black uppercase tracking-[0.3em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[3px_3px_0px_#000000]"
                       />
                    </div>
                    <Button type="submit" className="btn-gaming h-16 px-10 rounded-2xl">

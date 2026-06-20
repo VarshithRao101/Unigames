@@ -110,7 +110,7 @@ export default function ProfilePage() {
   } = useAuth();
 
   // Mode Switchers state
-  const [activeTab, setActiveTab] = useState<"combat" | "security" | "settings">("combat");
+  const [activeTab, setActiveTab] = useState<"combat" | "settings">("combat");
 
   // Editable fields
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -164,7 +164,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-dark text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center">
         <div className="w-10 h-10 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-4" />
         <p className="font-space text-xs font-black uppercase tracking-widest text-slate-500">Retrieving Uplink...</p>
       </div>
@@ -256,7 +256,7 @@ export default function ProfilePage() {
   const currentPreset = AVATAR_PRESETS.find(p => p.id === selectedAvatarPreset) || AVATAR_PRESETS[0];
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen relative overflow-hidden">
+    <div className="bg-transparent text-white min-h-screen relative overflow-hidden">
       <Navbar />
 
       {/* Floating Background Effects */}
@@ -298,7 +298,7 @@ export default function ProfilePage() {
               </span>
 
               {/* Dynamic Gradient Avatar */}
-              <div className={`w-24 h-24 rounded-full bg-gradient-to-tr ${currentPreset.gradients} border-4 border-black flex items-center justify-center font-space text-4xl font-black ${currentPreset.textColor} shadow-[4px_4px_0px_#000] relative mb-6 mt-4 transition-all duration-300`}>
+              <div className={`w-24 h-24 flex-shrink-0 aspect-square rounded-full bg-gradient-to-tr ${currentPreset.gradients} border-4 border-black flex items-center justify-center font-space text-4xl font-black ${currentPreset.textColor} shadow-[4px_4px_0px_#000] relative mb-6 mt-4 transition-all duration-300`}>
                 {user.username.slice(0, 2).toUpperCase()}
                 <span className="absolute bottom-1 right-1 h-5 w-5 bg-success rounded-full border-4 border-black animate-pulse" />
               </div>
@@ -327,13 +327,13 @@ export default function ProfilePage() {
                     type="text"
                     value={tempUsername}
                     onChange={(e) => setTempUsername(e.target.value)}
-                    className="w-full h-11 bg-slate-dark border-2 border-black rounded-xl px-3 text-center text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
+                    className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-3 text-center text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
                     placeholder="USERNAME"
                   />
                   <textarea
                     value={tempBio}
                     onChange={(e) => setTempBio(e.target.value)}
-                    className="w-full h-20 bg-slate-dark border-2 border-black rounded-xl p-3 text-center text-xs font-bold text-slate-400 focus:outline-none focus:border-brand-orange resize-none"
+                    className="w-full h-20 bg-slate-900 border-2 border-black rounded-xl p-3 text-center text-xs font-bold text-slate-400 focus:outline-none focus:border-brand-orange resize-none"
                     placeholder="Casually competitive..."
                   />
                   <div className="flex gap-2 justify-center">
@@ -360,19 +360,6 @@ export default function ProfilePage() {
                   <p className="text-[11px] font-bold text-slate-400 leading-relaxed max-w-xs mx-auto italic mb-4">
                     "{user.bio || "Casually competitive..."}"
                   </p>
-                  
-                  <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
-
-                  <div className="flex flex-col gap-2.5 text-left text-[9.5px] font-black text-slate-550 uppercase tracking-widest px-2">
-                    <div className="flex items-center gap-2.5">
-                      <Mail className="w-3.5 h-3.5 text-brand-orange" />
-                      <span className="truncate">{user.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <Calendar className="w-3.5 h-3.5 text-brand-orange" />
-                      <span>Sync established: {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -381,6 +368,45 @@ export default function ProfilePage() {
                 <LogOut className="w-4 h-4 mr-2" /> Sever Terminal
               </Button>
             </motion.div>
+
+            {/* APPEARANCE MODULES CARD */}
+            <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
+              <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
+                <Eye className="w-4 h-4 text-brand-orange" /> Appearance Modules
+              </h4>
+
+              <div className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Interface Theme Mode</span>
+                  <div className="grid grid-cols-3 gap-3">
+                    {["dark", "light", "gaming"].map(thm => (
+                      <button
+                        key={thm}
+                        onClick={() => updateAppearanceSettings({ theme: thm as any })}
+                        className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${appearanceSettings.theme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                      >
+                        {thm} theme
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
+
+                <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-white">Animations Enabled</p>
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Smooth page and card interactions transition effects</p>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    checked={appearanceSettings.animationsEnabled}
+                    onChange={(e) => updateAppearanceSettings({ animationsEnabled: e.target.checked })}
+                    className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                  />
+                </label>
+              </div>
+            </div>
 
             {/* TAB SELECTOR */}
             <div className="glass p-2 rounded-2xl border-2 border-black shadow-card flex flex-col gap-2 bg-white/2">
@@ -392,18 +418,11 @@ export default function ProfilePage() {
                 <Gamepad2 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab("security")}
-                className={`w-full h-11 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-4 ${activeTab === "security" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
-              >
-                <span>Terminal Security</span>
-                <Shield className="w-4 h-4" />
-              </button>
-              <button
                 onClick={() => setActiveTab("settings")}
                 className={`w-full h-11 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border-2 border-black flex items-center justify-between px-4 ${activeTab === "settings" ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
               >
-                <span>System Registry</span>
-                <Bell className="w-4 h-4" />
+                <span>Terminal Settings</span>
+                <Shield className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -452,15 +471,15 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="grid grid-cols-3 gap-3 pt-2">
-                          <div className="text-center p-2.5 bg-slate-dark/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Victories</p>
                             <p className="text-xl font-space font-black text-white">92</p>
                           </div>
-                          <div className="text-center p-2.5 bg-slate-dark/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Ratio</p>
                             <p className="text-xl font-space font-black text-brand-orange">64.7%</p>
                           </div>
-                          <div className="text-center p-2.5 bg-slate-dark/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
+                          <div className="text-center p-2.5 bg-slate-900/50 border border-black rounded-xl shadow-[2px_2px_0px_#000]">
                             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Streak</p>
                             <p className="text-xl font-space font-black text-white flex items-center justify-center gap-1.5 leading-none">
                               4 <Flame className="w-4 h-4 text-brand-orange fill-current" />
@@ -565,7 +584,7 @@ export default function ProfilePage() {
                         {MOCK_MATCH_HISTORY.map(match => (
                           <div 
                             key={match.id} 
-                            className="p-3 bg-slate-dark/50 border-2 border-black rounded-2xl flex items-center justify-between hover:border-brand-orange/40 transition-all duration-250 shadow-[2px_2px_0px_#000]"
+                            className="p-3 bg-slate-900/50 border-2 border-black rounded-2xl flex items-center justify-between hover:border-brand-orange/40 transition-all duration-250 shadow-[2px_2px_0px_#000]"
                           >
                             <div className="flex items-center gap-3">
                               <div className="h-10 w-10 rounded-xl bg-slate-950 border-2 border-black flex items-center justify-center text-xs font-black text-brand-orange shadow-[1px_1px_0px_#000]">
@@ -644,11 +663,11 @@ export default function ProfilePage() {
               )}
             </AnimatePresence>
 
-            {/* TAB 2: TERMINAL SECURITY */}
+            {/* TAB 2: TERMINAL SETTINGS */}
             <AnimatePresence mode="wait">
-              {activeTab === "security" && (
+              {activeTab === "settings" && (
                 <motion.div
-                  key="security-panel"
+                  key="settings-panel"
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -15 }}
@@ -656,11 +675,28 @@ export default function ProfilePage() {
                 >
                   <div className="grid gap-6 md:grid-cols-2">
                     
-                    {/* Credentials Update */}
-                    <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                        <Key className="w-4 h-4 text-brand-orange" /> Credentials Update
-                      </h4>
+                    {/* Private Details & Credentials */}
+                    <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
+                          <User className="w-4 h-4 text-brand-orange" /> Private Details & credentials
+                        </h4>
+
+                        <div className="flex flex-col gap-3 text-[10px] font-black text-slate-450 uppercase tracking-widest bg-slate-900/50 border-2 border-black rounded-2xl p-4 mb-6 shadow-[2px_2px_0px_#000]">
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-slate-550">Email Address</span>
+                            <span className="text-white truncate max-w-[190px]">{user.email}</span>
+                          </div>
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-slate-550">Date Established</span>
+                            <span className="text-white">{new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</span>
+                          </div>
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-slate-550">Security Clearance</span>
+                            <span className="text-brand-orange font-bold">Standard</span>
+                          </div>
+                        </div>
+                      </div>
 
                       <form onSubmit={handlePasswordChange} className="space-y-4">
                         <div className="space-y-1.5">
@@ -669,7 +705,7 @@ export default function ProfilePage() {
                             type="password" 
                             value={oldPassword}
                             onChange={(e) => setOldPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-dark border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
@@ -679,7 +715,7 @@ export default function ProfilePage() {
                             type="password" 
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-dark border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
@@ -689,7 +725,7 @@ export default function ProfilePage() {
                             type="password" 
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full h-11 bg-slate-dark border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
+                            className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-brand-orange"
                             placeholder="••••••••"
                           />
                         </div>
@@ -699,63 +735,106 @@ export default function ProfilePage() {
                       </form>
                     </div>
 
-                    {/* Authenticator and verification */}
+                    {/* System Preference Registry */}
                     <div className="space-y-6">
-                      {/* Two factor */}
+                      {/* Notifications settings */}
                       <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4">
-                          <ShieldCheck className="w-4 h-4 text-brand-orange" /> Two-Factor Security
+                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
+                          <Bell className="w-4 h-4 text-brand-orange" /> Notification Preferences
                         </h4>
                         
-                        <label className="flex items-center justify-between p-3.5 bg-slate-dark border-2 border-black rounded-2xl cursor-pointer select-none">
-                          <div>
-                            <p className="text-[10px] font-black uppercase tracking-wider text-white">Enable 2FA Validation</p>
-                            <p className="text-[8px] font-bold text-slate-550 uppercase tracking-widest mt-0.5">Validate logins using code confirmation signals</p>
-                          </div>
-                          <input 
-                            type="checkbox" 
-                            checked={user.isTwoFactorEnabled}
-                            onChange={(e) => handleTwoFactorToggle(e.target.checked)}
-                            className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
-                          />
-                        </label>
+                        <div className="space-y-4">
+                          <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-white">Email Subscriptions</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Receive news and matchmaking reports</p>
+                            </div>
+                            <input 
+                              type="checkbox" 
+                              checked={notificationSettings.emailNotifications}
+                              onChange={(e) => updateNotificationSettings({ emailNotifications: e.target.checked })}
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                            />
+                          </label>
+                          <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-white">Push Alerts</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Active matchmaking invites notifications</p>
+                            </div>
+                            <input 
+                              type="checkbox" 
+                              checked={notificationSettings.pushNotifications}
+                              onChange={(e) => updateNotificationSettings({ pushNotifications: e.target.checked })}
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                            />
+                          </label>
+                          <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-white">Lobby Invites</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Allow invitations from non-squad players</p>
+                            </div>
+                            <input 
+                              type="checkbox" 
+                              checked={notificationSettings.gameInvites}
+                              onChange={(e) => updateNotificationSettings({ gameInvites: e.target.checked })}
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                            />
+                          </label>
+                        </div>
                       </div>
 
-                      {/* Contributor Verification */}
+                      {/* Privacy registry */}
                       <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4">
-                          <Sparkles className="w-4 h-4 text-brand-orange" /> Creator Uplink Verification
+                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
+                          <Shield className="w-4 h-4 text-brand-orange" /> Privacy Registry
                         </h4>
-                        <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-4">
-                          Submit proof of repository contributions to unlock developer credits and special system tags on UniGames.
-                        </p>
 
-                        <form onSubmit={handleAccountVerification} className="space-y-3">
-                          <div className="flex gap-2">
-                            <select 
-                              value={verificationDocType}
-                              onChange={(e) => setVerificationDocType(e.target.value)}
-                              className="bg-slate-dark border-2 border-black rounded-xl px-2 text-[9px] font-black uppercase tracking-wider text-white focus:outline-none focus:border-brand-orange h-11"
-                            >
-                              <option value="github">GitHub PR</option>
-                              <option value="commit">Commit SHA</option>
-                              <option value="invite">Collab Code</option>
-                            </select>
-                            <input 
-                              type="text"
-                              value={verificationProofUrl}
-                              onChange={(e) => setVerificationProofUrl(e.target.value)}
-                              placeholder="https://github.com/..."
-                              className="flex-1 h-11 bg-slate-dark border-2 border-black rounded-xl px-3 text-xs text-white focus:outline-none focus:border-brand-orange"
-                            />
+                        <div className="space-y-4">
+                          <div className="flex flex-col gap-2">
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Profile Visibility</span>
+                            <div className="grid grid-cols-3 gap-3">
+                              {["public", "friends", "private"].map(vis => (
+                                <button
+                                  key={vis}
+                                  onClick={() => updatePrivacySettings({ profileVisibility: vis as any })}
+                                  className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${privacySettings.profileVisibility === vis ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                                >
+                                  {vis}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                          <Button type="submit" className="w-full h-11 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[10px] tracking-widest border-2 border-black rounded-xl transition-all">
-                            Submit Verification Proof
-                          </Button>
-                        </form>
+
+                          <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
+
+                          <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Online Status</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Let squad contacts detect when you are online</p>
+                            </div>
+                            <input 
+                              type="checkbox" 
+                              checked={privacySettings.showOnlineStatus}
+                              onChange={(e) => updatePrivacySettings({ showOnlineStatus: e.target.checked })}
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                            />
+                          </label>
+
+                          <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Game Feed</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Permit match outcome streaming to leaderboards</p>
+                            </div>
+                            <input 
+                              type="checkbox" 
+                              checked={privacySettings.showGameActivity}
+                              onChange={(e) => updatePrivacySettings({ showGameActivity: e.target.checked })}
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                            />
+                          </label>
+                        </div>
                       </div>
                     </div>
-
                   </div>
 
                   {/* ACTIVE TERMINAL SESSION LIST */}
@@ -778,7 +857,7 @@ export default function ProfilePage() {
                       {sessions.map(session => (
                         <div 
                           key={session.id}
-                          className={`p-4 bg-slate-dark/50 border-2 rounded-2xl flex flex-col justify-between h-40 shadow-[2px_2px_0px_#000] ${session.isCurrent ? "border-brand-orange" : "border-black"}`}
+                          className={`p-4 bg-slate-900/50 border-2 rounded-2xl flex flex-col justify-between h-40 shadow-[2px_2px_0px_#000] ${session.isCurrent ? "border-brand-orange" : "border-black"}`}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2.5">
@@ -848,156 +927,6 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* TAB 3: SYSTEM REGISTRY (SETTINGS) */}
-            <AnimatePresence mode="wait">
-              {activeTab === "settings" && (
-                <motion.div
-                  key="settings-panel"
-                  initial={{ opacity: 0, x: 15 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -15 }}
-                  className="space-y-6"
-                >
-                  {/* PREFERENCES PANEL */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                      <Bell className="w-4 h-4 text-brand-orange" /> Notification Preferences
-                    </h4>
-                    
-                    <div className="space-y-4">
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Email Subscriptions</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Receive news, updates and matchmaking reports in email</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={notificationSettings.emailNotifications}
-                          onChange={(e) => updateNotificationSettings({ emailNotifications: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Push Alerts</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Active matchmaking and lobby invitations notifications</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={notificationSettings.pushNotifications}
-                          onChange={(e) => updateNotificationSettings({ pushNotifications: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Lobby Invites</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Allow invitations from players not in your active squad list</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={notificationSettings.gameInvites}
-                          onChange={(e) => updateNotificationSettings({ gameInvites: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* PRIVACY SETTINGS */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                      <Shield className="w-4 h-4 text-brand-orange" /> Privacy & Security Registry
-                    </h4>
-
-                    <div className="space-y-4.5">
-                      <div className="flex flex-col gap-2">
-                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Visibility Frequency</span>
-                        <div className="grid grid-cols-3 gap-3">
-                          {["public", "friends", "private"].map(vis => (
-                            <button
-                              key={vis}
-                              onClick={() => updatePrivacySettings({ profileVisibility: vis as any })}
-                              className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${privacySettings.profileVisibility === vis ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
-                            >
-                              {vis}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
-
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Online Status</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Let squad contacts detect when you are actively on the platform</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={privacySettings.showOnlineStatus}
-                          onChange={(e) => updatePrivacySettings({ showOnlineStatus: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Game Feed</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Permit matches outcome streaming to leaderboards feed</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={privacySettings.showGameActivity}
-                          onChange={(e) => updatePrivacySettings({ showGameActivity: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* VISUAL & INTERFACE THEME */}
-                  <div className="glass p-6 rounded-3xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-6 border-b border-black pb-4">
-                      <Eye className="w-4 h-4 text-brand-orange" /> Appearance Modules
-                    </h4>
-
-                    <div className="space-y-4">
-                      <div className="flex flex-col gap-2">
-                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Interface Theme Mode</span>
-                        <div className="grid grid-cols-3 gap-3">
-                          {["dark", "light", "gaming"].map(thm => (
-                            <button
-                              key={thm}
-                              onClick={() => updateAppearanceSettings({ theme: thm as any })}
-                              className={`h-11 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border-2 border-black ${appearanceSettings.theme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
-                            >
-                              {thm} theme
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
-
-                      <label className="flex items-center justify-between p-3.5 bg-slate-dark/40 hover:bg-slate-dark/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-white">Animations Enabled</p>
-                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Smooth page and card interactions transition effects</p>
-                        </div>
-                        <input 
-                          type="checkbox" 
-                          checked={appearanceSettings.animationsEnabled}
-                          onChange={(e) => updateAppearanceSettings({ animationsEnabled: e.target.checked })}
-                          className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
-                        />
-                      </label>
-                    </div>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

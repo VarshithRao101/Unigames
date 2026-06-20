@@ -45,7 +45,7 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-white min-h-screen">
       <Navbar />
 
       <main suppressHydrationWarning>
@@ -70,7 +70,7 @@ export default function RoomsPage() {
                      onChange={(e) => setSearch(e.target.value)}
                      type="text" 
                      placeholder="Search Code/Host..."
-                     className="w-full h-11 bg-slate-dark border-2 border-black rounded-xl px-4 text-[10px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
+                     className="w-full h-11 bg-slate-900 border-2 border-black rounded-xl px-4 text-[10px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-brand-orange"
                    />
                 </div>
 
@@ -99,7 +99,7 @@ export default function RoomsPage() {
                      type="text" 
                      maxLength={6}
                      placeholder="ENTER ROOM CODE"
-                     className="w-full h-12 bg-slate-dark border-2 border-black rounded-xl px-4 text-center text-base font-black uppercase tracking-[0.3em] text-brand-orange focus:outline-none focus:border-brand-orange"
+                     className="w-full h-12 bg-slate-900 border-2 border-black rounded-xl px-4 text-center text-base font-black uppercase tracking-[0.3em] text-brand-orange focus:outline-none focus:border-brand-orange"
                    />
                    <button type="submit" className="w-full h-11 rounded-xl bg-white text-slate-950 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[10px] tracking-widest transition-all shadow-[2px_2px_0px_#000] cursor-pointer">
                       Join Room
@@ -120,9 +120,9 @@ export default function RoomsPage() {
                     viewport={{ once: true }}
                     className="group glass p-1.5 rounded-3xl border-2 border-black hover:border-brand-orange shadow-card transition-all duration-300"
                   >
-                     <div className="bg-slate-dark/50 rounded-[1.4rem] p-5 flex flex-col xl:flex-row items-center justify-between gap-6">
+                     <div className="bg-slate-900/50 rounded-[1.4rem] p-5 flex flex-col xl:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-5 w-full md:w-auto">
-                           <div className="w-14 h-14 rounded-xl bg-slate-dark border-2 border-black flex items-center justify-center font-space text-2xl font-black text-brand-orange group-hover:scale-105 transition-transform shadow-[2px_2px_0px_#000]">
+                           <div className="w-14 h-14 rounded-xl bg-slate-950 border-2 border-black flex items-center justify-center font-space text-2xl font-black text-brand-orange group-hover:scale-105 transition-transform shadow-[2px_2px_0px_#000]">
                               {room.gameName.slice(0, 2).toUpperCase()}
                            </div>
                            <div>

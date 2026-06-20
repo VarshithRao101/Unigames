@@ -50,7 +50,7 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
   return (
     <PublicLayout>
       <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 flex flex-col items-center justify-center min-h-[70vh]">
-        <div className="relative w-full max-w-2xl bg-[#24261f] border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden">
+        <div className="relative w-full max-w-2xl bg-slate-800 border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden">
           {/* Close Button ("Wrong" cancel button that redirects to /games) */}
           <Link href="/games">
             <button 
@@ -103,7 +103,7 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
             </div>
 
             {/* Right Side: Deploy Panel */}
-            <div className="md:col-span-5 p-6 md:p-8 bg-[#1c1d18] flex flex-col justify-center">
+            <div className="md:col-span-5 p-6 md:p-8 bg-slate-900 flex flex-col justify-center">
               <div className="space-y-6">
                 <div className="text-center md:text-left">
                   <h3 className="text-base font-black text-white tracking-wider uppercase">Deploy Arena</h3>

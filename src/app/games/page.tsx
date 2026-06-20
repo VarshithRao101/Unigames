@@ -58,7 +58,7 @@ export default function GamesPage() {
       status: "released",
       progressPercent: 100,
       description: "Command the classic board in high-speed, cybernetic 2-player rounds.",
-      image: "/images/tictactoe.png",
+      image: "/images/tictactoe_logo.png",
       tags: ["Quick", "Simple", "2 Players"]
     },
     {
@@ -69,7 +69,7 @@ export default function GamesPage() {
       status: "beta",
       progressPercent: 95,
       description: "Tactical warfare on a 64-square battlefield. Synchronize moves in real-time.",
-      image: "/images/chess.png",
+      image: "/images/chess_logo.avif",
       tags: ["Deep Strategy", "Ranked", "Classic"]
     },
     {
@@ -80,7 +80,7 @@ export default function GamesPage() {
       status: "in-dev",
       progressPercent: 40,
       description: "Roll, strike, and race your squad to the home sector in fast-paced board combat.",
-      image: null,
+      image: "/images/ludo_logo.webp",
       tags: ["4 Players", "Casual", "Lobby Party"]
     },
     {
@@ -91,7 +91,7 @@ export default function GamesPage() {
       status: "in-dev",
       progressPercent: 15,
       description: "Ascend grids and avoid sector hazards in this classic casual multiplayer race.",
-      image: null,
+      image: "/images/snakes_logo.webp",
       tags: ["Multiplayer", "Casual", "Dice Roll"]
     }
   ], []);
@@ -111,13 +111,13 @@ export default function GamesPage() {
   }, [search, selectedFilter, gamesList]);
 
   return (
-    <div className="bg-slate-dark text-white min-h-screen">
+    <div className="bg-transparent text-slate-50 min-h-screen">
       <Navbar />
 
       <main className="pt-32 pb-20 px-6 container mx-auto max-w-7xl">
         {/* Search & Filter Bar */}
         <section className="glass p-2 rounded-[1.5rem] sm:rounded-[2.5rem] mb-6 sm:mb-12">
-          <div className="bg-slate-dark/50 rounded-[1.3rem] sm:rounded-[2.3rem] p-2.5 sm:p-4 flex flex-col lg:flex-row items-center gap-3 sm:gap-6">
+          <div className="bg-slate-900/50 rounded-[1.3rem] sm:rounded-[2.3rem] p-2.5 sm:p-4 flex flex-col lg:flex-row items-center gap-3 sm:gap-6">
             <div className="relative flex-1 w-full">
               <Search className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-500" />
               <input 
@@ -125,7 +125,7 @@ export default function GamesPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 type="text" 
                 placeholder="SEARCH SECTORS..."
-                className="w-full h-10 sm:h-14 bg-slate-dark border-2 border-black rounded-xl sm:rounded-2xl px-10 sm:px-16 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] text-white focus:outline-none focus:border-brand-orange"
+                className="w-full h-10 sm:h-14 bg-slate-900 border-2 border-black rounded-xl sm:rounded-2xl px-10 sm:px-16 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] text-slate-50 focus:outline-none focus:border-brand-orange"
               />
             </div>
             
@@ -137,7 +137,7 @@ export default function GamesPage() {
                   className={`px-3 sm:px-5 h-10 sm:h-14 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2 border-black ${
                     selectedFilter === filter 
                       ? 'bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000000] sm:shadow-[4px_4px_0px_#000000]' 
-                      : 'bg-white/5 text-slate-400 hover:border-brand-orange/30'
+                      : 'bg-slate-900/45 text-slate-400 hover:border-brand-orange/30'
                   }`}
                 >
                   {filter}
@@ -154,7 +154,7 @@ export default function GamesPage() {
         </section>
 
         {/* Game Cards Grid */}
-        <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4">
           {filteredGames.map((game, i) => {
             const isComingSoon = game.status === "in-dev";
             
@@ -169,139 +169,84 @@ export default function GamesPage() {
                     setSelectedGameSlug(game.slug);
                   }
                 }}
-                className={`group relative h-[95px] sm:h-[290px] rounded-2xl overflow-hidden flex flex-col justify-between p-2.5 sm:p-4 ${
+                className={`group relative rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 transition-all duration-300 ${
                   isComingSoon 
                     ? 'border-2 border-dashed border-slate-700 bg-white/2 cursor-not-allowed' 
-                    : 'border-2 border-black bg-slate-dark/60 glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer'
+                    : 'border-2 border-black bg-slate-900/60 glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer'
                 }`}
               >
-                {/* Mobile view content (hidden on sm and up) */}
-                <div className="flex sm:hidden flex-col justify-between h-full w-full relative z-20">
-                  {/* Status Dot Top Right */}
-                  <div className="absolute top-0 right-0 flex items-center justify-center">
-                    <span className={`h-2 w-2 rounded-full border border-black ${
+                {/* 2D Game Photo (Top part) */}
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-black/40 bg-slate-900 shadow-[1.5px_1.5px_0px_#000000] sm:shadow-[3px_3px_0px_#000000]">
+                  {game.image ? (
+                    <img 
+                      src={game.image} 
+                      alt={game.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 contrast-[1.03] saturate-[1.08] brightness-[1.03]" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                      <Gamepad2 className="w-8 h-8 text-slate-650" />
+                    </div>
+                  )}
+
+                  {/* Status Overlay Badge (Top Right of image) */}
+                  <div className="absolute top-1.5 right-1.5 z-20">
+                    <span className={`h-2.5 w-2.5 rounded-full border border-black block sm:hidden ${
                       game.status === 'released' 
                         ? 'bg-success shadow-[0_0_4px_rgba(0,255,204,0.6)]' 
                         : game.status === 'beta' 
                           ? 'bg-brand-orange shadow-[0_0_4px_rgba(255,170,0,0.6)]' 
                           : 'bg-slate-600 animate-pulse'
                     }`} />
-                  </div>
-
-                  {/* CMD Shortcode Badge Top Left */}
-                  <div className="absolute top-0 left-0">
-                    <span className="text-[6.5px] font-black text-slate-500 uppercase tracking-wider">
-                      {game.shortCode}
+                    <span className={`hidden sm:inline-block px-1.5 py-0.5 rounded-md border font-black text-[7.5px] uppercase tracking-widest ${
+                      game.status === 'released' 
+                        ? 'bg-success/15 border-success/30 text-success' 
+                        : game.status === 'beta' 
+                          ? 'bg-brand-orange/15 border-brand-orange/30 text-brand-orange' 
+                          : 'bg-slate-850 border-black text-slate-500 animate-pulse'
+                    }`}>
+                      {game.status === 'released' ? 'Active' : game.status === 'beta' ? 'Beta' : 'Syncing'}
                     </span>
                   </div>
 
-                  {/* Centered Large ShortCode */}
-                  <div className="flex-1 flex flex-col items-center justify-center pt-2">
-                    <span className="font-outfit font-black text-2xl tracking-tighter text-white group-hover:text-brand-orange transition-colors">
+                  {/* CMD Shortcode Tag (Top Left of image) */}
+                  <div className="absolute top-1.5 left-1.5 z-20">
+                    <span className="px-1.5 py-0.5 rounded bg-black/75 border border-black text-[6.5px] sm:text-[7.5px] font-black uppercase tracking-wider text-slate-400">
                       {game.shortCode}
-                    </span>
-                    <span className="text-[7.5px] font-black uppercase text-slate-400 group-hover:text-white transition-colors tracking-tighter truncate w-full text-center mt-0.5">
-                      {game.name.replace(" Arena", "").replace(" Rush", "")}
                     </span>
                   </div>
                 </div>
 
-                {/* Desktop view content (hidden on mobile) */}
-                <div className="hidden sm:flex flex-col justify-between h-full w-full relative z-20">
-                  {/* Card Header Status */}
-                  <div className="flex justify-between items-start">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-950/80 border border-black font-black text-[7.5px] uppercase tracking-widest text-slate-400">
-                      CMD-{game.shortCode}
-                    </span>
-                    
-                    {game.status === 'released' && (
-                      <span className="px-2 py-0.5 rounded-md bg-success/15 border border-success/30 text-success font-black text-[7.5px] uppercase tracking-widest">
-                        Active
-                      </span>
-                    )}
-                    {game.status === 'beta' && (
-                      <span className="px-2 py-0.5 rounded-md bg-brand-orange/15 border border-brand-orange/30 text-brand-orange font-black text-[7.5px] uppercase tracking-widest">
-                        Beta
-                      </span>
-                    )}
-                    {isComingSoon && (
-                      <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-black text-slate-500 font-black text-[7.5px] uppercase tracking-widest animate-pulse">
-                        Syncing
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Card Content & Action Area */}
+                {/* Game Name & Info (Bottom part) */}
+                <div className="mt-2.5 sm:mt-4 flex flex-col justify-between flex-1">
                   <div>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {game.tags.slice(0, 2).map((t, idx) => (
-                        <span key={idx} className="text-[6.5px] font-black uppercase tracking-widest text-slate-505 border border-slate-700/40 px-1 py-0.2 rounded">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-
-                    <h3 className="text-lg font-black mb-1 uppercase tracking-tighter text-white group-hover:text-brand-orange transition-colors">
+                    <h3 className="text-[9.5px] sm:text-base font-black uppercase tracking-tight sm:tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors truncate">
                       {game.name}
                     </h3>
                     
-                    <p className="text-[9.5px] text-slate-400 font-bold leading-normal mb-3 line-clamp-2">
+                    <span className="hidden sm:block text-[8px] font-black uppercase tracking-wider text-slate-500 mt-0.5">
+                      {game.category}
+                    </span>
+
+                    <p className="hidden sm:block text-[10px] text-slate-400 font-bold leading-normal mt-1.5 line-clamp-2">
                       {game.description}
                     </p>
-
-                    {/* Synchronization Progress Bar */}
-                    <div className="space-y-1 mb-3.5">
-                      <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-wider text-slate-505">
-                        <span>Sync</span>
-                        <span>{game.progressPercent}%</span>
-                      </div>
-                      <div className="h-1 w-full bg-slate-950 border border-black rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full transition-all duration-500 ${
-                            isComingSoon ? 'bg-slate-700' : 'bg-brand-orange'
-                          }`}
-                          style={{ width: `${game.progressPercent}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                      {isComingSoon ? (
-                        <Button disabled className="w-full h-9 border-2 border-slate-850 bg-transparent text-slate-600 rounded-lg uppercase text-[8px] font-black cursor-not-allowed">
-                          Offline
-                        </Button>
-                      ) : (
-                        <Button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedGameSlug(game.slug);
-                          }}
-                          className="btn-gaming w-full h-9 rounded-lg font-black uppercase text-[8px]"
-                        >
-                          Deploy Arena
-                        </Button>
-                      )}
-                    </div>
                   </div>
-                </div>
 
-                {/* Thumbnail background - only loaded for desktop view layout */}
-                {!isComingSoon && (
-                  <div className="hidden sm:block absolute inset-0 z-10">
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-dark via-slate-dark/50 to-transparent" />
-                    {game.image ? (
-                      <img 
-                        src={game.image} 
-                        alt={game.name} 
-                        className="absolute inset-0 w-full h-full object-cover opacity-15 group-hover:opacity-25 group-hover:scale-105 transition-all duration-700" 
-                      />
+                  {/* Action/Deploy button on PC */}
+                  <div className="hidden sm:flex items-center justify-between mt-4 pt-3 border-t border-black/20">
+                    <span className="text-[7.5px] font-black uppercase tracking-wider text-slate-505">
+                      {game.tags[0]} • {game.tags[1]}
+                    </span>
+                    {isComingSoon ? (
+                      <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Offline</span>
                     ) : (
-                      <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
-                        <Gamepad2 className="w-12 h-12 text-white/5" />
-                      </div>
+                      <span className="text-[8.5px] font-black text-brand-orange uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-0.5 transition-all">
+                        Deploy <Play className="w-2.5 h-2.5 fill-current" />
+                      </span>
                     )}
                   </div>
-                )}
+                </div>
               </motion.article>
             );
           })}
@@ -320,7 +265,7 @@ export default function GamesPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-2xl bg-[#24261f] border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden"
+              className="relative w-full max-w-2xl bg-slate-800 border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden"
             >
               {/* Close Button ("Wrong" cancel button) */}
               <button 
@@ -337,7 +282,7 @@ export default function GamesPage() {
                     <span className="kicker px-3 py-1 text-[8.5px] font-black uppercase tracking-[0.2em]">
                       {activeGame.category}
                     </span>
-                    <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-white">
+                    <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-slate-50">
                       {activeGame.name}
                     </h2>
                     
@@ -373,10 +318,10 @@ export default function GamesPage() {
                 </div>
 
                 {/* Right Side: Deploy Panel */}
-                <div className="md:col-span-5 p-6 md:p-8 bg-[#1c1d18] flex flex-col justify-center">
+                <div className="md:col-span-5 p-6 md:p-8 bg-slate-900 flex flex-col justify-center">
                   <div className="space-y-6">
                     <div className="text-center md:text-left">
-                      <h3 className="text-base font-black text-white tracking-wider uppercase">Deploy Arena</h3>
+                      <h3 className="text-base font-black text-slate-50 tracking-wider uppercase">Deploy Arena</h3>
                       <p className="text-[9px] font-semibold text-slate-500 mt-1">Start match or join lobby</p>
                     </div>
 

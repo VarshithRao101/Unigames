@@ -128,8 +128,8 @@ export default function TicTacToeGame() {
   return (
     <div className="flex flex-col items-center justify-center space-y-6 max-w-md mx-auto py-8">
       {/* Turn indicator / status banner */}
-      <div className="w-full text-center p-4 bg-[#24261f] border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
-        <p className="font-outfit font-black text-sm text-white uppercase tracking-wide">
+      <div className="w-full text-center p-4 bg-slate-800 border-[3px] border-black rounded-2xl shadow-[3px_3px_0px_#000000]">
+        <p className="font-outfit font-black text-sm text-slate-555 uppercase tracking-wide">
           {statusText}
         </p>
         {isSpectator && (
@@ -140,7 +140,7 @@ export default function TicTacToeGame() {
       </div>
 
       {/* 3x3 Grid Board */}
-      <div className="grid grid-cols-3 gap-3.5 w-72 h-72 bg-[#1c1d18] p-4 rounded-3xl border-[3.5px] border-black shadow-[4px_4px_0px_#000000] relative">
+      <div className="grid grid-cols-3 gap-3.5 w-72 h-72 bg-slate-900 p-4 rounded-3xl border-[3.5px] border-black shadow-[4px_4px_0px_#000000] relative">
         {board.map((cell: string, idx: number) => (
           <button
             key={idx}
@@ -148,10 +148,10 @@ export default function TicTacToeGame() {
             disabled={isSpectator || !isMyTurn || cell !== "" || !!winnerId || isDraw}
             className={`rounded-2xl flex items-center justify-center text-3xl font-outfit font-black transition-all cursor-pointer select-none border-[3px] border-black shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000000] disabled:transform-none disabled:shadow-[2px_2px_0px_#000000] disabled:cursor-not-allowed ${
               cell === "" 
-                ? "bg-[#1c1d18] hover:bg-[#24261f] text-transparent" 
+                ? "bg-slate-900 hover:bg-slate-800 text-transparent" 
                 : cell === "X" 
-                ? "bg-[#ffaa00] text-black" 
-                : "bg-[#00ffcc] text-black"
+                ? "bg-brand-orange text-black font-black" 
+                : "bg-success text-black font-black"
             }`}
           >
             {cell}
@@ -161,18 +161,18 @@ export default function TicTacToeGame() {
 
       {/* Players hud */}
       <div className="grid grid-cols-2 gap-4 w-full text-xs font-semibold">
-        <div className="bg-[#24261f] border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
+        <div className="bg-slate-800 border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
           <div className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-[#ffaa00] border-2 border-black flex items-center justify-center font-black text-[9px] text-black">X</span>
-            <span className="text-white block font-extrabold truncate max-w-[120px]">{players[0]?.name || "Challenger A"}</span>
+            <span className="w-4 h-4 rounded-full bg-brand-orange border-2 border-black flex items-center justify-center font-black text-[9px] text-black">X</span>
+            <span className="text-slate-50 block font-outfit font-black truncate max-w-[120px]">{players[0]?.name || "Challenger A"}</span>
           </div>
           <span className="text-[9px] text-slate-500 font-extrabold block">Player 1</span>
         </div>
 
-        <div className="bg-[#24261f] border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
+        <div className="bg-slate-800 border-[3px] border-black p-3.5 rounded-2xl text-center space-y-1.5 shadow-[3px_3px_0px_#000000]">
           <div className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-[#00ffcc] border-2 border-black flex items-center justify-center font-black text-[9px] text-black">O</span>
-            <span className="text-white block font-extrabold truncate max-w-[120px]">{players[1]?.name || "Challenger B"}</span>
+            <span className="w-4 h-4 rounded-full bg-success border-2 border-black flex items-center justify-center font-black text-[9px] text-black">O</span>
+            <span className="text-slate-50 block font-outfit font-black truncate max-w-[120px]">{players[1]?.name || "Challenger B"}</span>
           </div>
           <span className="text-[9px] text-slate-500 font-extrabold block">Player 2</span>
         </div>

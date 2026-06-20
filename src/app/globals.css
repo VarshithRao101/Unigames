@@ -1,41 +1,197 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-orange: #ffaa00; /* Flat bright yellow-orange */
-  --color-brand-amber: #f97316;
-  --color-brand-light: #fb923c;
-  --color-brand-dark: #c2410c;
-  --color-brand-neon: #ffaa00;
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-light: var(--brand-light);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-neon: var(--brand-neon);
 
-  --color-slate-dark: #161713; /* Yellowish Grey Dark Background */
-  --color-slate-muted: #8c8f85;
-  --color-grey-border: #000000; /* Pure Black Borders */
-  --color-grey-surface: #24261f; /* Lighter Yellowish Grey for Panels */
-  --color-grey-light: #1c1d18;
-  --color-white: #ffffff;
-
-  --color-success: #00ffcc; 
-  --color-warning: #fbbf24;
-  --color-danger: #ff4d4d;
-  --color-info: #00d2ff;
-  --color-purple: #bf00ff;
+  --color-slate-dark: var(--slate-dark-color);
+  --color-slate-muted: var(--slate-400);
+  --color-grey-border: var(--grey-border);
+  --color-grey-surface: var(--slate-800);
+  --color-grey-light: var(--slate-900);
+  --color-white: var(--white);
+  --color-success: var(--success-color);
+  --color-warning: var(--warning-color);
+  --color-danger: var(--danger-color);
+  --color-info: var(--info-color);
+  --color-purple: var(--purple-color);
 
   --font-outfit: var(--font-outfit), sans-serif;
   --font-inter: var(--font-inter), sans-serif;
   --font-space: var(--font-space), sans-serif;
   --font-orbitron: 'Orbitron', sans-serif;
 
-  --shadow-premium: 4px 4px 0px 0px #000000;
-  --shadow-orange: 4px 4px 0px 0px #000000;
-  --shadow-neon: 6px 6px 0px 0px #000000;
-  --shadow-card: 6px 6px 0px 0px #000000;
+  --shadow-premium: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--shadow-color);
+  --shadow-orange: var(--shadow-offset) var(--shadow-offset) 0px 0px var(--shadow-color);
+  --shadow-neon: var(--shadow-offset-neon) var(--shadow-offset-neon) 0px 0px var(--shadow-color);
+  --shadow-card: var(--shadow-offset-neon) var(--shadow-offset-neon) 0px 0px var(--shadow-color);
+
+  --color-slate-950: var(--slate-950);
+  --color-slate-900: var(--slate-900);
+  --color-slate-850: var(--slate-850);
+  --color-slate-800: var(--slate-800);
+  --color-slate-700: var(--slate-700);
+  --color-slate-600: var(--slate-600);
+  --color-slate-500: var(--slate-500);
+  --color-slate-400: var(--slate-400);
+  --color-slate-350: var(--slate-350);
+  --color-slate-300: var(--slate-300);
+  --color-slate-200: var(--slate-200);
+  --color-slate-100: var(--slate-100);
+  --color-slate-50: var(--slate-50);
 }
 
 :root {
+  /* Default/Dark Theme */
+  --brand-orange: #ffaa00;
+  --brand-amber: #f97316;
+  --brand-light: #fb923c;
+  --brand-dark: #c2410c;
+  --brand-neon: #ffaa00;
+
+  --slate-dark-color: #161713;
+  --slate-950: #161713;
+  --slate-900: #1c1d18;
+  --slate-850: #20221c;
+  --slate-800: #24261f;
+  --slate-700: #2d3027;
+  --slate-600: #3c3f35;
+  --slate-500: #585c51;
+  --slate-400: #8c8f85;
+  --slate-350: #9da096;
+  --slate-300: #aeb1a8;
+  --slate-200: #cfd2cb;
+  --slate-100: #e2e5de;
+  --slate-50: #f4f6f2;
+  --white: #ffffff;
+  
+  --grey-border: #000000;
+  --success-color: #00ffcc;
+  --warning-color: #fbbf24;
+  --danger-color: #ff4d4d;
+  --info-color: #00d2ff;
+  --purple-color: #bf00ff;
+
   --background: #161713;
   --foreground: #fcfdfa;
-  --brand-orange: 255, 170, 0;
-  --slate-950: 22, 23, 19;
+  --panel-bg: #24261f;
+  --panel-bg-hover: #2d3027;
+  --kicker-bg: #1c1d18;
+  --input-bg: #1c1d18;
+  --input-color: #ffffff;
+  --grid-line-color: #000000;
+  --grid-line-opacity: 0.08;
+  --scroll-track: #161713;
+  --scroll-thumb: #24261f;
+  --glass-orange-bg: #3c392c;
+  --text-muted: #8c8f85;
+  
+  --shadow-offset: 4px;
+  --shadow-offset-neon: 6px;
+  --shadow-color: #000000;
+}
+
+html.light {
+  /* Light Theme - whitish-grey background with lines and boxes */
+  --brand-orange: #ffaa00;
+  --brand-amber: #f97316;
+  --brand-light: #fb923c;
+  --brand-dark: #c2410c;
+  --brand-neon: #ffaa00;
+
+  --slate-dark-color: #161713; /* Ensure text-slate-dark on buttons remains dark and readable */
+  --slate-950: #eff1eb; 
+  --slate-900: #e8ece5;
+  --slate-850: #e2e5de;
+  --slate-800: #ffffff; 
+  --slate-700: #f5f7f2; 
+  --slate-600: #cfd2cb;
+  --slate-500: #8c8f85;
+  --slate-400: #585c51; 
+  --slate-350: #4b4e45;
+  --slate-300: #24261f; 
+  --slate-200: #2d3027;
+  --slate-100: #1c1d18;
+  --slate-50: #161713;
+  --white: #161713; 
+
+  --grey-border: #000000;
+  --success-color: #00aa88;
+  --warning-color: #d97706;
+  --danger-color: #dc2626;
+  --info-color: #0284c7;
+  --purple-color: #7c3aed;
+
+  --background: #eff1eb;
+  --foreground: #161713;
+  --panel-bg: #ffffff;
+  --panel-bg-hover: #f5f7f2;
+  --kicker-bg: #e2e5de;
+  --input-bg: #ffffff;
+  --input-color: #161713;
+  --grid-line-color: #000000;
+  --grid-line-opacity: 0.05;
+  --scroll-track: #eff1eb;
+  --scroll-thumb: #ffffff;
+  --glass-orange-bg: #fff5e0;
+  --text-muted: #585c51;
+
+  --shadow-offset: 4px;
+  --shadow-offset-neon: 6px;
+  --shadow-color: #000000;
+}
+
+html.gaming {
+  /* Gaming Theme - neon arcade vibes */
+  --brand-orange: #1df2ff;
+  --brand-amber: #ff00ff;
+  --brand-light: #bf00ff;
+  --brand-dark: #0f051d;
+  --brand-neon: #1df2ff;
+
+  --slate-dark-color: #0a0b0e; /* Dark for button texts */
+  --slate-950: #0a0b0e;
+  --slate-900: #12131a;
+  --slate-850: #1a1b24;
+  --slate-800: #1f2130;
+  --slate-700: #292b3d;
+  --slate-600: #404461;
+  --slate-500: #739bb0;
+  --slate-400: #8bbcd4;
+  --slate-350: #aae0ff;
+  --slate-300: #c0e8ff;
+  --slate-200: #d5f0ff;
+  --slate-100: #eef8ff;
+  --slate-50: #1df2ff;
+  --white: #ffffff; 
+
+  --grey-border: #000000;
+  --success-color: #39ff14;
+  --warning-color: #ffe700;
+  --danger-color: #ff0055;
+  --info-color: #1df2ff;
+  --purple-color: #bf00ff;
+
+  --background: #0a0b0e;
+  --foreground: #c0e8ff;
+  --panel-bg: #12131a;
+  --panel-bg-hover: #1a1b24;
+  --kicker-bg: #1f0833;
+  --input-bg: #12131a;
+  --input-color: #1df2ff;
+  --grid-line-color: #1df2ff;
+  --grid-line-opacity: 0.12;
+  --scroll-track: #0a0b0e;
+  --scroll-thumb: #12131a;
+  --glass-orange-bg: #29103a;
+  --text-muted: #739bb0;
+
+  --shadow-offset: 4px;
+  --shadow-offset-neon: 6px;
+  --shadow-color: #000000;
 }
 
 html { 
@@ -45,7 +201,7 @@ html {
 }
 
 body {
-  background: #161713 !important;
+  background: var(--background) !important;
   color: var(--foreground);
   font-family: var(--font-inter);
   min-height: 100vh;
@@ -58,10 +214,10 @@ body::before {
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(#000000 1.5px, transparent 1.5px),
-    linear-gradient(90deg, #000000 1.5px, transparent 1.5px);
+    linear-gradient(var(--grid-line-color) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--grid-line-color) 1.5px, transparent 1.5px);
   background-size: 40px 40px;
-  opacity: 0.08;
+  opacity: var(--grid-line-opacity);
   mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
   pointer-events: none;
   z-index: 0;
@@ -75,7 +231,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── 2D Cel-Shaded Glassmorphism Panels ─────────────────────── */
 .glass {
-  background: #24261f !important;
+  background: var(--panel-bg) !important;
   border: 3.5px solid #000000 !important;
   box-shadow: 6px 6px 0px 0px #000000 !important;
   backdrop-filter: none !important;
@@ -83,15 +239,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-orange {
-  background: #3c392c !important;
+  background: var(--glass-orange-bg) !important;
   border: 3.5px solid #000000 !important;
-  box-shadow: 6px 6px 0px 0px #000000, inset 0px 0px 0px 2.5px #ffaa00 !important;
+  box-shadow: 6px 6px 0px 0px #000000, inset 0px 0px 0px 2.5px var(--color-brand-orange) !important;
   backdrop-filter: none !important;
 }
 
 /* ── Cel-Shaded Panel System ───────────────────────────── */
 .panel {
-  background: #24261f !important;
+  background: var(--panel-bg) !important;
   border: 3.5px solid #000000 !important;
   box-shadow: 6px 6px 0px 0px #000000 !important;
   border-radius: 2rem !important;
@@ -103,7 +259,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .panel-interactive:hover {
   border-color: #000000 !important;
-  background: #2d3027 !important;
+  background: var(--panel-bg-hover) !important;
   box-shadow: 10px 10px 0px 0px #000000 !important;
   transform: translate(-4px, -4px) !important;
 }
@@ -114,7 +270,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-neon-orange {
-  color: #ffaa00;
+  color: var(--color-brand-orange);
   text-shadow: none !important;
 }
 
@@ -138,9 +294,9 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.5rem;
   padding: 0.4rem 1rem;
   border-radius: 12px;
-  background: #1c1d18;
+  background: var(--kicker-bg);
   border: 3px solid #000000;
-  color: #ffaa00;
+  color: var(--color-brand-orange);
   font-family: var(--font-outfit);
   font-size: 0.75rem;
   font-weight: 900;
@@ -151,7 +307,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Flat Gaming Button overrides ────────────────────────── */
 .btn-gaming {
-  background: #ffaa00 !important;
+  background: var(--color-brand-orange) !important;
   color: #000000 !important;
   border: 3.5px solid #000000 !important;
   box-shadow: 4px 4px 0px 0px #000000 !important;
@@ -167,7 +323,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-gaming:hover {
-  background: #ffbb00 !important;
+  background: var(--color-brand-orange) !important;
+  opacity: 0.9 !important;
   transform: translate(-3px, -3px) !important;
   box-shadow: 7px 7px 0px 0px #000000 !important;
 }
@@ -196,21 +353,58 @@ button:not(.btn-gaming):not([disabled]):active {
 /* ── Cel-Shaded Input overrides ── */
 input[type="text"], input[type="password"], input[type="email"], select, textarea {
   border: 3.5px solid #000000 !important;
-  background: #1c1d18 !important;
-  color: #ffffff !important;
+  background: var(--input-bg) !important;
+  color: var(--input-color) !important;
   box-shadow: 3px 3px 0px 0px #000000 !important;
   border-radius: 1rem !important;
   font-weight: 800 !important;
 }
 input[type="text"]:focus, select:focus, textarea:focus {
-  border-color: #ffaa00 !important;
-  box-shadow: 5px 5px 0px 0px #000000, inset 0px 0px 0px 2px #ffaa00 !important;
+  border-color: var(--color-brand-orange) !important;
+  box-shadow: 5px 5px 0px 0px #000000, inset 0px 0px 0px 2px var(--color-brand-orange) !important;
   outline: none !important;
+}
+
+/* ── Text Color Overrides for Light Theme Readability ── */
+html.light .text-slate-950 {
+  color: #161713 !important;
+}
+html.light .text-slate-400 {
+  color: #585c51 !important;
+}
+html.light .text-slate-450 {
+  color: #4b4e45 !important;
+}
+html.light .text-slate-500 {
+  color: #4b4e45 !important;
+}
+html.light .text-slate-550 {
+  color: #3b3d36 !important;
+}
+html.light .text-slate-350 {
+  color: #3b3d36 !important;
+}
+html.light .text-slate-300 {
+  color: #24261f !important;
+}
+
+/* ── Text Color Overrides for Gaming Theme Neon ── */
+html.gaming .text-slate-950 {
+  color: #0a0b0e !important;
+}
+html.gaming .text-slate-400 {
+  color: #739bb0 !important;
+}
+html.gaming .text-slate-500 {
+  color: #8bbcd4 !important;
+}
+html.gaming .text-slate-300 {
+  color: #aae0ff !important;
 }
 
 /* ── Gradient Text ─────────────────────────── */
 .gradient-text {
-  background: linear-gradient(to right, #ffaa00, #ffc800);
+  background: linear-gradient(to right, var(--color-brand-orange), var(--color-brand-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

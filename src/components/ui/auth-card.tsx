@@ -13,7 +13,7 @@ export function AuthCard({ children, className, animate = true, ...props }: Auth
   const CardContent = (
     <div
       className={cn(
-        "w-full max-w-md bg-white/70 dark:bg-slate-dark/40 backdrop-blur-xl border border-white/40 dark:border-slate-muted/20 shadow-premium p-8 rounded-3xl relative overflow-hidden",
+        "w-full max-w-md bg-slate-900 border-3 border-black shadow-[4px_4px_0px_#000000] p-8 rounded-3xl relative overflow-hidden",
         className
       )}
       {...props}
