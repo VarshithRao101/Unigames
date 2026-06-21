@@ -33,6 +33,15 @@ export function logAnalyticsEvent(
     const capped = [...existing, newEvent].slice(-200);
     localStorage.setItem(ANALYTICS_STORAGE_KEY, JSON.stringify(capped));
 
+    // POST event to backend database asynchronously
+    fetch("/api/analytics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newEvent),
+    }).catch((err) => {
+      console.error("Failed to POST analytics event to backend:", err);
+    });
+
     // Mock console log for developers visibility
     console.log(`[Analytics] Tracked Event: ${eventName}`, newEvent);
   } catch (err) {

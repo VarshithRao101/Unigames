@@ -96,22 +96,22 @@ export const ChatBot: React.FC = () => {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
-              "mb-4 w-80 sm:w-96 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-2xl flex flex-col",
+              "mb-4 w-80 sm:w-96 overflow-hidden rounded-[2rem] border-3 border-black bg-slate-900/95 backdrop-blur-xl shadow-[6px_6px_0px_#000000] flex flex-col",
               isMinimized ? "h-14" : "h-[500px]"
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-brand-amber/10 border-b border-white/5">
+            <div className="flex items-center justify-between p-4 bg-brand-orange/10 border-b-3 border-black">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-brand-amber flex items-center justify-center text-slate-950">
+                  <div className="w-8 h-8 rounded-full bg-brand-orange border-2 border-black flex items-center justify-center text-slate-950 shadow-[1.5px_1.5px_0px_#000000]">
                     <Bot size={18} />
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-slate-900" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white leading-none">UniGame AI</h3>
-                  <p className="text-[10px] text-brand-amber mt-1 font-medium tracking-wider uppercase">Online Support</p>
+                  <h3 className="text-sm font-black uppercase text-white leading-none">UniGame AI</h3>
+                  <p className="text-[10px] text-brand-orange mt-1 font-bold tracking-wider uppercase">Online Support</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -143,20 +143,28 @@ export const ChatBot: React.FC = () => {
                       )}
                     >
                       <div className={cn(
-                        "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1",
-                        m.sender === "bot" ? "bg-brand-amber/20 text-brand-amber" : "bg-white/10 text-white/70"
+                        "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1 border-2 border-black shadow-[1px_1px_0px_#000000]",
+                        m.sender === "bot" ? "bg-brand-orange/20 text-brand-orange" : "bg-slate-800 text-white/70"
                       )}>
                         {m.sender === "bot" ? <Bot size={12} /> : <User size={12} />}
                       </div>
-                      <div
-                        className={cn(
-                          "p-3 rounded-2xl text-sm leading-relaxed",
-                          m.sender === "bot" 
-                            ? "bg-white/5 text-white/90 rounded-tl-none border border-white/5" 
-                            : "bg-brand-amber text-slate-950 font-medium rounded-tr-none"
+                      <div className="relative">
+                        <div
+                          className={cn(
+                            "p-3 rounded-2xl text-sm leading-relaxed border-2 border-black shadow-[2px_2px_0px_#000000] relative",
+                            m.sender === "bot" 
+                              ? "bg-slate-950 text-slate-350 rounded-tl-none" 
+                              : "bg-brand-orange text-slate-950 font-black rounded-tr-none"
+                          )}
+                        >
+                          {m.text}
+                        </div>
+                        {/* Comic Speech Bubble Tail */}
+                        {m.sender === "user" ? (
+                          <div className="absolute top-[3px] right-[-4px] w-2.5 h-2.5 bg-brand-orange border-r-2 border-t-2 border-black rotate-[45deg] z-10" />
+                        ) : (
+                          <div className="absolute top-[3px] left-[-4px] w-2.5 h-2.5 bg-slate-950 border-l-2 border-t-2 border-black rotate-[-45deg] z-10" />
                         )}
-                      >
-                        {m.text}
                       </div>
                     </div>
                   ))}
@@ -164,7 +172,7 @@ export const ChatBot: React.FC = () => {
                 </div>
 
                 {/* Input */}
-                <div className="p-4 border-t border-white/5 bg-slate-950/50">
+                <div className="p-4 border-t-3 border-black bg-slate-950/50">
                   <form 
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -177,15 +185,14 @@ export const ChatBot: React.FC = () => {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Ask anything..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brand-amber/50 transition-colors placeholder:text-white/20"
+                      className="flex-1 bg-slate-900 border-2 border-black rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-50 focus:outline-none focus:border-brand-orange shadow-[2px_2px_0px_#000000] placeholder:text-slate-600"
                     />
                     <Button 
                       type="submit" 
-                      size="sm" 
-                      className="shrink-0 bg-brand-amber hover:bg-brand-amber/80 text-slate-950"
+                      className="shrink-0 btn-gaming h-10 px-4 rounded-xl shadow-none"
                       disabled={!input.trim()}
                     >
-                      <Send size={18} />
+                      <Send size={16} />
                     </Button>
                   </form>
                 </div>
@@ -200,17 +207,17 @@ export const ChatBot: React.FC = () => {
         whileTap={{ scale: 0.95 }}
         onClick={toggleChat}
         className={cn(
-          "w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300",
+          "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 border-3 border-black shadow-[3px_3px_0px_#000000]",
           isOpen 
-            ? "bg-brand-amber text-slate-950 rotate-90" 
-            : "bg-slate-900 border border-brand-amber/30 text-brand-amber hover:border-brand-amber hover:shadow-brand-amber/20"
+            ? "bg-brand-orange text-slate-950 rotate-90" 
+            : "bg-slate-900 text-brand-orange hover:bg-slate-800"
         )}
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        {isOpen ? <X size={24} className="stroke-[3]" /> : <MessageSquare size={24} className="stroke-[3]" />}
         {!isOpen && (
           <span className="absolute top-0 right-0 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-amber opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-amber"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-orange border border-black"></span>
           </span>
         )}
       </motion.button>

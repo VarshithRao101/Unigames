@@ -153,14 +153,22 @@ export function Sidebar() {
                           <span>{message.sender}</span>
                           <span>{message.time}</span>
                         </div>
-                        <div
-                          className={`max-w-[90%] rounded-2xl px-5 py-3 text-sm font-bold border-2 border-black shadow-[2px_2px_0px_#000000] ${
-                            isSelf
-                              ? "bg-brand-orange text-black"
-                              : "bg-slate-900 text-slate-300"
-                          }`}
-                        >
-                          {message.text}
+                        <div className="relative">
+                          <div
+                            className={`max-w-[90%] rounded-2xl px-5 py-3 text-sm font-bold border-2 border-black shadow-[2px_2px_0px_#000000] relative ${
+                              isSelf
+                                ? "bg-brand-orange text-black rounded-tr-none"
+                                : "bg-slate-900 text-slate-300 rounded-tl-none"
+                            }`}
+                          >
+                            {message.text}
+                          </div>
+                          {/* Comic Speech Bubble Tail */}
+                          {isSelf ? (
+                            <div className="absolute top-[3px] right-[-4px] w-2.5 h-2.5 bg-brand-orange border-r-2 border-t-2 border-black rotate-[45deg] z-10" />
+                          ) : (
+                            <div className="absolute top-[3px] left-[-4px] w-2.5 h-2.5 bg-slate-900 border-l-2 border-t-2 border-black rotate-[-45deg] z-10" />
+                          )}
                         </div>
                       </div>
                     );

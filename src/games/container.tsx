@@ -195,7 +195,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   const GameComponent = entry.component;
 
   return (
-    <MatchProvider initialRoom={initialRoomData} initialPlayers={initialPlayersList} initialGameId={entry.metadata.id}>
+    <MatchProvider matchId="sandbox-match" initialRoom={initialRoomData} initialPlayers={initialPlayersList}>
       <GameWorkspaceWrapper component={GameComponent} metadata={entry.metadata} onFinish={onFinish} onBack={onBack} />
     </MatchProvider>
   );
@@ -268,7 +268,10 @@ function GameWorkspaceWrapper({
           </div>
 
           {/* Load component inside standard container */}
-          <div className="min-h-[350px] flex items-center justify-center bg-slate-900 rounded-2xl border-[3px] border-black p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)]">
+          <div className="min-h-[350px] flex items-center justify-center bg-slate-900 rounded-2xl border-[3px] border-black p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.2)] relative overflow-hidden">
+            {/* CRT Screen Scanlines and Flicker Overlays */}
+            <div className="absolute inset-0 pointer-events-none z-30 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] [background-size:100%_4px,6px_100%] opacity-[0.22] rounded-xl shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]" />
+
             {lifecycleState === "waiting" ? (
               <div className="text-center space-y-4 max-w-sm py-12">
                 <span className="text-5xl inline-block">{metadata.thumbnail}</span>

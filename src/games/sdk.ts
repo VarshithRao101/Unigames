@@ -2,6 +2,7 @@
 
 import { useMatchContext } from "./context";
 import { Player, Spectator, RoomData, MatchData } from "./types";
+import { useAuth } from "@/context/auth-context";
 
 export interface UnigamesSDK {
   room: RoomData;
@@ -19,15 +20,17 @@ export interface UnigamesSDK {
 
 export function useUnigamesSDK(): UnigamesSDK {
   const context = useMatchContext();
+  const { user } = useAuth();
 
-  const localPlayer = context.players.find(p => p.id === "p1");
+  const localPlayer = context.players.find(p => p.id === user?.id);
+  const isSpectator = user ? !context.players.some(p => p.id === user.id) : true;
 
   return {
     room: context.room,
     match: context.match,
     players: context.players,
     spectators: context.spectators,
-    isSpectator: context.isSpectator,
+    isSpectator,
     localPlayer,
     gameState: context.match.gameState,
     submitMove: (actionType, payload) => {
@@ -40,7 +43,9 @@ export function useUnigamesSDK(): UnigamesSDK {
       context.endMatch(winnerId, rankings, xp);
     },
     setReady: (isReady) => {
-      context.setReady("p1", isReady);
+      if (user?.id) {
+        context.setReady(user.id, isReady);
+      }
     }
   };
 }

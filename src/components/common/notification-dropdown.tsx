@@ -5,76 +5,39 @@ import { Bell, UserPlus, Play, Trophy, Megaphone, Check, Trash2, X } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-interface NotificationItem {
-  id: string;
-  type: "friend_request" | "room_invite" | "match_result" | "announcement";
-  title: string;
-  message: string;
-  time: string;
-  isRead: boolean;
+import { NotificationItem } from "@/hooks/use-notifications";
+
+interface NotificationDropdownProps {
+  isOpen: boolean;
+  onClose: () => void;
+  notifications: NotificationItem[];
+  unreadCount: number;
+  markRead: (id: string, e: React.MouseEvent) => void;
+  markAllRead: () => void;
+  clearAll: () => void;
 }
 
-export function NotificationDropdown({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: "n1",
-      type: "friend_request",
-      title: "Friend Request",
-      message: "Alice sent you a friend invitation.",
-      time: "2m ago",
-      isRead: false,
-    },
-    {
-      id: "n2",
-      type: "room_invite",
-      title: "Room Invitation",
-      message: "DevWizard invited you to join Chess Room #AX49Z.",
-      time: "15m ago",
-      isRead: false,
-    },
-    {
-      id: "n3",
-      type: "match_result",
-      title: "Match Victory!",
-      message: "You won Tic-Tac-Toe VS Bob. (+150 XP)",
-      time: "1h ago",
-      isRead: true,
-    },
-    {
-      id: "n4",
-      type: "announcement",
-      title: "System Update",
-      message: "Ludo Club Playtests are now open.",
-      time: "1d ago",
-      isRead: true,
-    },
-  ]);
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
-  };
-
-  const markSingleRead = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-  };
+export function NotificationDropdown({
+  isOpen,
+  onClose,
+  notifications,
+  unreadCount,
+  markRead,
+  markAllRead,
+  clearAll,
+}: NotificationDropdownProps) {
 
   const getIcon = (type: NotificationItem["type"]) => {
     switch (type) {
       case "friend_request":
         return <UserPlus className="w-4 h-4 text-blue-600" />;
       case "room_invite":
+      case "match_invite":
         return <Play className="w-4 h-4 text-brand-dark" />;
       case "match_result":
+      case "achievement":
         return <Trophy className="w-4 h-4 text-success" />;
+      case "system":
       case "announcement":
         return <Megaphone className="w-4 h-4 text-purple-600" />;
     }
@@ -85,9 +48,12 @@ export function NotificationDropdown({ isOpen, onClose }: { isOpen: boolean; onC
       case "friend_request":
         return "bg-blue-50 border-blue-200";
       case "room_invite":
+      case "match_invite":
         return "bg-amber-50 border-brand-amber/20";
       case "match_result":
+      case "achievement":
         return "bg-green-50 border-green-200";
+      case "system":
       case "announcement":
         return "bg-purple-50 border-purple-200";
     }
@@ -161,7 +127,7 @@ export function NotificationDropdown({ isOpen, onClose }: { isOpen: boolean; onC
                     {/* Mark as read button overlay */}
                     {!item.isRead && (
                       <button
-                        onClick={(e) => markSingleRead(item.id, e)}
+                        onClick={(e) => markRead(item.id, e)}
                         className="absolute right-3 top-3 p-1.5 bg-grey-light hover:bg-brand-light text-slate-400 hover:text-brand-dark rounded-lg cursor-pointer transition-colors shadow-sm"
                         title="Mark as Read"
                       >

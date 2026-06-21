@@ -12,6 +12,23 @@ export interface User {
   isOnboarded: boolean;
   onboardingStep: number;
   createdAt: string;
+  xp?: number;
+  level?: number;
+  stats?: {
+    gamesPlayed: number;
+    wins: number;
+    losses: number;
+    draws: number;
+    winStreak: number;
+    maxWinStreak: number;
+    gameStats?: Record<string, {
+      played: number;
+      wins: number;
+      losses: number;
+      draws: number;
+      highScore?: number;
+    }>;
+  };
 }
 
 export interface Session {

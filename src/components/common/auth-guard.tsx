@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { signIn } from "next-auth/react";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -20,23 +21,14 @@ export function AuthGuard({ children, allowedRoles, guestOnly = false }: AuthGua
 
     if (guestOnly) {
       if (user) {
-        if (!user.isOnboarded) {
-          router.replace("/onboarding");
-        } else {
-          router.replace("/profile");
-        }
+        router.replace("/profile");
       }
       return;
     }
 
     if (!user) {
-      // Not logged in -> redirect to login with ref redirect
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
-      return;
-    }
-
-    if (!user.isOnboarded && pathname !== "/onboarding") {
-      router.replace("/onboarding");
+      // Trigger Google OAuth sign-in directly and redirect back here on success
+      signIn("google", { callbackUrl: pathname });
       return;
     }
 
@@ -65,7 +57,6 @@ export function AuthGuard({ children, allowedRoles, guestOnly = false }: AuthGua
   // Prevent flash of content when rendering protected route while user is invalid
   if (guestOnly && user) return null;
   if (!guestOnly && !user) return null;
-  if (!guestOnly && user && !user.isOnboarded && pathname !== "/onboarding") return null;
   if (!guestOnly && user && allowedRoles && !allowedRoles.includes(user.role)) return null;
 
   return <>{children}</>;
