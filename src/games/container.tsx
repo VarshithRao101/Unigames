@@ -24,18 +24,14 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   const entry = getGameRegistryEntry(gameIdOrSlug);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-      if (!entry) {
-        setError("missing");
-      } else if (entry.metadata.status === "coming_soon" && entry.metadata.id !== "tictactoe") {
-        setError(null); 
-      } else if (parseFloat(entry.metadata.version) < 0.5) {
-        setError("unsupported");
-      }
-    }, 1200);
-
-    return () => clearTimeout(timer);
+    setLoading(false);
+    if (!entry) {
+      setError("missing");
+    } else if (entry.metadata.status === "coming_soon" && entry.metadata.id !== "tictactoe") {
+      setError(null); 
+    } else if (parseFloat(entry.metadata.version) < 0.5) {
+      setError("unsupported");
+    }
   }, [gameIdOrSlug, entry]);
 
   // Loading Screen

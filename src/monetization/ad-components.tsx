@@ -264,13 +264,14 @@ export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         if (prev <= 1) {
           clearInterval(timer);
           setCanClose(true);
+          onClose(); // Automatically close and start match after 5 seconds
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

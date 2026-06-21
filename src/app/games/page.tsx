@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Gamepad2, Zap, X, DoorOpen } from "lucide-react";
+import { Search, Gamepad2, Zap, X, DoorOpen, Play } from "lucide-react";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { Button } from "@/components/ui/button";
@@ -243,7 +243,6 @@ export default function GamesPage() {
                       </span>
                     )}
                   </div>
-                </div>
                 </div>
               </motion.article>
             );

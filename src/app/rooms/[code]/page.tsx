@@ -10,6 +10,9 @@ import {
   Copy, Users, Send, AlertCircle, Crown, LogOut, Trophy, Play, Check, Plus, Eye, BookOpen, Clock, 
   HelpCircle, RefreshCw, X, ShieldAlert, Award, Zap, Share2, Gamepad2
 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/context/toast-context";
+import { getPusherClient } from "@/lib/pusher";
 
 const getGameIcon = (id: string) => {
   switch (id) {
@@ -153,6 +156,8 @@ const ONLINE_FRIENDS = [
 
 export default function LobbyRoomPage({ params }: { params: Promise<{ code: string }> }) {
   const router = useRouter();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const resolvedParams = use(params);
   const roomCode = resolvedParams.code.toUpperCase();
 
@@ -200,72 +205,161 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.chess;
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize data
+  // Initialize and sync room data with Pusher presence / private channel
   useEffect(() => {
-    const createdRooms = loadCreatedRooms();
-    let targetRoom = createdRooms.find((r) => r.code === roomCode);
-    if (!targetRoom) {
-      targetRoom = ROOMS_AVAILABLE.find((r) => r.code === roomCode);
-    }
+    if (!user) return;
+    const currentUserId = user.id;
 
-    let resolvedGameId = "chess";
-    
-    if (targetRoom) {
-      resolvedGameId = targetRoom.gameSlug;
-      setGameId(targetRoom.gameSlug);
-      setRoomName(targetRoom.name);
-      setIsPrivate(targetRoom.isPrivate);
-      setRegion(targetRoom.region || "Mumbai Hub");
+    let active = true;
+    let pusherChannel: any = null;
 
-      // Creator bypass check (using host matches "You" or local storage creator flag)
-      const isCreator = (typeof window !== "undefined" && window.localStorage.getItem(`room_creator_${roomCode}`) === "true") || targetRoom.host === "You";
-      
-      if (targetRoom.isPrivate && !isCreator) {
-        setIsLocked(true);
-      } else {
-        setIsLocked(false);
+    async function initRoom() {
+      try {
+        const res = await fetch(`/api/rooms/${roomCode}`);
+        if (!res.ok) {
+          throw new Error("Lobby room not found or expired");
+        }
+        const json = await res.json();
+        if (!json.success || !json.data) {
+          throw new Error("Lobby room not found");
+        }
+
+        let currentRoom = json.data;
+
+        // Auto-join if user is not currently in the room
+        const userInRoom = currentRoom.players.some((p: any) => p.userId === currentUserId);
+        if (!userInRoom) {
+          const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
+            method: "POST",
+          });
+          const joinJson = await joinRes.json();
+          if (!joinJson.success || !joinJson.data) {
+            throw new Error(joinJson.error?.message || "Failed to join room");
+          }
+          currentRoom = joinJson.data;
+        }
+
+        if (!active) return;
+
+        setGameId(currentRoom.gameSlug);
+        setRoomName(currentRoom.name);
+        setIsPrivate(currentRoom.settings.isPrivate);
+        setRegion(currentRoom.region || "Mumbai Hub");
+
+        // Creator check using host flag
+        const hostPlayer = currentRoom.players.find((p: any) => p.isHost);
+        const isCreator = hostPlayer?.userId === currentUserId;
+        if (currentRoom.settings.isPrivate && !isCreator && !userInRoom) {
+          setIsLocked(true);
+        } else {
+          setIsLocked(false);
+        }
+
+        // Map backend players list to frontend structure
+        const mappedPlayers = currentRoom.players.map((p: any) => ({
+          id: p.userId,
+          name: p.username,
+          isHost: p.isHost,
+          isReady: p.isReady,
+          avatar: p.avatar || p.username.charAt(0),
+          isAI: false,
+          color: p.isHost ? "#FFC107" : "#1971C2",
+        }));
+        setPlayers(mappedPlayers);
+
+        // Subscribe to Pusher Room channel
+        const pusher = getPusherClient();
+        pusherChannel = pusher.subscribe(`private-room-${roomCode}`);
+
+        // Listeners for real-time room sync
+        pusherChannel.bind("player-joined", (newPlayer: any) => {
+          setPlayers((prev) => {
+            if (prev.some((p) => p.id === newPlayer.userId)) return prev;
+            return [
+              ...prev,
+              {
+                id: newPlayer.userId,
+                name: newPlayer.username,
+                isHost: newPlayer.isHost,
+                isReady: newPlayer.isReady,
+                avatar: newPlayer.avatar || newPlayer.username.charAt(0),
+                isAI: false,
+                color: "#1971C2",
+              },
+            ];
+          });
+          setChatMessages((prev) => [
+            ...prev,
+            { sender: "System", text: `${newPlayer.username} entered the room.`, time: "Now", isSystem: true }
+          ]);
+        });
+
+        pusherChannel.bind("player-left", (data: { userId: string; newHostId?: string }) => {
+          setPlayers((prev) => {
+            const filtered = prev.filter((p) => p.id !== data.userId);
+            if (data.newHostId) {
+              return filtered.map((p) => p.id === data.newHostId ? { ...p, isHost: true, isReady: true } : p);
+            }
+            return filtered;
+          });
+          setChatMessages((prev) => [
+            ...prev,
+            { sender: "System", text: `A player left the room.`, time: "Now", isSystem: true }
+          ]);
+        });
+
+        pusherChannel.bind("player-ready", (data: { userId: string; isReady: boolean }) => {
+          setPlayers((prev) =>
+            prev.map((p) => (p.id === data.userId ? { ...p, isReady: data.isReady } : p))
+          );
+        });
+
+        pusherChannel.bind("match-started", (data: { matchId: string; gameSlug: string }) => {
+          // Tunnel redirection to gameplay screen!
+          router.push(`/play/${data.gameSlug}?match=${data.matchId}`);
+        });
+
+      } catch (err: any) {
+        console.error("Lobby room initialization error:", err);
+        if (active) {
+          toast(err.message || "Failed to establish link with lobby room", "error");
+          router.push("/rooms");
+        }
       }
-    } else {
-      // Fallback for custom or direct codes
-      const cachedGameId = (typeof window !== "undefined" && window.localStorage.getItem(`room_game_${roomCode}`)) || "chess";
-      resolvedGameId = cachedGameId;
-      setGameId(cachedGameId);
-      setIsPrivate(false);
-      setIsLocked(false);
-      setRegion("Mumbai Hub");
     }
 
-    // Initialize players list based on game capacity
-    const initialPlayers: Player[] = [
-      { id: "p1", name: "You (Varshith)", isHost: true, isReady: false, avatar: "V", isAI: false, color: "#FFC107" },
-      { id: "p2", name: "AliceW", isHost: false, isReady: true, avatar: "A", isAI: false, color: "#1971C2" },
-    ];
-    setPlayers(initialPlayers);
-    
-    const config = GAME_CONFIGS[resolvedGameId] || GAME_CONFIGS.chess;
-    setLoadingTip(config.tips[0]);
-  }, [roomCode]);
+    initRoom();
+
+    return () => {
+      active = false;
+      if (pusherChannel) {
+        const pusher = getPusherClient();
+        pusher.unsubscribe(`private-room-${roomCode}`);
+      }
+    };
+  }, [roomCode, user, router, toast]);
 
   // Handle password entry
-  const handleVerifyPassword = (e: React.FormEvent) => {
+  const handleVerifyPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const createdRooms = loadCreatedRooms();
-    let targetRoom = createdRooms.find((r) => r.code === roomCode);
-    if (!targetRoom) {
-      targetRoom = ROOMS_AVAILABLE.find((r) => r.code === roomCode);
-    }
-    
-    const requiredPasscode = targetRoom?.passcode || "1234";
+    try {
+      const res = await fetch(`/api/rooms/${roomCode}`);
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      const requiredPasscode = json.data?.settings?.passcode || "1234";
 
-    if (passwordInput === requiredPasscode) {
-      setIsLocked(false);
-      setPasswordError("");
-      setChatMessages((prev) => [
-        ...prev,
-        { sender: "System", text: "You have unlocked and joined the private lobby room.", time: "Now", isSystem: true }
-      ]);
-    } else {
-      setPasswordError("Incorrect Passcode. Access Denied.");
+      if (passwordInput === requiredPasscode) {
+        setIsLocked(false);
+        setPasswordError("");
+        setChatMessages((prev) => [
+          ...prev,
+          { sender: "System", text: "You have unlocked and joined the private lobby room.", time: "Now", isSystem: true }
+        ]);
+      } else {
+        setPasswordError("Incorrect Passcode. Access Denied.");
+      }
+    } catch (err) {
+      setPasswordError("Failed to verify room credentials");
     }
   };
 
@@ -274,7 +368,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Loading Screen simulation logic
+  // Loading Screen simulation logic (unused but kept for layout type safety)
   useEffect(() => {
     if (gameState !== "loading") return;
     
@@ -289,7 +383,6 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         if (prev >= 100) {
           clearInterval(progressInterval);
           clearInterval(tipInterval);
-          // Transition to gameplay
           setGameState("playing");
           triggerGameplaySimulation();
           return 100;
@@ -304,7 +397,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     };
   }, [gameState, game]);
 
-  // Countdown timer logic
+  // Countdown timer logic (unused but kept for type safety)
   useEffect(() => {
     if (gameState !== "countdown") return;
     if (countdown === 0) {
@@ -323,21 +416,18 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Switch between Player and Spectator Mode
   const handleToggleSpectatorMode = () => {
     if (isSpectatingOnly) {
-      // Return to player
       if (players.length >= game.maxPlayers) {
         alert("The game slots are currently full! Remove a bot or wait for a slot.");
         return;
       }
       setIsSpectatingOnly(false);
-      // Remove from spectators and add to players
-      setSpectators(prev => prev.filter(s => s.name !== "You (Varshith)"));
-      setPlayers(prev => [...prev, { id: "p1", name: "You (Varshith)", isHost: true, isReady: false, avatar: "V", isAI: false, color: "#FFC107" }]);
+      setSpectators(prev => prev.filter(s => s.name !== (user?.username || "You")));
+      setPlayers(prev => [...prev, { id: user?.id || "p1", name: user?.username || "You", isHost: false, isReady: false, avatar: (user?.username || "Y").charAt(0), isAI: false, color: "#1971C2" }]);
       setChatMessages(prev => [...prev, { sender: "System", text: "You joined as a player.", time: "Now", isSystem: true }]);
     } else {
-      // Join spectators
       setIsSpectatingOnly(true);
-      setPlayers(prev => prev.filter(p => p.id !== "p1"));
-      setSpectators(prev => [...prev, { id: "spec-you", name: "You (Varshith)", avatar: "V" }]);
+      setPlayers(prev => prev.filter(p => p.id !== user?.id));
+      setSpectators(prev => [...prev, { id: user?.id || "spec-you", name: user?.username || "You", avatar: (user?.username || "Y").charAt(0) }]);
       setChatMessages(prev => [...prev, { sender: "System", text: "You switched to Spectator Mode.", time: "Now", isSystem: true }]);
     }
   };
@@ -348,7 +438,6 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     const botIndex = Math.floor(Math.random() * BOT_NAMES.length);
     const botName = BOT_NAMES[botIndex] + ` [AI]`;
     
-    // Check if bot already exists in lobby
     if (players.some(p => p.name === botName)) return;
 
     const newBot: Player = {
@@ -379,36 +468,92 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     ]);
   };
 
-  // Toggle ready status
-  const handleToggleReady = () => {
+  // Toggle ready status via PATCH API
+  const handleToggleReady = async () => {
+    const me = players.find((p) => p.id === user?.id);
+    if (!me) return;
+
+    const nextReady = !me.isReady;
+    
     setPlayers((prev) =>
-      prev.map((p) => (p.id === "p1" ? { ...p, isReady: !p.isReady } : p))
+      prev.map((p) => (p.id === user?.id ? { ...p, isReady: nextReady } : p))
     );
+
+    try {
+      const res = await fetch(`/api/rooms/${roomCode}/ready`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isReady: nextReady }),
+      });
+      if (!res.ok) throw new Error();
+    } catch (err) {
+      toast("Failed to update ready state", "error");
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === user?.id ? { ...p, isReady: !nextReady } : p))
+      );
+    }
   };
 
-  // Start lobby countdown
-  const handleStartMatch = () => {
+  // Start match immediately via POST /api/matches (tunnel handoff)
+  const handleStartMatch = async () => {
     if (!hasShownStartAd) {
       setIsAdOpen(true);
       return;
     }
-    setCountdown(5);
-    setGameState("countdown");
-    setChatMessages((prev) => [
-      ...prev,
-      { sender: "System", text: "Match host triggered launch countdown.", time: "Now", isSystem: true }
-    ]);
+    
+    try {
+      const res = await fetch("/api/matches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomCode }),
+      });
+      const json = await res.json();
+      if (!json.success || !json.data) {
+        throw new Error(json.error?.message || "Failed to initialize match");
+      }
+      
+      const match = json.data;
+      const matchId = match._id;
+      // Host immediately redirects (other guests will be redirected by Pusher 'match-started' broadcast)
+      router.push(`/play/${match.gameSlug}?match=${matchId}`);
+    } catch (err: any) {
+      toast(err.message || "Could not launch match arena", "error");
+    }
   };
 
-  const handleCloseAd = () => {
+  const handleCloseAd = async () => {
     setIsAdOpen(false);
     setHasShownStartAd(true);
-    setCountdown(5);
-    setGameState("countdown");
-    setChatMessages((prev) => [
-      ...prev,
-      { sender: "System", text: "Match host triggered launch countdown.", time: "Now", isSystem: true }
-    ]);
+    
+    try {
+      const res = await fetch("/api/matches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomCode }),
+      });
+      const json = await res.json();
+      if (!json.success || !json.data) {
+        throw new Error(json.error?.message || "Failed to initialize match");
+      }
+      
+      const match = json.data;
+      const matchId = match._id;
+      router.push(`/play/${match.gameSlug}?match=${matchId}`);
+    } catch (err: any) {
+      toast(err.message || "Could not launch match arena", "error");
+    }
+  };
+
+  const handleLeaveRoom = async () => {
+    try {
+      await fetch(`/api/rooms/${roomCode}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.error("Error leaving room:", err);
+    } finally {
+      router.push("/rooms");
+    }
   };
 
   // Invite Friends to list
@@ -733,13 +878,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     >
                       Invite Friends
                     </button>
-                    <Link href="/rooms">
-                      <button
-                        className="h-8.5 px-3.5 border-2 border-black bg-[#ff4d4d] text-black font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:bg-[#ff6666] transition-all cursor-pointer rounded-lg flex items-center justify-center"
-                      >
-                        Leave Room
-                      </button>
-                    </Link>
+                    <button
+                      onClick={handleLeaveRoom}
+                      className="h-8.5 px-3.5 border-2 border-black bg-[#ff4d4d] text-black font-black text-[9px] uppercase tracking-widest shadow-[2px_2px_0px_#000000] active:translate-y-0.5 hover:bg-[#ff6666] transition-all cursor-pointer rounded-lg flex items-center justify-center"
+                    >
+                      Leave Room
+                    </button>
                   </div>
                 </div>
 

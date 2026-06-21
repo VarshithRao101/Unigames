@@ -163,6 +163,22 @@ export default function ProfilePage() {
     return () => clearTimeout(timer);
   }, [user, router, toast]);
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white font-outfit">
+        <div className="text-center space-y-4">
+          <div className="relative w-12 h-12 mx-auto">
+            <div className="absolute inset-0 border-4 border-brand-orange/20 rounded-full" />
+            <div className="absolute inset-0 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="font-outfit font-black text-[10px] text-slate-450 uppercase tracking-widest">
+            Loading Profile...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Fallback helper for displayed values
   const displayedUser = dbUser || user;
 

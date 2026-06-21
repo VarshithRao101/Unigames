@@ -79,21 +79,7 @@ export default function LeaderboardsPage() {
     })),
   ];
 
-  const currentGame = gameFilter === "overall"
-    ? { name: "Overall Rankings", slug: "overall" }
-    : PLATFORM_GAMES.find(g => g.slug === gameFilter) ?? { name: gameFilter, slug: gameFilter };
 
-  const colors = GAME_COLORS[gameFilter] ?? GAME_COLORS.overall;
-
-  const gameOptions = [
-    { slug: "overall", name: "Overall Rankings", icon: "🏆", desc: "All games combined" },
-    ...PLATFORM_GAMES.map(g => ({
-      slug: g.slug,
-      name: g.name,
-      icon: GAME_COLORS[g.slug]?.icon ?? "🎮",
-      desc: g.spotlight ?? g.category,
-    })),
-  ];
 
   return (
     <div className="bg-transparent text-slate-50 min-h-screen">
