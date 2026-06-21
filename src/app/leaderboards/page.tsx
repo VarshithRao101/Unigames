@@ -21,7 +21,6 @@ export default function LeaderboardsPage() {
   const [gameFilter, setGameFilter] = useState<GameFilter>("overall");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -63,6 +62,22 @@ export default function LeaderboardsPage() {
 
   const topThree = useMemo(() => board.slice(0, 3), [board]);
   const rest = useMemo(() => board.slice(3), [board]);
+
+  const currentGame = gameFilter === "overall"
+    ? { name: "Overall Rankings", slug: "overall" }
+    : PLATFORM_GAMES.find(g => g.slug === gameFilter) ?? { name: gameFilter, slug: gameFilter };
+
+  const colors = GAME_COLORS[gameFilter] ?? GAME_COLORS.overall;
+
+  const gameOptions = [
+    { slug: "overall", name: "Overall Rankings", icon: "🏆", desc: "All games combined" },
+    ...PLATFORM_GAMES.map(g => ({
+      slug: g.slug,
+      name: g.name,
+      icon: GAME_COLORS[g.slug]?.icon ?? "🎮",
+      desc: g.spotlight ?? g.category,
+    })),
+  ];
 
   const currentGame = gameFilter === "overall"
     ? { name: "Overall Rankings", slug: "overall" }

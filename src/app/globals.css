@@ -413,6 +413,28 @@ input[type="text"]:focus, select:focus, textarea:focus {
   outline: none !important;
 }
 
+/* ── Text Shadow Overrides for Light Theme ── */
+html.light h1 {
+  text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6) !important;
+}
+html.light h2 {
+  text-shadow: 1.75px 1.75px 0px rgba(255, 255, 255, 0.5) !important;
+}
+html.light h3 {
+  text-shadow: 1.5px 1.5px 0px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* ── Text Shadow Overrides for Gaming Theme ── */
+html.gaming h1 {
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
+}
+html.gaming h2 {
+  text-shadow: 1.75px 1.75px 0px rgba(0, 0, 0, 0.4) !important;
+}
+html.gaming h3 {
+  text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.35) !important;
+}
+
 /* ── Text Color Overrides for Light Theme Readability ── */
 html.light .text-slate-950 {
   color: #161713 !important;

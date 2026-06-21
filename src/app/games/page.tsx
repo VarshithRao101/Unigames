@@ -186,6 +186,26 @@ export default function GamesPage() {
                     </div>
                   )}
 
+                  {/* Status Overlay Sticker Badge (Top Right of image) */}
+                  <div className="absolute top-2.5 right-2.5 z-20">
+                    <span className={`h-2.5 w-2.5 rounded-full border border-black block sm:hidden ${
+                      game.status === 'released' 
+                        ? 'bg-success shadow-[0_0_4px_rgba(0,255,204,0.6)]' 
+                        : game.status === 'beta' 
+                          ? 'bg-brand-orange shadow-[0_0_4px_rgba(255,170,0,0.6)]' 
+                          : 'bg-slate-600 animate-pulse'
+                    }`} />
+                    <span className={`hidden sm:inline-block px-2.5 py-1 rounded-lg border-2 border-black font-black text-[8px] uppercase tracking-widest rotate-[3deg] shadow-[2.5px_2.5px_0px_#000000] transition-transform group-hover:scale-105 ${
+                      game.status === 'released' 
+                        ? 'bg-success text-slate-950 border-black' 
+                        : game.status === 'beta' 
+                          ? 'bg-brand-orange text-slate-950 border-black' 
+                          : 'bg-slate-700 border-black text-slate-400 animate-pulse'
+                    }`}>
+                      {game.status === 'released' ? 'Active' : game.status === 'beta' ? 'Beta' : 'Syncing'}
+                    </span>
+                  </div>
+
                   {/* CMD Shortcode Sticker Tag (Top Left of image) */}
                   <div className="absolute top-2.5 left-2.5 z-20">
                     <span className="px-2 py-0.5 rounded bg-slate-950 border-2 border-black text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider text-brand-orange rotate-[-3deg] shadow-[2px_2px_0px_#000000] block">
@@ -194,11 +214,36 @@ export default function GamesPage() {
                   </div>
                 </div>
 
-                {/* Game Name (Bottom part) */}
-                <div className="mt-2 z-10">
-                  <h3 className="text-[9.5px] sm:text-sm font-black uppercase tracking-tight sm:tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors truncate">
-                    {game.name}
-                  </h3>
+                {/* Game Name & Info (Bottom part) */}
+                <div className="mt-2 flex flex-col justify-between flex-1 z-10">
+                  <div>
+                    <h3 className="text-[9.5px] sm:text-sm font-black uppercase tracking-tight sm:tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors truncate">
+                      {game.name}
+                    </h3>
+                    
+                    <span className="hidden sm:block text-[7.5px] font-black uppercase tracking-wider text-slate-500 mt-0.5">
+                      {game.category}
+                    </span>
+
+                    <p className="hidden sm:block text-[9px] text-slate-400 font-bold leading-normal mt-1 line-clamp-2">
+                      {game.description}
+                    </p>
+                  </div>
+
+                  {/* Action/Deploy button on PC */}
+                  <div className="hidden sm:flex items-center justify-between mt-3 pt-2.5 border-t border-black/20">
+                    <span className="text-[7px] font-black uppercase tracking-wider text-slate-500">
+                      {game.tags[0]} • {game.tags[1]}
+                    </span>
+                    {isComingSoon ? (
+                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest">Offline</span>
+                    ) : (
+                      <span className="text-[7.5px] font-black text-brand-orange uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-0.5 transition-all">
+                        Deploy <Play className="w-2.5 h-2.5 fill-current" />
+                      </span>
+                    )}
+                  </div>
+                </div>
                 </div>
               </motion.article>
             );
