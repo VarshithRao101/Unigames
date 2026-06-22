@@ -86,11 +86,11 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
                 </h2>
                 
                 <div className="flex flex-wrap gap-1.5 mt-3">
-                  <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border border-slate-700/60 bg-black/25 px-2 py-0.5 rounded">
+                  <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
                     {game.multiplayerType}
                   </span>
                   {(game.tags || []).map((tag) => (
-                    <span key={tag} className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border border-slate-700/60 bg-black/25 px-2 py-0.5 rounded">
+                    <span key={tag} className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
                       {tag}
                     </span>
                   ))}
@@ -101,7 +101,7 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
                 </p>
               </div>
 
-              <div className="mt-6 p-4 rounded-2xl bg-black/20 border-2 border-black shadow-[2px_2px_0px_#000]">
+              <div className="mt-6 p-4 rounded-2xl bg-slate-900/50 border-2 border-black shadow-[2px_2px_0px_#000]">
                 <p className="font-outfit text-[10px] font-black uppercase tracking-widest text-brand-orange">
                   How it plays
                 </p>
@@ -117,7 +117,7 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
             </div>
 
             {/* Right Side: Play Panel */}
-            <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center z-10 relative" style={{ background: 'var(--panel-bg)' }}>
+            <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center z-10 relative bg-slate-900">
               <div className="space-y-6">
                 <div className="text-center md:text-left">
                   <h3 className="text-base font-black tracking-wider uppercase">Play Now</h3>
