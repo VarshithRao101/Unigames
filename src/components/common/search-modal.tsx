@@ -5,6 +5,7 @@ import { Search, X, Gamepad2, User, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Loader } from "@/components/ui/loader";
 
 interface SearchItem {
   id: string;
@@ -15,16 +16,13 @@ interface SearchItem {
 }
 
 const SEARCH_DATABASE: SearchItem[] = [
-  { id: "1", type: "game", title: "Chess Online", subtitle: "Board VS - Playable", url: "/games/chess" },
   { id: "2", type: "game", title: "Tic-Tac-Toe Arena", subtitle: "Casual VS - Playable", url: "/games/tictactoe" },
-  { id: "3", type: "game", title: "Ludo Club", subtitle: "Board FFA - Alpha Testing", url: "/games/ludo" },
-  { id: "4", type: "game", title: "Reversi Deluxe", subtitle: "Board VS - Prototyping", url: "/games/reversi" },
   { id: "5", type: "contributor", title: "Varshith", subtitle: "Lead Frontend Architect", url: "/about" },
   { id: "6", type: "contributor", title: "DevWizard", subtitle: "Real-time Backend Dev", url: "/about" },
   { id: "7", type: "contributor", title: "Alice W.", subtitle: "Creative UI/UX Designer", url: "/about" },
   { id: "8", type: "contributor", title: "Bob S.", subtitle: "Game Engine Developer", url: "/about" },
-  { id: "9", type: "post", title: "Add support for 3D Chess pieces", subtitle: "Community suggestion (112 votes)", url: "/community" },
-  { id: "10", type: "post", title: "Dice roll physics consistent checks", subtitle: "Bug report (45 votes)", url: "/community" },
+  { id: "9", type: "post", title: "Add custom symbol skins for X/O", subtitle: "Community suggestion (112 votes)", url: "/community" },
+  { id: "10", type: "post", title: "Tic-Tac-Toe click register delays on mobile", subtitle: "Bug report (45 votes)", url: "/community" },
   { id: "11", type: "post", title: "Organize seasonal tournaments", subtitle: "Feedback forum (189 votes)", url: "/community" },
 ];
 
@@ -153,12 +151,8 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
             {/* Result list pane */}
             <div className="max-h-[350px] overflow-y-auto p-4 flex flex-col gap-2">
               {loading ? (
-                <div className="py-12 flex flex-col items-center justify-center text-slate-400 text-xs gap-3">
-                  <svg className="animate-spin w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  <span className="font-space uppercase text-[9px] font-black tracking-widest">Searching databases...</span>
+                <div className="py-12 flex flex-col items-center justify-center">
+                  <Loader label="Searching..." className="w-56" />
                 </div>
               ) : query && results.length > 0 ? (
                 results.map((item) => {
@@ -199,7 +193,7 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                       Search suggestion tags
                     </span>
                     <div className="flex flex-wrap justify-center gap-2.5 mt-3.5 max-w-sm mx-auto">
-                      {["Chess", "Tic-Tac-Toe", "Varshith", "Ludo", "Roadmap", "Tournaments"].map((tag) => (
+                      {["Tic-Tac-Toe", "Varshith", "Roadmap", "Tournaments", "Achievements", "Neobrutalism"].map((tag) => (
                         <button
                           key={tag}
                           onClick={() => setQuery(tag)}

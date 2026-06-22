@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Session, LoginHistoryEntry, UserRole } from "@/types/auth";
 import { SessionProvider, useSession, signIn, signOut } from "next-auth/react";
+import { resolveAvatarUrl } from "@/utils/avatar-generator";
 
 interface NotificationSettings {
   emailNotifications: boolean;
@@ -18,7 +19,7 @@ interface PrivacySettings {
 }
 
 interface AppearanceSettings {
-  theme: "dark" | "light" | "gaming";
+  theme: "dark" | "light";
   highContrast: boolean;
   animationsEnabled: boolean;
 }
@@ -89,7 +90,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   });
 
   const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettings>({
-    theme: "dark",
+    theme: "light",
     highContrast: false,
     animationsEnabled: true,
   });
@@ -100,7 +101,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
         id: nextSession.user.id || "",
         username: (nextSession.user as any).username || nextSession.user.name || "Gamer",
         email: nextSession.user.email || "",
-        avatarUrl: nextSession.user.image || "/avatars/avatar-placeholder.png",
+        avatarUrl: resolveAvatarUrl(nextSession.user.image || undefined),
         bio: (nextSession.user as any).bio || "Welcome to my UniGames profile!",
         role: ((nextSession.user as any).role as UserRole) || "user",
         isEmailVerified: true,
@@ -121,14 +122,26 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
 
     if (savedNotif) setNotificationSettings(JSON.parse(savedNotif));
     if (savedPriv) setPrivacySettings(JSON.parse(savedPriv));
-    if (savedAppe) setAppearanceSettings(JSON.parse(savedAppe));
+    if (savedAppe) {
+      const appe = JSON.parse(savedAppe);
+      const savedTheme = localStorage.getItem("unigames_theme");
+      if (savedTheme) {
+        appe.theme = savedTheme;
+      }
+      setAppearanceSettings(appe);
+    } else {
+      const savedTheme = localStorage.getItem("unigames_theme");
+      if (savedTheme) {
+        setAppearanceSettings(prev => ({ ...prev, theme: savedTheme as any }));
+      }
+    }
   }, []);
 
   // Synchronize document theme class list
   useEffect(() => {
     if (typeof window !== "undefined") {
       const doc = document.documentElement;
-      doc.classList.remove("light", "dark", "gaming");
+      doc.classList.remove("light", "dark");
       doc.classList.add(appearanceSettings.theme);
     }
   }, [appearanceSettings.theme]);
@@ -165,7 +178,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   // Update profile updates the session info
   const updateProfile = async (data: { username?: string; bio?: string; avatarUrl?: string }) => {
     try {
-      // Trigger a PATCH request to our backend profile endpoint (Phase 2.1)
+      // Trigger a PATCH request to our backend profile endpoint
       const res = await fetch("/api/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -176,13 +189,18 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
         }),
       });
 
-      if (res.ok) {
-        // Trigger a NextAuth session update to refresh client state
-        update({
-          username: data.username,
-          image: data.avatarUrl,
-        });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        console.error("Profile update API error:", res.status, errorBody);
+        return;
       }
+
+      // Trigger a NextAuth session update to refresh client state
+      await update({
+        username: data.username,
+        image: data.avatarUrl,
+        bio: data.bio,
+      });
     } catch (err) {
       console.error("Failed to update profile", err);
     }
@@ -212,7 +230,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     localStorage.setItem("unigames_settings_appe", JSON.stringify(updated));
     if (typeof window !== "undefined") {
       const doc = document.documentElement;
-      doc.classList.remove("light", "dark", "gaming");
+      doc.classList.remove("light", "dark");
       doc.classList.add(updated.theme);
     }
   };

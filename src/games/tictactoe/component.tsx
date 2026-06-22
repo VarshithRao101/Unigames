@@ -141,7 +141,7 @@ export default function TicTacToeGame() {
         </p>
         {isSpectator && (
           <span className="text-[9px] text-brand-orange font-black uppercase tracking-widest block mt-1.5 animate-pulse relative z-10">
-            SPECTATOR UPLINK
+            SPECTATING
           </span>
         )}
       </div>
@@ -254,7 +254,7 @@ export default function TicTacToeGame() {
       {localPlayer?.isHost && (winnerId || isDraw) && (
         <Button
           onClick={handleRestart}
-          className="btn-gaming h-10 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] mt-2 relative z-10"
+          className="btn-neo h-10 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] mt-2 relative z-10"
         >
           <RefreshCw className="w-3.5 h-3.5 mr-1" /> Reset Board
         </Button>

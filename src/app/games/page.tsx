@@ -53,46 +53,11 @@ export default function GamesPage() {
     {
       slug: "tictactoe",
       name: "Tic-Tac-Toe",
-      shortCode: "XO",
       category: "Arcade",
       status: "released",
       progressPercent: 100,
-      description: "Command the classic board in high-speed, cybernetic 2-player rounds.",
       image: "/images/tictactoe_logo.png",
       tags: ["Quick", "Simple", "2 Players"]
-    },
-    {
-      slug: "chess",
-      name: "Chess Arena",
-      shortCode: "CHS",
-      category: "Strategy",
-      status: "beta",
-      progressPercent: 95,
-      description: "Tactical warfare on a 64-square battlefield. Synchronize moves in real-time.",
-      image: "/images/chess_logo.avif",
-      tags: ["Deep Strategy", "Ranked", "Classic"]
-    },
-    {
-      slug: "ludo",
-      name: "Ludo Rush",
-      shortCode: "LDO",
-      category: "Board Games",
-      status: "in-dev",
-      progressPercent: 40,
-      description: "Roll, strike, and race your squad to the home sector in fast-paced board combat.",
-      image: "/images/ludo_logo.webp",
-      tags: ["4 Players", "Casual", "Lobby Party"]
-    },
-    {
-      slug: "snakes",
-      name: "Snakes & Ladders",
-      shortCode: "SNK",
-      category: "Board Games",
-      status: "in-dev",
-      progressPercent: 15,
-      description: "Ascend grids and avoid sector hazards in this classic casual multiplayer race.",
-      image: "/images/snakes_logo.webp",
-      tags: ["Multiplayer", "Casual", "Dice Roll"]
     }
   ], []);
 
@@ -124,7 +89,7 @@ export default function GamesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 type="text" 
-                placeholder="SEARCH SECTORS..."
+                placeholder="Search games..."
                 className="w-full h-10 sm:h-11 bg-slate-900 border-2 border-black rounded-xl px-10 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] text-slate-50 focus:outline-none focus:border-brand-orange"
               />
             </div>
@@ -146,7 +111,7 @@ export default function GamesPage() {
             </div>
 
             <Link href="/rooms/create" className="w-full lg:w-auto">
-              <Button className="btn-gaming h-10 sm:h-11 px-6 sm:px-8 rounded-xl w-full lg:w-auto text-[10px] sm:text-xs shadow-none">
+              <Button className="btn-neo h-10 sm:h-11 px-6 sm:px-8 rounded-xl w-full lg:w-auto text-[10px] sm:text-xs shadow-none">
                 Create Room
               </Button>
             </Link>
@@ -167,13 +132,13 @@ export default function GamesPage() {
                 onClick={() => {
                   setSelectedGameSlug(game.slug);
                 }}
-                className="group relative rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 transition-all duration-300 border-2 border-black bg-slate-900/60 glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer"
+                className="group relative rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 transition-all duration-300 border-2 border-black glass panel-interactive shadow-[3px_3px_0px_#000000] sm:shadow-card cursor-pointer"
               >
                 {/* 2D Comic Halftone Background Pattern Overlay */}
                 <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:10px_10px] opacity-[0.04] group-hover:opacity-[0.08] transition-opacity pointer-events-none z-0" />
 
                 {/* 2D Game Photo (Top part) */}
-                <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-black/40 bg-slate-900 shadow-[1.5px_1.5px_0px_#000000] sm:shadow-[3px_3px_0px_#000000] z-10">
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-black/40 shadow-[1.5px_1.5px_0px_#000000] sm:shadow-[3px_3px_0px_#000000] z-10">
                   {game.image ? (
                     <img 
                       src={game.image} 
@@ -181,65 +146,34 @@ export default function GamesPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 contrast-[1.03] saturate-[1.08] brightness-[1.03]" 
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                    <div className="w-full h-full flex items-center justify-center">
                       <Gamepad2 className="w-8 h-8 text-slate-650" />
                     </div>
                   )}
-
-                  {/* Status Overlay Sticker Badge (Top Right of image) */}
-                  <div className="absolute top-2.5 right-2.5 z-20">
-                    <span className={`h-2.5 w-2.5 rounded-full border border-black block sm:hidden ${
-                      game.status === 'released' 
-                        ? 'bg-success shadow-[0_0_4px_rgba(0,255,204,0.6)]' 
-                        : game.status === 'beta' 
-                          ? 'bg-brand-orange shadow-[0_0_4px_rgba(255,170,0,0.6)]' 
-                          : 'bg-slate-600 animate-pulse'
-                    }`} />
-                    <span className={`hidden sm:inline-block px-2.5 py-1 rounded-lg border-2 border-black font-black text-[8px] uppercase tracking-widest rotate-[3deg] shadow-[2.5px_2.5px_0px_#000000] transition-transform group-hover:scale-105 ${
-                      game.status === 'released' 
-                        ? 'bg-success text-slate-950 border-black' 
-                        : game.status === 'beta' 
-                          ? 'bg-brand-orange text-slate-950 border-black' 
-                          : 'bg-slate-700 border-black text-slate-400 animate-pulse'
-                    }`}>
-                      {game.status === 'released' ? 'Active' : game.status === 'beta' ? 'Beta' : 'Syncing'}
-                    </span>
-                  </div>
-
-                  {/* CMD Shortcode Sticker Tag (Top Left of image) */}
-                  <div className="absolute top-2.5 left-2.5 z-20">
-                    <span className="px-2 py-0.5 rounded bg-slate-950 border-2 border-black text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider text-brand-orange rotate-[-3deg] shadow-[2px_2px_0px_#000000] block">
-                      {game.shortCode}
-                    </span>
-                  </div>
                 </div>
 
                 {/* Game Name & Info (Bottom part) */}
                 <div className="mt-2 flex flex-col justify-between flex-1 z-10">
                   <div>
-                    <h3 className="text-[9.5px] sm:text-sm font-black uppercase tracking-tight sm:tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors truncate">
+                    <h3 className="text-[9.5px] sm:text-sm font-black uppercase tracking-tight sm:tracking-tighter group-hover:text-brand-orange transition-colors truncate">
                       {game.name}
                     </h3>
                     
                     <span className="hidden sm:block text-[7.5px] font-black uppercase tracking-wider text-slate-500 mt-0.5">
                       {game.category}
                     </span>
-
-                    <p className="hidden sm:block text-[9px] text-slate-400 font-bold leading-normal mt-1 line-clamp-2">
-                      {game.description}
-                    </p>
                   </div>
 
-                  {/* Action/Deploy button on PC */}
+                  {/* Play button on PC */}
                   <div className="hidden sm:flex items-center justify-between mt-3 pt-2.5 border-t border-black/20">
                     <span className="text-[7px] font-black uppercase tracking-wider text-slate-500">
                       {game.tags[0]} • {game.tags[1]}
                     </span>
                     {isComingSoon ? (
-                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest">Offline</span>
+                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest">Coming Soon</span>
                     ) : (
                       <span className="text-[7.5px] font-black text-brand-orange uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-0.5 transition-all">
-                        Deploy <Play className="w-2.5 h-2.5 fill-current" />
+                        Play <Play className="w-2.5 h-2.5 fill-current" />
                       </span>
                     )}
                   </div>
@@ -262,7 +196,7 @@ export default function GamesPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-2xl bg-slate-800 border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden"
+              className="relative w-full max-w-2xl glass border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden"
             >
               {/* Close Button ("Wrong" cancel button) */}
               <button 
@@ -315,11 +249,11 @@ export default function GamesPage() {
                 </div>
 
                 {/* Right Side: Deploy Panel */}
-                <div className="md:col-span-5 p-6 md:p-8 bg-slate-900 flex flex-col justify-center">
+                <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center" style={{ background: 'var(--panel-bg)' }}>
                   <div className="space-y-6">
                     <div className="text-center md:text-left">
-                      <h3 className="text-base font-black text-slate-50 tracking-wider uppercase">Deploy Arena</h3>
-                      <p className="text-[9px] font-semibold text-slate-500 mt-1">Start match or join lobby</p>
+                      <h3 className="text-base font-black tracking-wider uppercase">Play Now</h3>
+                      <p className="text-[9px] font-semibold text-slate-500 mt-1">Start a match or join a room</p>
                     </div>
 
                     <Button 
@@ -327,7 +261,7 @@ export default function GamesPage() {
                         router.push(`/rooms/create?game=${activeGame.slug}`);
                         setSelectedGameSlug(null);
                       }}
-                      className="btn-gaming w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                      className="btn-neo w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
                     >
                       Create Room
                     </Button>

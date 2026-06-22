@@ -54,7 +54,10 @@ export async function updateProfile(
     // Flatten direct fields
     if (data.username !== undefined) updatePayload.username = data.username;
     if (data.bio !== undefined) updatePayload.bio = data.bio;
-    if (data.avatar !== undefined) updatePayload.avatar = data.avatar;
+    if (data.avatar !== undefined) {
+      updatePayload.avatar = data.avatar;
+      updatePayload.image = data.avatar; // Keep NextAuth default image field in sync
+    }
 
     // Flatten nested settings fields to avoid replacing the whole object
     if (data.settings) {

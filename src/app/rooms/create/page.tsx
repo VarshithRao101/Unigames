@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PLATFORM_GAMES } from "@/data/platform";
 import { createRoomCode, saveCreatedRoom } from "@/utils/mock-room-store";
 import { AnimatePresence, motion } from "framer-motion";
+import { AuthGuard } from "@/components/common/auth-guard";
 
 function CreateRoomForm() {
   const router = useRouter();
@@ -31,7 +32,7 @@ function CreateRoomForm() {
     if (gameParam && PLATFORM_GAMES.some((g) => g.slug === gameParam)) {
       setSelectedGame(gameParam);
       // Automatically adjust player count defaults
-      setMaxPlayers(gameParam === "ludo" ? 4 : gameParam === "snakes" ? 6 : 2);
+      setMaxPlayers(2);
     }
   }, [searchParams]);
 
@@ -46,10 +47,8 @@ function CreateRoomForm() {
   );
 
   const allowedPlayerCounts = useMemo(() => {
-    if (selectedGame === "ludo") return [4];
-    if (selectedGame === "snakes") return [2, 3, 4, 6];
-    return [2]; // chess and tictactoe only support 2 players
-  }, [selectedGame]);
+    return [2]; // Only tictactoe is supported (2 players)
+  }, []);
 
   // Adjust max players if current value is not allowed
   useEffect(() => {
@@ -92,8 +91,9 @@ function CreateRoomForm() {
   }
 
   return (
-    <div className="bg-transparent text-white min-h-screen">
-      <Navbar />
+    <AuthGuard>
+      <div className="bg-transparent text-white min-h-screen">
+        <Navbar />
 
       <main className="pt-32 pb-20 px-6 container mx-auto max-w-7xl">
         <Link href="/rooms" className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-brand-orange transition-colors mb-6">
@@ -265,7 +265,7 @@ function CreateRoomForm() {
                      </label>
                   </div>
 
-                  <Button type="submit" className="btn-gaming w-full rounded-xl h-11 text-xs font-black tracking-widest shadow-[3px_3px_0px_#000000]">
+                  <Button type="submit" className="btn-neo w-full rounded-xl h-11 text-xs font-black tracking-widest shadow-[3px_3px_0px_#000000]">
                      Create Room
                   </Button>
                </form>
@@ -308,7 +308,8 @@ function CreateRoomForm() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
 

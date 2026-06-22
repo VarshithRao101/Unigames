@@ -117,13 +117,13 @@ export default function TestArenaGame() {
               <div className="flex gap-4">
                 <Button
                   onClick={() => handleEndMatchSimulation(0)}
-                  className="btn-gaming flex-1 h-12 uppercase font-black text-xs tracking-wider shadow-[3px_3px_0px_#000000]"
+                  className="btn-neo flex-1 h-12 uppercase font-black text-xs tracking-wider shadow-[3px_3px_0px_#000000]"
                 >
                   Player 1 Wins
                 </Button>
                 <Button
                   onClick={() => handleEndMatchSimulation(1)}
-                  className="btn-gaming flex-1 h-12 uppercase font-black text-xs tracking-wider shadow-[3px_3px_0px_#000000]"
+                  className="btn-neo flex-1 h-12 uppercase font-black text-xs tracking-wider shadow-[3px_3px_0px_#000000]"
                 >
                   Player 2 Wins
                 </Button>
@@ -246,7 +246,7 @@ export default function TestArenaGame() {
                 </button>
                 <button 
                   onClick={() => router.push("/games")}
-                  className="btn-gaming h-11 text-[9px] uppercase font-black px-2.5 truncate shadow-[2px_2px_0px_#000000]"
+                  className="btn-neo h-11 text-[9px] uppercase font-black px-2.5 truncate shadow-[2px_2px_0px_#000000]"
                 >
                   Return To Games
                 </button>

@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader } from "@/components/ui/loader";
 import { 
   User, 
   Calendar, 
@@ -40,6 +41,8 @@ import { Footer } from "@/components/common/footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/context/toast-context";
+import { useTheme } from "@/context/theme-context";
+import { resolveAvatarUrl, PRELOADED_AVATARS } from "@/utils/avatar-generator";
 
 // Map badge keys to Lucide React icons to replace raw emojis
 const BADGE_ICONS: Record<string, React.ComponentType<any>> = {
@@ -51,30 +54,22 @@ const BADGE_ICONS: Record<string, React.ComponentType<any>> = {
   flame: Flame,
 };
 
-// Preset Avatars with distinct gradient schemes
-const AVATAR_PRESETS = [
-  { id: "p1", name: "Cyber Knight", gradients: "from-brand-orange to-brand-neon", textColor: "text-slate-950" },
-  { id: "p2", name: "Neon Rogue", gradients: "from-pink-500 to-rose-500", textColor: "text-white" },
-  { id: "p3", name: "Techno Mage", gradients: "from-cyan-400 to-blue-500", textColor: "text-slate-950" },
-  { id: "p4", name: "Pixel Ninja", gradients: "from-emerald-400 to-teal-500", textColor: "text-slate-950" },
-  { id: "p5", name: "Retro Founder", gradients: "from-red-500 to-orange-500", textColor: "text-white" },
-  { id: "p6", name: "Cosmic Master", gradients: "from-violet-600 to-indigo-600", textColor: "text-white" },
-];
+
 
 // Mock Match History Data
 const MOCK_MATCH_HISTORY = [
   { id: "m1", game: "Tic-Tac-Toe", outcome: "won", xp: 120, time: "42 mins ago", mode: "1v1 Duel", opponent: "Luna" },
-  { id: "m2", game: "Chess Arena", outcome: "lost", xp: 30, time: "2 hours ago", mode: "Ranked Match", opponent: "Garry" },
+  { id: "m2", game: "Tic-Tac-Toe", outcome: "lost", xp: 30, time: "2 hours ago", mode: "1v1 Duel", opponent: "Nova" },
   { id: "m3", game: "Tic-Tac-Toe", outcome: "won", xp: 150, time: "1 day ago", mode: "Tournament Final", opponent: "BoardKing" },
-  { id: "m4", game: "Ludo Rush", outcome: "won", xp: 90, time: "2 days ago", mode: "4-Player Party", opponent: "Nova" },
+  { id: "m4", game: "Tic-Tac-Toe", outcome: "won", xp: 90, time: "2 days ago", mode: "1v1 Duel", opponent: "Nova" },
 ];
 
 // Mock Achievements / Badges
 const ACHIEVEMENT_BADGES = [
   { id: "b1", title: "Gold Champion", desc: "Ascend to Rank #1 on any weekly board", icon: "trophy", color: "bg-amber-500/20 border-amber-500 text-amber-300", unlocked: true },
-  { id: "b2", title: "Snakes Slayer", desc: "Climb 5 ladders in a single race", icon: "gamepad", color: "bg-emerald-500/20 border-emerald-500 text-emerald-300", unlocked: true },
-  { id: "b3", title: "Double Check", desc: "Deliver checkmate in under 10 moves", icon: "crown", color: "bg-indigo-500/20 border-indigo-500 text-indigo-300", unlocked: true },
-  { id: "b4", title: "Tactician Elite", desc: "Reach 50 wins across board games", icon: "brain", color: "bg-pink-500/20 border-pink-500 text-pink-300", unlocked: true },
+  { id: "b2", title: "Perfect Align", desc: "Align three markers in under 4 moves", icon: "gamepad", color: "bg-emerald-500/20 border-emerald-500 text-emerald-300", unlocked: true },
+  { id: "b3", title: "Block Master", desc: "Successfully block 5 opponent win patterns", icon: "crown", color: "bg-indigo-500/20 border-indigo-500 text-indigo-300", unlocked: true },
+  { id: "b4", title: "Tactician Elite", desc: "Reach 50 wins across arcade games", icon: "brain", color: "bg-pink-500/20 border-pink-500 text-pink-300", unlocked: true },
   { id: "b5", title: "Beta Operator", desc: "Active tester during community phases", icon: "shield", color: "bg-cyan-500/20 border-cyan-500 text-cyan-300", unlocked: true },
   { id: "b6", title: "Unstoppable", desc: "Achieve a 10-match winning streak", icon: "flame", color: "bg-red-500/20 border-red-500 text-red-300", unlocked: false },
 ];
@@ -82,14 +77,15 @@ const ACHIEVEMENT_BADGES = [
 // Mock Friends
 const MOCK_FRIENDS = [
   { id: "f1", name: "Luna", status: "online", game: "Tic-Tac-Toe" },
-  { id: "f2", name: "Garry", status: "online", game: "Chess Arena" },
+  { id: "f2", name: "Nova", status: "online", game: "Tic-Tac-Toe" },
   { id: "f3", name: "BoardKing", status: "offline", lastActive: "3 hours ago" },
-  { id: "f4", name: "Nova", status: "offline", lastActive: "1 day ago" },
+  { id: "f4", name: "XOMaster", status: "offline", lastActive: "1 day ago" },
 ];
 
 export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { theme: activeTheme, setTheme: setActiveTheme } = useTheme();
   const { 
     user, 
     sessions,
@@ -115,7 +111,7 @@ export default function ProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [tempUsername, setTempUsername] = useState(user?.username || "");
   const [tempBio, setTempBio] = useState(user?.bio || "");
-  const [selectedAvatarPreset, setSelectedAvatarPreset] = useState("p1");
+  const [selectedAvatarPreset, setSelectedAvatarPreset] = useState(user?.avatarUrl || "preset-1");
 
   // Security tab states
   const [oldPassword, setOldPassword] = useState("");
@@ -127,72 +123,6 @@ export default function ProfilePage() {
   // Live database user state
   const [dbUser, setDbUser] = useState<any>(null);
   const [isLoadingDbUser, setIsLoadingDbUser] = useState(true);
-
-  const fetchDbUser = async () => {
-    try {
-      const res = await fetch("/api/users/me");
-      if (res.ok) {
-        const result = await res.json();
-        if (result.success && result.data) {
-          setDbUser(result.data);
-          setTempUsername(result.data.username || "");
-          setTempBio(result.data.bio || "");
-        }
-      }
-    } catch (err) {
-      console.error("Error loading user profile:", err);
-    } finally {
-      setIsLoadingDbUser(false);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchDbUser();
-    }
-  }, [user]);
-
-  // If not logged in and session finished loading, redirect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!user) {
-        toast("Access restricted. Please sign in to view profiles.", "error");
-        router.push("/");
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [user, router, toast]);
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white font-outfit">
-        <div className="text-center space-y-4">
-          <div className="relative w-12 h-12 mx-auto">
-            <div className="absolute inset-0 border-4 border-brand-orange/20 rounded-full" />
-            <div className="absolute inset-0 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
-          </div>
-          <p className="font-outfit font-black text-[10px] text-slate-450 uppercase tracking-widest">
-            Loading Profile...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback helper for displayed values
-  const displayedUser = dbUser || user;
-
-  // Level & XP progression values
-  const currentXP = displayedUser.xp || 0;
-  const currentLevel = displayedUser.level || 1;
-  const progressPercent = Math.round(((currentXP % 500) / 500) * 100);
-  const nextLevel = currentLevel + 1;
-
-  // Stats values
-  const gamesPlayed = displayedUser.stats?.gamesPlayed || 0;
-  const victories = displayedUser.stats?.wins || 0;
-  const winStreak = displayedUser.stats?.winStreak || 0;
-  const winRatio = gamesPlayed > 0 ? ((victories / gamesPlayed) * 100).toFixed(1) : "0.0";
 
   // Calculate SVG Radar Chart coordinates dynamically
   // Radar metrics: Strategy, Speed, Tactics, Consistency, Adaptability
@@ -209,25 +139,87 @@ export default function ProfilePage() {
     }).join(" ");
   }, [radarStats]);
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="font-space text-xs font-black uppercase tracking-widest text-slate-500">Retrieving Uplink...</p>
-      </div>
-    );
-  }
+  const fetchDbUser = async () => {
+    try {
+      const res = await fetch("/api/users/me");
+      if (res.ok) {
+        const result = await res.json();
+        if (result.success && result.data) {
+          setDbUser(result.data);
+          setTempUsername(result.data.username || "");
+          setTempBio(result.data.bio || "");
+          if (result.data.avatar) {
+            setSelectedAvatarPreset(result.data.avatar);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error loading user profile:", err);
+    } finally {
+      setIsLoadingDbUser(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      setTempUsername(user.username || "");
+      setTempBio(user.bio || "");
+      setSelectedAvatarPreset(user.avatarUrl || "preset-1");
+      fetchDbUser();
+    }
+  }, [user]);
+
+  // If not logged in and session finished loading, redirect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!user) {
+        toast("Access restricted. Please sign in to view profiles.", "error");
+        router.push("/");
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [user, router, toast]);
+
+  // Fallback helper for displayed values
+  const displayedUser = dbUser || user;
+
+  // Level & XP progression values
+  const currentXP = displayedUser?.xp || 0;
+  const currentLevel = displayedUser?.level || 1;
+  const progressPercent = Math.round(((currentXP % 500) / 500) * 100);
+  const nextLevel = currentLevel + 1;
+
+  // Stats values
+  const gamesPlayed = displayedUser?.stats?.gamesPlayed || 0;
+  const victories = displayedUser?.stats?.wins || 0;
+  const winStreak = displayedUser?.stats?.winStreak || 0;
+  const winRatio = gamesPlayed > 0 ? ((victories / gamesPlayed) * 100).toFixed(1) : "0.0";
+
+
 
   // Handle Profile Update
   const handleSaveProfile = async () => {
-    if (!tempUsername.trim()) {
+    const trimmed = tempUsername.trim();
+    if (!trimmed) {
       toast("Username cannot be empty", "error");
       return;
     }
-    await updateProfile({ username: tempUsername, bio: tempBio });
+    if (trimmed.length < 3) {
+      toast("Username must be at least 3 characters", "error");
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
+      toast("Username can only contain letters, numbers, and underscores", "error");
+      return;
+    }
+    await updateProfile({ 
+      username: trimmed, 
+      bio: tempBio,
+      avatarUrl: selectedAvatarPreset
+    });
     setIsEditingProfile(false);
-    toast("Tactical profile details synchronized successfully", "success");
-    fetchDbUser();
+    toast("Profile updated successfully", "success");
+    await fetchDbUser();
   };
 
   // Change Password Action
@@ -301,7 +293,13 @@ export default function ProfilePage() {
     toast(`Combat link invite dispatched to ${friendName}`, "success");
   };
 
-  const currentPreset = AVATAR_PRESETS.find(p => p.id === selectedAvatarPreset) || AVATAR_PRESETS[0];
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-50 font-outfit">
+        <Loader label="Loading Profile" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-transparent text-white min-h-screen relative overflow-hidden">
@@ -345,36 +343,43 @@ export default function ProfilePage() {
                 {displayedUser.role}
               </span>
 
-              {/* Dynamic Gradient Avatar */}
-              <div className={`w-16 h-16 flex-shrink-0 aspect-square rounded-full bg-gradient-to-tr ${currentPreset.gradients} border-3 border-black flex items-center justify-center font-space text-2xl font-black ${currentPreset.textColor} shadow-[3px_3px_0px_#000] relative mb-4 mt-2 transition-all duration-300`}>
-                {displayedUser.username.slice(0, 2).toUpperCase()}
+              {/* Dynamic Neobrutalist Avatar */}
+              <div className="relative mb-4 mt-2">
+                <img
+                  src={resolveAvatarUrl(selectedAvatarPreset || "preset-1")}
+                  alt={displayedUser.username}
+                  className="w-16 h-16 flex-shrink-0 aspect-square rounded-full border-3 border-black object-cover bg-slate-900 shadow-[3px_3px_0px_#000]"
+                />
                 <span className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 bg-success rounded-full border-2 border-black animate-pulse" />
               </div>
 
-              {/* Preset Avatar Selector when editing */}
+              {/* 50 Preset Avatar Grid when editing */}
               {isEditingProfile && (
-                <div className="w-full mb-4 p-3 border-2 border-black bg-slate-900/60 rounded-xl shadow-[inset_2px_2px_0px_rgba(0,0,0,0.3)]">
-                  <p className="text-[8px] font-black text-brand-orange uppercase tracking-widest mb-3 select-none">SELECT GAME CARTRIDGE SKIN</p>
-                  <div className="flex gap-3 justify-center flex-wrap">
-                    {AVATAR_PRESETS.map(preset => {
+                <div className="w-full mb-4 p-3 border-2 border-black bg-slate-900/60 dark:bg-slate-950/60 rounded-xl shadow-[inset_2px_2px_0px_rgba(0,0,0,0.3)]">
+                  <p className="text-[8px] font-black text-brand-orange uppercase tracking-widest mb-2 text-center select-none">
+                    Select Avatar Skin ({PRELOADED_AVATARS.length} Options)
+                  </p>
+                  <div className="grid grid-cols-5 gap-2.5 max-h-48 overflow-y-auto pr-1.5 scrollbar-thin py-1">
+                    {PRELOADED_AVATARS.map((preset) => {
                       const isSelected = selectedAvatarPreset === preset.id;
+                      const avatarUrl = resolveAvatarUrl(preset.id);
                       return (
                         <button
                           key={preset.id}
+                          type="button"
                           onClick={() => setSelectedAvatarPreset(preset.id)}
-                          className={`w-10 h-12 flex flex-col justify-between p-1 rounded bg-slate-950 border-2 transition-all shadow-[2px_2px_0px_#000000] active:translate-y-px active:shadow-[1px_1px_0px_#000000] ${
+                          className={`aspect-square rounded-xl border-2 transition-all cursor-pointer relative overflow-hidden flex items-center justify-center bg-white shadow-[1.5px_1.5px_0px_#000] active:translate-y-px active:shadow-none ${
                             isSelected 
-                              ? "border-brand-orange scale-105 shadow-[3px_3px_0px_#000000]" 
-                              : "border-black hover:border-brand-orange/40"
+                              ? "border-brand-orange scale-105 shadow-[2.5px_2.5px_0px_#000000]" 
+                              : "border-black hover:border-brand-orange/45"
                           }`}
                           title={preset.name}
                         >
-                          {/* Cartridge top ridge notch */}
-                          <div className="w-full h-1 bg-slate-800 rounded-sm border border-black/40" />
-                          {/* Color label label sticker */}
-                          <div className={`w-full flex-1 rounded-sm bg-gradient-to-tr ${preset.gradients} border border-black flex items-center justify-center font-space text-[9px] font-black text-slate-950`}>
-                            {preset.id.toUpperCase()}
-                          </div>
+                          <img
+                            src={avatarUrl}
+                            alt={preset.name}
+                            className="w-full h-full object-cover"
+                          />
                         </button>
                       );
                     })}
@@ -408,20 +413,19 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ) : (
-                <div className="w-full mb-4">
+                <div className="w-full mb-2">
                   <h2 className="text-lg font-black uppercase tracking-tighter text-white mb-1 flex items-center justify-center gap-2">
                     {displayedUser.username}
-                    <button 
-                      onClick={() => setIsEditingProfile(true)} 
-                      className="text-slate-500 hover:text-brand-orange transition-colors"
-                      title="Edit Profile"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
                   </h2>
-                  <p className="text-[10px] font-bold text-slate-400 leading-relaxed max-w-xs mx-auto italic mb-3">
+                  <p className="text-[10px] font-bold text-slate-400 leading-relaxed max-w-xs mx-auto italic mb-4">
                     "{displayedUser.bio || "Casually competitive..."}"
                   </p>
+                  <button
+                    onClick={() => setIsEditingProfile(true)}
+                    className="btn-neo w-full h-9 rounded-lg font-black uppercase text-[9px] tracking-widest flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#000] cursor-pointer mb-3 animate-none hover:scale-[1.02] active:scale-95 transition-transform"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" /> Edit Profile
+                  </button>
                 </div>
               )}
 
@@ -440,12 +444,15 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Interface Theme Mode</span>
-                  <div className="grid grid-cols-3 gap-2">
-                    {["dark", "light", "gaming"].map(thm => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {["dark", "light"].map(thm => (
                       <button
                         key={thm}
-                        onClick={() => updateAppearanceSettings({ theme: thm as any })}
-                        className={`h-9 rounded-lg text-[7px] font-black uppercase tracking-wider transition-all border-2 border-black ${appearanceSettings.theme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
+                        onClick={() => {
+                          setActiveTheme(thm as any);
+                          updateAppearanceSettings({ theme: thm as any });
+                        }}
+                        className={`h-9 rounded-lg text-[7px] font-black uppercase tracking-wider transition-all border-2 border-black ${activeTheme === thm ? "bg-brand-orange text-slate-950 shadow-[2px_2px_0px_#000]" : "bg-white/5 text-slate-400 hover:border-brand-orange/30"}`}
                       >
                         {thm}
                       </button>
@@ -510,16 +517,16 @@ export default function ProfilePage() {
                       <div className="md:col-span-3 space-y-3">
                         <div>
                           <div className="flex items-center gap-2 mb-1.5">
-                            <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">SECTOR LEVEL</span>
-                            <span className="text-[9px] font-space font-black text-slate-400">CLASS OPERATOR</span>
+                            <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">PLAYER LEVEL</span>
+                            <span className="text-[9px] font-space font-black text-slate-400">GAMER STATUS</span>
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Combat Level {currentLevel}</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {currentLevel}</h3>
                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentXP.toLocaleString()} Total XP Earned</p>
                         </div>
                         
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-brand-orange">
-                            <span>PROGRESSION UPLINK</span>
+                            <span>LEVEL PROGRESS</span>
                             <span>{progressPercent}% TO LVL {nextLevel}</span>
                           </div>
                           <div className="h-2.5 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
@@ -591,14 +598,14 @@ export default function ProfilePage() {
                           <span className="absolute left-6 bottom-2 text-[6.5px] font-black text-slate-500 uppercase tracking-widest">CNS</span>
                           <span className="absolute left-2 top-[35%] text-[6.5px] font-black text-slate-500 uppercase tracking-widest">ADP</span>
                         </div>
-                        <p className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-2">TACTICAL ATTRIBUTES GRID</p>
+                        <p className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-2">PLAYER ATTRIBUTES</p>
                       </div>
 
                     </div>
                              {/* ACHIEVEMENT BADGES SHOWCASE */}
                   <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
                     <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
-                      <Trophy className="w-3 h-3 text-brand-orange" /> Combat Badges
+                      <Trophy className="w-3 h-3 text-brand-orange" /> Gamer Badges
                     </h4>
                     
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
@@ -675,7 +682,7 @@ export default function ProfilePage() {
                     {/* Active Squad (Friends) */}
                     <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-1 bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
-                        <Users className="w-3 h-3 text-brand-orange" /> Operational Squad
+                        <Users className="w-3 h-3 text-brand-orange" /> Friends List
                       </h4>
 
                       <div className="space-y-2">
@@ -711,7 +718,7 @@ export default function ProfilePage() {
                             {/* Offline last active details */}
                             {friend.status === "offline" && (
                               <div className="absolute bottom-full mb-1 right-0 p-1.5 rounded-lg bg-slate-950 border border-black text-[7.5px] font-bold text-slate-400 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl">
-                                Last sync: {friend.lastActive}
+                                Last seen: {friend.lastActive}
                               </div>
                             )}
                           </div>
@@ -833,7 +840,7 @@ export default function ProfilePage() {
                           <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Lobby Invites</p>
-                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Allow invitations from non-squad players</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Allow invitations from other players</p>
                             </div>
                             <input 
                               type="checkbox" 
@@ -848,7 +855,7 @@ export default function ProfilePage() {
                       {/* Privacy registry */}
                       <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
                         <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
-                          <Shield className="w-3.5 h-3.5 text-brand-orange" /> Privacy Registry
+                          <Shield className="w-3.5 h-3.5 text-brand-orange" /> Privacy Settings
                         </h4>
 
                         <div className="space-y-4">
@@ -872,7 +879,7 @@ export default function ProfilePage() {
                           <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Online Status</p>
-                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Let squad contacts detect when you are online</p>
+                              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Let friends detect when you are online</p>
                             </div>
                             <input 
                               type="checkbox" 
@@ -903,7 +910,7 @@ export default function ProfilePage() {
                   <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
                     <div className="flex items-center justify-between mb-4 border-b border-black pb-3">
                       <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
-                        <Laptop className="w-3.5 h-3.5 text-brand-orange" /> Authenticated System Uplinks
+                        <Laptop className="w-3.5 h-3.5 text-brand-orange" /> Active Sessions
                       </h4>
                       {sessions.length > 1 && (
                         <button 
@@ -958,7 +965,7 @@ export default function ProfilePage() {
                   {/* SECURITY SIGNALS LOG (LOGIN HISTORY) */}
                   <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
                     <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4">
-                      <Clock className="w-3.5 h-3.5 text-brand-orange" /> Authentication History Logs
+                      <Clock className="w-3.5 h-3.5 text-brand-orange" /> Login History
                     </h4>
                     
                     <div className="overflow-x-auto">
@@ -967,8 +974,8 @@ export default function ProfilePage() {
                           <tr className="border-b-2 border-black text-[8px] font-black uppercase tracking-widest text-slate-550">
                             <th className="pb-3.5">Timestamp</th>
                             <th className="pb-3.5">Device Identity</th>
-                            <th className="pb-3.5">Uplink IP</th>
-                            <th className="pb-3.5 text-center">Uplink Status</th>
+                            <th className="pb-3.5">IP Address</th>
+                            <th className="pb-3.5 text-center">Status</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-black/45">

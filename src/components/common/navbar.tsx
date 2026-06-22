@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Home, Gamepad2, Trophy, MessageSquareText, DoorOpen, Bell, User, Search } from "lucide-react";
+import { Menu, X, Home, Gamepad2, Trophy, MessageSquareText, DoorOpen, Bell, User, Search, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
@@ -15,6 +15,7 @@ const navItems = [
   { label: "Community", href: "/", icon: MessageSquareText },
   { label: "Leaderboard", href: "/leaderboards", icon: Trophy },
   { label: "Lobbies", href: "/rooms", icon: DoorOpen },
+  { label: "Friends", href: "/friends", icon: Users },
 ];
 
 export function Navbar() {
@@ -129,13 +130,13 @@ export function Navbar() {
               </div>
             </Link>
           ) : (
-            <button onClick={() => login("", "")} className="hidden sm:block cursor-pointer">
+            <Link href="/signin" className="cursor-pointer">
               {/* User Profile */}
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900/40 border-2 border-black hover:border-brand-orange transition-all group relative shadow-[1.5px_1.5px_0px_#000000]">
-                 <User className="h-5 w-5 text-slate-450 group-hover:text-brand-orange transition-colors" />
+                 <User className="h-5 w-5 text-slate-455 group-hover:text-brand-orange transition-colors" />
                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-success border-2 border-black" />
               </div>
-            </button>
+            </Link>
           )}
 
           {/* 🔴 LIVE indicator */}

@@ -35,7 +35,7 @@ export function EmptyState({ type, title, description, actionText, onAction }: E
         return {
           icon: <Trophy className="w-10 h-10 text-brand-amber" />,
           title: title || "No Achievements Unlocked",
-          description: description || "Play chess and other arena games to earn competitive medals.",
+          description: description || "Play Tic-Tac-Toe and other arena games to earn competitive medals.",
           actionText: actionText || "Explore Leaderboards",
         };
       case "notifications":

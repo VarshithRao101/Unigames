@@ -34,7 +34,7 @@ export async function seedDatabase() {
       role: "admin",
       xp: 1840,
       level: 4,
-      settings: { notifications: true, privacy: "public", appearance: "dark" },
+      settings: { notifications: true, privacy: "public", appearance: "light" },
       stats: {
         gamesPlayed: 24,
         wins: 18,
@@ -44,7 +44,6 @@ export async function seedDatabase() {
         maxWinStreak: 9,
         gameStats: {
           tictactoe: { played: 15, wins: 12, losses: 2, draws: 1, highScore: 100 },
-          chess: { played: 9, wins: 6, losses: 2, draws: 1, highScore: 1500 },
         },
       },
       achievements: [
@@ -64,7 +63,7 @@ export async function seedDatabase() {
       role: "user",
       xp: 1660,
       level: 4,
-      settings: { notifications: true, privacy: "public", appearance: "gaming" },
+      settings: { notifications: true, privacy: "public", appearance: "light" },
       stats: {
         gamesPlayed: 22,
         wins: 16,
@@ -74,7 +73,6 @@ export async function seedDatabase() {
         maxWinStreak: 7,
         gameStats: {
           tictactoe: { played: 12, wins: 9, losses: 2, draws: 1 },
-          chess: { played: 10, wins: 7, losses: 3, draws: 0 },
         },
       },
       achievements: [
@@ -103,7 +101,6 @@ export async function seedDatabase() {
         maxWinStreak: 8,
         gameStats: {
           tictactoe: { played: 10, wins: 7, losses: 2, draws: 1 },
-          chess: { played: 9, wins: 7, losses: 1, draws: 1 },
         },
       },
       achievements: [],
@@ -120,7 +117,7 @@ export async function seedDatabase() {
       role: "user",
       xp: 1290,
       level: 3,
-      settings: { notifications: false, privacy: "friends-only", appearance: "dark" },
+      settings: { notifications: false, privacy: "friends-only", appearance: "light" },
       stats: {
         gamesPlayed: 17,
         wins: 12,
@@ -130,7 +127,6 @@ export async function seedDatabase() {
         maxWinStreak: 6,
         gameStats: {
           tictactoe: { played: 8, wins: 6, losses: 2, draws: 0 },
-          chess: { played: 9, wins: 6, losses: 3, draws: 0 },
         },
       },
       achievements: [],
@@ -147,7 +143,7 @@ export async function seedDatabase() {
       role: "user",
       xp: 1180,
       level: 3,
-      settings: { notifications: true, privacy: "public", appearance: "gaming" },
+      settings: { notifications: true, privacy: "public", appearance: "light" },
       stats: {
         gamesPlayed: 16,
         wins: 11,
@@ -157,7 +153,6 @@ export async function seedDatabase() {
         maxWinStreak: 5,
         gameStats: {
           tictactoe: { played: 7, wins: 4, losses: 2, draws: 1 },
-          chess: { played: 9, wins: 7, losses: 2, draws: 0 },
         },
       },
       achievements: [],
@@ -169,7 +164,7 @@ export async function seedDatabase() {
   await db.collection("users").insertMany(users);
   console.log("Seeded 5 test users.");
 
-  // 2. Create 3 test active rooms (lobbies)
+  // 2. Create 2 test active rooms (lobbies)
   const rooms = [
     {
       code: "TIC442",
@@ -216,35 +211,15 @@ export async function seedDatabase() {
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    {
-      code: "CHS992",
-      gameSlug: "chess",
-      players: [
-        {
-          userId: userIds[2].toString(),
-          username: "BoardKing",
-          avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c",
-          isHost: true,
-          isReady: true,
-        },
-      ],
-      maxPlayers: 2,
-      status: "waiting",
-      settings: { isPrivate: true, timeLimit: 600 },
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
   ];
 
   await db.collection("rooms").insertMany(rooms);
-  console.log("Seeded 3 lobby rooms.");
+  console.log("Seeded 2 lobby rooms.");
 
   // 3. Create 10 completed matches
   const matches: any[] = [];
   for (let i = 0; i < 10; i++) {
-    const isTicTacToe = i % 2 === 0;
-    const gameSlug = isTicTacToe ? "tictactoe" : "chess";
+    const gameSlug = "tictactoe";
     const p1Index = i % 5;
     const p2Index = (i + 1) % 5;
     const winnerIndex = i % 3 === 0 ? p1Index : i % 3 === 1 ? p2Index : null; // null for draw
@@ -286,24 +261,24 @@ export async function seedDatabase() {
   // 4. Create pre-aggregated leaderboard data (overall + games; weekly + all-time)
   const leaderboards: any[] = [];
   
-  // Scopes: "global", "tictactoe", "chess"
+  // Scopes: "global", "tictactoe"
   // Periods: "weekly", "all-time"
   const periods = ["weekly", "all-time"];
-  const scopes = ["global", "tictactoe", "chess"];
+  const scopes = ["global", "tictactoe"];
 
   for (const period of periods) {
     for (const scope of scopes) {
       // Sort users by their stats to distribute rankings beautifully
       const sortedUsers = [...users].sort((a, b) => {
         if (scope === "global") return b.xp - a.xp;
-        const bStats = b.stats.gameStats[scope as "tictactoe" | "chess"]?.played || 0;
-        const aStats = a.stats.gameStats[scope as "tictactoe" | "chess"]?.played || 0;
+        const bStats = b.stats.gameStats[scope as "tictactoe"]?.played || 0;
+        const aStats = a.stats.gameStats[scope as "tictactoe"]?.played || 0;
         return bStats - aStats;
       });
 
       sortedUsers.forEach((user, index) => {
         // Calculate distinct XP values based on rank to keep list structured
-        let baseXP = scope === "global" ? user.xp : (user.stats.gameStats[scope as "tictactoe" | "chess"]?.wins || 0) * 100 + 120;
+        let baseXP = scope === "global" ? user.xp : (user.stats.gameStats[scope as "tictactoe"]?.wins || 0) * 100 + 120;
         if (period === "weekly") {
           baseXP = Math.floor(baseXP * 0.2) + 50; // weekly is smaller portion
         }

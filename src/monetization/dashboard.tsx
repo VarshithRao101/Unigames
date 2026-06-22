@@ -103,9 +103,7 @@ export function UserEngagementDashboard() {
   ];
 
   const mostPlayedGames = [
-    { game: "Chess Online", matches: 180, category: "Board Games", activeLobbies: 14 },
-    { game: "Ludo Club", matches: 140, category: "Board Games", activeLobbies: 8 },
-    { game: "Tic-Tac-Toe Arena", matches: 90, category: "Arcade", activeLobbies: 4 }
+    { game: "Tic-Tac-Toe Arena", matches: 412, category: "Arcade", activeLobbies: 26 }
   ];
 
   return (

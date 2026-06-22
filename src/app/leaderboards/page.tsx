@@ -6,6 +6,7 @@ import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { PLATFORM_GAMES } from "@/data/platform";
 import { motion, AnimatePresence } from "framer-motion";
+import { Loader } from "@/components/ui/loader";
 
 type TimeMode = "weekly" | "allTime";
 type GameFilter = "overall" | string; // slug or "overall"
@@ -13,7 +14,6 @@ type GameFilter = "overall" | string; // slug or "overall"
 const GAME_COLORS: Record<string, { badge: string; glow: string; icon: string }> = {
   overall:    { badge: "bg-brand-orange text-slate-950",  glow: "shadow-[0_0_12px_rgba(255,193,7,0.35)]",  icon: "🏆" },
   tictactoe:  { badge: "bg-cyan-400 text-slate-950",      glow: "shadow-[0_0_12px_rgba(34,211,238,0.35)]", icon: "✕〇" },
-  chess:      { badge: "bg-amber-400 text-slate-950",     glow: "shadow-[0_0_12px_rgba(251,191,36,0.35)]", icon: "♟" },
 };
 
 export default function LeaderboardsPage() {
@@ -187,11 +187,7 @@ export default function LeaderboardsPage() {
             >
               {isLoading ? (
                 <div className="glass rounded-3xl p-16 text-center border-2 border-black shadow-[4px_4px_0px_#000] flex flex-col items-center justify-center min-h-[300px]">
-                  <div className="relative w-16 h-16 mb-4">
-                    <div className="absolute inset-0 rounded-full border-4 border-slate-800" />
-                    <div className="absolute inset-0 rounded-full border-4 border-brand-orange border-t-transparent animate-spin" />
-                  </div>
-                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] animate-pulse">Loading Leaderboard...</p>
+                  <Loader label="Loading Leaderboard" />
                 </div>
               ) : board.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center border-2 border-black shadow-card">

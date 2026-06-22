@@ -1,6 +1,6 @@
 import { AdPlacement, AdSlotConfig, AdCreative } from "./ad-types";
 
-// Prohibited zones mapping to prevent negative gaming experiences
+// Prohibited zones mapping to prevent negative platform experiences
 export const PROHIBITED_PATHS = [
   /^\/checkout/,             // Payment windows
   /^\/payment/
@@ -24,7 +24,7 @@ export const PLATFORM_SPONSOR_CREATIVES: Record<string, AdCreative[]> = {
       imageUrl: "♟️ Boost your gameplay to 240 FPS now.",
       targetUrl: "https://nvidia.com",
       ctaText: "Stream Now",
-      description: "Experience GeForce RTX gaming in high resolutions on any device."
+      description: "Experience GeForce RTX streaming in high resolutions on any device."
     }
   ],
   game_details: [

@@ -83,7 +83,7 @@ export async function getLeaderboard(
         for (const [slug, stats] of Object.entries(userDoc.stats.gameStats)) {
           if (stats.played > maxPlayed) {
             maxPlayed = stats.played;
-            favoriteGame = slug === "tictactoe" ? "Tic-Tac-Toe" : slug === "chess" ? "Chess Arena" : slug;
+            favoriteGame = slug === "tictactoe" ? "Tic-Tac-Toe" : slug;
           }
         }
       }

@@ -5,6 +5,8 @@ import { friendRequestSchema } from "@/lib/utils/validation";
 import { getPusherServer } from "@/lib/pusher";
 import { rateLimit } from "@/lib/utils/rate-limit";
 import { NextRequest } from "next/server";
+import { getFriendshipsCollection } from "@/lib/db/collections";
+import { ObjectId } from "mongodb";
 
 export async function GET() {
   const session = await auth();
@@ -15,13 +17,34 @@ export async function GET() {
 
   try {
     const userId = session.user.id;
-    const friends = await getFriendsList(userId);
+    const friendsList = await getFriendsList(userId);
     const pending = await getPendingRequests(userId);
+
+    const friendships = await getFriendshipsCollection();
+    const userObjectId = new ObjectId(userId);
+    const friendshipDocs = await friendships.find({
+      status: "accepted",
+      $or: [
+        { requesterId: userObjectId },
+        { receiverId: userObjectId },
+      ],
+    }).toArray();
+
+    const friends = friendsList.map((f) => {
+      const friendship = friendshipDocs.find((doc) =>
+        (doc.requesterId.toString() === userId && doc.receiverId.toString() === f._id?.toString()) ||
+        (doc.receiverId.toString() === userId && doc.requesterId.toString() === f._id?.toString())
+      );
+      return {
+        ...f,
+        friendshipId: friendship?._id?.toString(),
+      };
+    });
 
     return apiSuccess({ friends, pending });
   } catch (error) {
     console.error("Error in GET /api/friends:", error);
-    return apiErrors.serverError("Failed to retrieve squad lists", error);
+    return apiErrors.serverError("Failed to retrieve friends list", error);
   }
 }
 

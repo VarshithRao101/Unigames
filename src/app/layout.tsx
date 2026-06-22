@@ -28,8 +28,8 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
-  title: "UniGame - Premium Esports Hub",
-  description: "Level up your gaming legacy at UniGame. The premier destination for competitive strategy, global standings, and elite multiplayer lobbies.",
+  title: "UniGame - Premium Gaming Hub",
+  description: "Play your favorite games at UniGame. The premier destination for competitive strategy, global standings, and friendly multiplayer rooms.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
     title: "UniGame",
   },
   openGraph: {
-    title: "UniGame - Premium Esports Hub",
-    description: "Level up your gaming legacy at UniGame. The premier destination for competitive strategy and live lobbies.",
+    title: "UniGame - Premium Gaming Hub",
+    description: "Play your favorite games at UniGame. The premier destination for competitive strategy and live rooms.",
     url: "https://unigame.gg",
     siteName: "UniGame",
     images: [
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "UniGame - Premium Esports Hub",
-    description: "The global arena for elite strategic gaming.",
+    title: "UniGame - Premium Gaming Hub",
+    description: "The global platform for competitive gaming and strategic matchups.",
     images: ["/og-image.png"],
   },
   alternates: {

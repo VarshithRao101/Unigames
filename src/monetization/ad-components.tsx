@@ -117,7 +117,7 @@ export function PlatformAdComponent({ placement, className }: AdWrapperProps) {
                 Boost Your Platform Engagement
               </p>
               <p className="text-[9px] text-slate-600 font-semibold mt-0.5">
-                Targeted Gaming Campaigns with UniGames Adsense Integration
+                Targeted Sponsor Campaigns with UniGames Adsense Integration
               </p>
             </div>
           )}

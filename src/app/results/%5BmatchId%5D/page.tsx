@@ -5,8 +5,9 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { AuthGuard } from "@/components/common/auth-guard";
 import { Button } from "@/components/ui/button";
-import { Trophy, ArrowRight, Home, RefreshCw, Star, Flame, Loader2 } from "lucide-react";
+import { Trophy, ArrowRight, Home, RefreshCw, Star, Flame } from "lucide-react";
 import { motion } from "framer-motion";
+import { Loader } from "@/components/ui/loader";
 
 interface MatchResult {
   _id: string;
@@ -70,11 +71,8 @@ function MatchResults() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <Loader2 className="w-10 h-10 text-brand-orange animate-spin mb-4" />
-        <p className="text-xs font-bold font-space uppercase tracking-widest text-slate-500">
-          Compiling Scorecard...
-        </p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-50">
+        <Loader label="Loading Scorecard..." />
       </div>
     );
   }
@@ -83,11 +81,11 @@ function MatchResults() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white p-6">
         <div className="bg-danger/10 border-2 border-danger/45 p-6 rounded-2xl max-w-sm text-center space-y-4 shadow-card">
-          <h2 className="font-outfit font-black text-lg uppercase tracking-tight text-white">Retrieval Failure</h2>
+          <h2 className="font-outfit font-black text-lg uppercase tracking-tight text-white">Error Loading Results</h2>
           <p className="text-xs text-slate-450 leading-relaxed font-semibold">
             {error || "Match results cannot be verified."}
           </p>
-          <Button onClick={() => router.push("/games")} className="btn-gaming w-full h-10 font-black uppercase text-[10px] tracking-wider">
+          <Button onClick={() => router.push("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
             Go Back
           </Button>
         </div>

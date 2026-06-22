@@ -32,11 +32,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.username = (user as any).username || "";
         token.xp = (user as any).xp || 0;
         token.level = (user as any).level || 1;
+        token.bio = (user as any).bio || "";
+        if (user.image) {
+          token.picture = user.image;
+        }
       }
       
       // Handle session updates (if we update profile details in the frontend)
       if (trigger === "update" && session) {
         if (session.username) token.username = session.username;
+        if (session.image) token.picture = session.image;
+        if (session.bio !== undefined) token.bio = session.bio;
         if (session.role) token.role = session.role;
         if (session.xp !== undefined) token.xp = session.xp;
         if (session.level !== undefined) token.level = session.level;
@@ -51,6 +57,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         (session.user as any).username = token.username as string;
         (session.user as any).xp = token.xp as number;
         (session.user as any).level = token.level as number;
+        (session.user as any).bio = token.bio as string;
+        if (token.picture) {
+          session.user.image = token.picture as string;
+        }
       }
       return session;
     },

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sun, Moon, Gamepad2 } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useTheme, Theme } from "@/context/theme-context";
 import { motion } from "framer-motion";
 
@@ -11,7 +11,6 @@ export function ThemeToggle() {
   const themes: { id: Theme; icon: React.ReactNode; label: string }[] = [
     { id: "light", icon: <Sun className="w-4.5 h-4.5" />, label: "Light" },
     { id: "dark", icon: <Moon className="w-4.5 h-4.5" />, label: "Dark" },
-    { id: "gaming", icon: <Gamepad2 className="w-4.5 h-4.5" />, label: "Gaming" },
   ];
 
   return (

@@ -22,7 +22,7 @@ export default function GlobalError({
           <div className="space-y-1.5">
             <h1 className="font-outfit font-black text-xl uppercase tracking-wide">Critical Failure</h1>
             <p className="text-xs text-slate-400 leading-relaxed">
-              A global runtime failure occurred. Click below to reload the entire gaming application.
+              A global runtime failure occurred. Click below to reload the entire application.
             </p>
           </div>
 

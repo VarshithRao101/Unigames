@@ -116,19 +116,19 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
               </div>
             </div>
 
-            {/* Right Side: Deploy Panel */}
-            <div className="md:col-span-5 p-6 md:p-8 bg-slate-900 flex flex-col justify-center z-10 relative">
+            {/* Right Side: Play Panel */}
+            <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center z-10 relative" style={{ background: 'var(--panel-bg)' }}>
               <div className="space-y-6">
                 <div className="text-center md:text-left">
-                  <h3 className="text-base font-black text-white tracking-wider uppercase">Deploy Arena</h3>
-                  <p className="text-[9px] font-semibold text-slate-500 mt-1">Start match or join lobby</p>
+                  <h3 className="text-base font-black tracking-wider uppercase">Play Now</h3>
+                  <p className="text-[9px] font-semibold text-slate-500 mt-1">Start a match or join a room</p>
                 </div>
 
                 <Button 
                   onClick={() => {
                     router.push(`/rooms/create?game=${game.slug}`);
                   }}
-                  className="btn-gaming w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                  className="btn-neo w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
                 >
                   Create Room
                 </Button>

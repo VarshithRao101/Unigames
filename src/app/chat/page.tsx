@@ -47,19 +47,19 @@ export default function ChatPage() {
            <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-10">
               <div className="max-w-2xl">
                  <span className="kicker mb-4 inline-flex items-center gap-2">
-                    <Terminal className="w-4 h-4" /> Global Comms Channel
+                    <Terminal className="w-4 h-4" /> Global Chat Channel
                  </span>
                  <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase leading-[0.9]">
-                    COMMUNICATION <span className="gradient-text">UPLINK</span>
+                    Global <span className="gradient-text">Chat</span>
                  </h1>
                  <p className="text-lg text-slate-400 font-medium">
-                    Coordinate tactical maneuvers, share access keys, and maintain synchronization with the global squad.
+                    Chat with other players, share room codes, and hang out with the community.
                  </p>
               </div>
               <div className="flex bg-slate-900/40 border-3 border-black rounded-2xl p-4 items-center gap-6 shadow-[3px_3px_0px_#000000]">
                  <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-success animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-success">Node Online</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-success">Online</span>
                  </div>
                  <div className="h-8 w-[1.5px] bg-slate-800" />
                  <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export default function ChatPage() {
           <aside className="space-y-8">
              <div className="glass p-8">
                 <div className="flex items-center justify-between mb-8">
-                   <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-50">Active Squad</h4>
+                   <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-50">Online Users</h4>
                    <Activity className="w-4 h-4 text-brand-orange animate-pulse" />
                 </div>
                 
@@ -99,7 +99,7 @@ export default function ChatPage() {
 
                  <Link href="/rooms" className="mt-8 block">
                     <Button variant="outline" className="w-full h-14 rounded-2xl border-3 border-black bg-slate-900 text-slate-555 hover:bg-slate-800 font-black uppercase text-[10px] tracking-widest shadow-[3px_3px_0px_#000000]">
-                       Tactical Lobbies
+                       Game Rooms
                     </Button>
                  </Link>
              </div>
@@ -108,10 +108,10 @@ export default function ChatPage() {
              <div className="panel p-8 bg-brand-orange/5">
                 <div className="flex items-center gap-4 mb-4">
                    <Shield className="w-5 h-5 text-brand-orange" />
-                   <h4 className="text-[10px] font-black uppercase tracking-widest">Protocol Header</h4>
+                   <h4 className="text-[10px] font-black uppercase tracking-widest">Secure Chat</h4>
                 </div>
                 <p className="text-[10px] font-bold text-slate-450 leading-relaxed uppercase tracking-widest">
-                   End-to-end synchronization established. All data packets are encrypted via UniGame core security.
+                   Your connection is secure. All messages are encrypted and private.
                 </p>
              </div>
           </aside>
@@ -184,13 +184,13 @@ export default function ChatPage() {
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         type="text" 
-                        placeholder="INPUT TRANSMISSION..."
+                        placeholder="Type a message..."
                         className="w-full h-16 bg-slate-900 border-3 border-black rounded-2xl px-16 text-[10px] font-black uppercase tracking-[0.3em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[3px_3px_0px_#000000]"
                       />
-                   </div>
-                   <Button type="submit" className="btn-gaming h-16 px-10 rounded-2xl">
-                      Transmit
-                   </Button>
+                    </div>
+                    <Button type="submit" className="btn-neo h-16 px-10 rounded-2xl">
+                       Send
+                    </Button>
                 </form>
              </div>
           </section>

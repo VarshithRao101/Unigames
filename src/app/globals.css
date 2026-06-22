@@ -45,57 +45,7 @@
 }
 
 :root {
-  /* Default/Dark Theme */
-  --brand-orange: #ffaa00;
-  --brand-amber: #f97316;
-  --brand-light: #fb923c;
-  --brand-dark: #c2410c;
-  --brand-neon: #ffaa00;
-
-  --slate-dark-color: #161713;
-  --slate-950: #161713;
-  --slate-900: #1c1d18;
-  --slate-850: #20221c;
-  --slate-800: #24261f;
-  --slate-700: #2d3027;
-  --slate-600: #3c3f35;
-  --slate-500: #585c51;
-  --slate-400: #8c8f85;
-  --slate-350: #9da096;
-  --slate-300: #aeb1a8;
-  --slate-200: #cfd2cb;
-  --slate-100: #e2e5de;
-  --slate-50: #f4f6f2;
-  --white: #ffffff;
-  
-  --grey-border: #000000;
-  --success-color: #00ffcc;
-  --warning-color: #fbbf24;
-  --danger-color: #ff4d4d;
-  --info-color: #00d2ff;
-  --purple-color: #bf00ff;
-
-  --background: #161713;
-  --foreground: #fcfdfa;
-  --panel-bg: #24261f;
-  --panel-bg-hover: #2d3027;
-  --kicker-bg: #1c1d18;
-  --input-bg: #1c1d18;
-  --input-color: #ffffff;
-  --grid-line-color: #000000;
-  --grid-line-opacity: 0.08;
-  --scroll-track: #161713;
-  --scroll-thumb: #24261f;
-  --glass-orange-bg: #3c392c;
-  --text-muted: #8c8f85;
-  
-  --shadow-offset: 4px;
-  --shadow-offset-neon: 6px;
-  --shadow-color: #000000;
-}
-
-html.light {
-  /* Light Theme - whitish-grey background with lines and boxes */
+  /* Default/Light Theme */
   --brand-orange: #ffaa00;
   --brand-amber: #f97316;
   --brand-light: #fb923c;
@@ -144,61 +94,117 @@ html.light {
   --shadow-color: #000000;
 }
 
-html.gaming {
-  /* Gaming Theme - neon arcade vibes */
-  --brand-orange: #1df2ff;
-  --brand-amber: #ff00ff;
-  --brand-light: #bf00ff;
-  --brand-dark: #0f051d;
-  --brand-neon: #1df2ff;
+html.light {
+  /* Keep variables here same as root light default */
+  --brand-orange: #ffaa00;
+  --brand-amber: #f97316;
+  --brand-light: #fb923c;
+  --brand-dark: #c2410c;
+  --brand-neon: #ffaa00;
 
-  --slate-dark-color: #0a0b0e; /* Dark for button texts */
-  --slate-950: #0a0b0e;
-  --slate-900: #12131a;
-  --slate-850: #1a1b24;
-  --slate-800: #1f2130;
-  --slate-700: #292b3d;
-  --slate-600: #404461;
-  --slate-500: #739bb0;
-  --slate-400: #8bbcd4;
-  --slate-350: #aae0ff;
-  --slate-300: #c0e8ff;
-  --slate-200: #d5f0ff;
-  --slate-100: #eef8ff;
-  --slate-50: #1df2ff;
-  --white: #ffffff; 
+  --slate-dark-color: #161713;
+  --slate-950: #eff1eb; 
+  --slate-900: #e8ece5;
+  --slate-850: #e2e5de;
+  --slate-800: #ffffff; 
+  --slate-700: #f5f7f2; 
+  --slate-600: #cfd2cb;
+  --slate-500: #8c8f85;
+  --slate-400: #585c51; 
+  --slate-350: #4b4e45;
+  --slate-300: #24261f; 
+  --slate-200: #2d3027;
+  --slate-100: #1c1d18;
+  --slate-50: #161713;
+  --white: #161713; 
 
   --grey-border: #000000;
-  --success-color: #39ff14;
-  --warning-color: #ffe700;
-  --danger-color: #ff0055;
-  --info-color: #1df2ff;
-  --purple-color: #bf00ff;
+  --success-color: #00aa88;
+  --warning-color: #d97706;
+  --danger-color: #dc2626;
+  --info-color: #0284c7;
+  --purple-color: #7c3aed;
 
-  --background: #0a0b0e;
-  --foreground: #c0e8ff;
-  --panel-bg: #12131a;
-  --panel-bg-hover: #1a1b24;
-  --kicker-bg: #1f0833;
-  --input-bg: #12131a;
-  --input-color: #1df2ff;
-  --grid-line-color: #1df2ff;
-  --grid-line-opacity: 0.12;
-  --scroll-track: #0a0b0e;
-  --scroll-thumb: #12131a;
-  --glass-orange-bg: #29103a;
-  --text-muted: #739bb0;
+  --background: #eff1eb;
+  --foreground: #161713;
+  --panel-bg: #ffffff;
+  --panel-bg-hover: #f5f7f2;
+  --kicker-bg: #e2e5de;
+  --input-bg: #ffffff;
+  --input-color: #161713;
+  --grid-line-color: #000000;
+  --grid-line-opacity: 0.05;
+  --scroll-track: #eff1eb;
+  --scroll-thumb: #ffffff;
+  --glass-orange-bg: #fff5e0;
+  --text-muted: #585c51;
 
   --shadow-offset: 4px;
   --shadow-offset-neon: 6px;
   --shadow-color: #000000;
 }
 
+html.dark {
+  /* Dark Theme variables */
+  --brand-orange: #ffaa00;
+  --brand-amber: #f97316;
+  --brand-light: #fb923c;
+  --brand-dark: #c2410c;
+  --brand-neon: #ffaa00;
+
+  --slate-dark-color: #161713;
+  --slate-950: #161713;
+  --slate-900: #1c1d18;
+  --slate-850: #20221c;
+  --slate-800: #24261f;
+  --slate-700: #2d3027;
+  --slate-600: #3c3f35;
+  --slate-500: #585c51;
+  --slate-400: #8c8f85;
+  --slate-350: #9da096;
+  --slate-300: #aeb1a8;
+  --slate-200: #cfd2cb;
+  --slate-100: #e2e5de;
+  --slate-50: #f4f6f2;
+  --white: #ffffff;
+  
+  --grey-border: #000000;
+  --success-color: #00ffcc;
+  --warning-color: #fbbf24;
+  --danger-color: #ff4d4d;
+  --info-color: #00d2ff;
+  --purple-color: #bf00ff;
+
+  --background: #161713;
+  --foreground: #fcfdfa;
+  --panel-bg: #24261f;
+  --panel-bg-hover: #2d3027;
+  --kicker-bg: #1c1d18;
+  --input-bg: #1c1d18;
+  --input-color: #ffffff;
+  --grid-line-color: #000000;
+  --grid-line-opacity: 0.08;
+  --scroll-track: #161713;
+  --scroll-thumb: #24261f;
+  --glass-orange-bg: #3c392c;
+  --text-muted: #8c8f85;
+  
+  --shadow-offset: 4px;
+  --shadow-offset-neon: 6px;
+  --shadow-color: #000000;
+}
+
+
+
 html { 
   background: var(--background); 
   scroll-behavior: smooth; 
+  color-scheme: light;
+}
+html.dark {
   color-scheme: dark;
 }
+
 
 body {
   background: var(--background) !important;
@@ -321,12 +327,6 @@ h4, h5, h6 {
 }
 
 /* ── Typography ────────────────────────────── */
-.font-gaming {
-  font-family: var(--font-outfit);
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: -0.05em;
-}
 
 /* ── Kicker badge ───────────────────────────── */
 .kicker {
@@ -347,8 +347,8 @@ h4, h5, h6 {
   transform: rotate(-1.5deg);
 }
 
-/* ── Flat Gaming Button overrides ────────────────────────── */
-.btn-gaming {
+/* ── Flat Neobrutalist Button overrides ──────────────────── */
+.btn-neo {
   background: var(--color-brand-orange) !important;
   color: #000000 !important;
   border: 3px solid #000000 !important;
@@ -363,34 +363,34 @@ h4, h5, h6 {
   z-index: 1;
 }
 
-.btn-gaming::before {
+.btn-neo::before {
   display: none !important; /* Remove tech sweep */
 }
 
-.btn-gaming:hover {
+.btn-neo:hover {
   background: var(--color-brand-orange) !important;
   opacity: 0.95 !important;
   transform: translate(-2px, -2px) !important;
   box-shadow: 5px 5px 0px 0px #000000 !important;
 }
 
-.btn-gaming:active {
+.btn-neo:active {
   transform: translate(2px, 2px) !important;
   box-shadow: 1px 1px 0px 0px #000000 !important;
 }
 
 /* ── Global 2D Cel-Shaded overrides on standard buttons ── */
-button:not(.btn-gaming):not([disabled]) {
+button:not(.btn-neo):not([disabled]) {
   border: 3px solid #000000 !important;
   box-shadow: 3px 3px 0px 0px #000000 !important;
   transition: all 0.1s ease-in-out !important;
   cursor: pointer;
 }
-button:not(.btn-gaming):not([disabled]):hover {
+button:not(.btn-neo):not([disabled]):hover {
   transform: translate(-2px, -2px) !important;
   box-shadow: 5px 5px 0px 0px #000000 !important;
 }
-button:not(.btn-gaming):not([disabled]):active {
+button:not(.btn-neo):not([disabled]):active {
   transform: translate(2px, 2px) !important;
   box-shadow: 1px 1px 0px 0px #000000 !important;
 }
@@ -406,6 +406,10 @@ input[type="text"], input[type="password"], input[type="email"], select, textare
   padding: 0.5rem 1rem !important;
   height: 2.75rem !important;
   font-size: 0.75rem !important;
+}
+input::placeholder, select::placeholder, textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.65 !important;
 }
 input[type="text"]:focus, select:focus, textarea:focus {
   border-color: var(--color-brand-orange) !important;
@@ -424,16 +428,6 @@ html.light h3 {
   text-shadow: 1.5px 1.5px 0px rgba(255, 255, 255, 0.4) !important;
 }
 
-/* ── Text Shadow Overrides for Gaming Theme ── */
-html.gaming h1 {
-  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
-}
-html.gaming h2 {
-  text-shadow: 1.75px 1.75px 0px rgba(0, 0, 0, 0.4) !important;
-}
-html.gaming h3 {
-  text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.35) !important;
-}
 
 /* ── Text Color Overrides for Light Theme Readability ── */
 html.light .text-slate-950 {
@@ -458,19 +452,6 @@ html.light .text-slate-300 {
   color: #24261f !important;
 }
 
-/* ── Text Color Overrides for Gaming Theme Neon ── */
-html.gaming .text-slate-950 {
-  color: #0a0b0e !important;
-}
-html.gaming .text-slate-400 {
-  color: #739bb0 !important;
-}
-html.gaming .text-slate-500 {
-  color: #8bbcd4 !important;
-}
-html.gaming .text-slate-300 {
-  color: #aae0ff !important;
-}
 
 /* ── Gradient Text ─────────────────────────── */
 .gradient-text {
@@ -529,7 +510,7 @@ html.gaming .text-slate-300 {
   mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
 
-/* ── Disable all white borders globally to maintain 2D cel-shaded gaming vibe ── */
+/* ── Disable all white borders globally to maintain 2D cel-shaded vibe ── */
 .border-white,
 [class*="border-white/"] {
   border-color: #000000 !important;
@@ -616,7 +597,7 @@ html.gaming .text-slate-300 {
   }
 
   /* Scale down buttons */
-  .btn-gaming {
+  .btn-neo {
     border-width: 2px !important;
     box-shadow: 2px 2px 0px 0px #000000 !important;
     border-radius: 0.6rem !important;
@@ -624,24 +605,24 @@ html.gaming .text-slate-300 {
     height: auto !important;
     padding: 0.5rem 0.75rem !important;
   }
-  .btn-gaming:hover {
+  .btn-neo:hover {
     box-shadow: 3px 3px 0px 0px #000000 !important;
     transform: translate(-1px, -1px) !important;
   }
-  .btn-gaming:active {
+  .btn-neo:active {
     box-shadow: 1px 1px 0px 0px #000000 !important;
     transform: translate(1px, 1px) !important;
   }
 
-  button:not(.btn-gaming):not([disabled]) {
+  button:not(.btn-neo):not([disabled]) {
     border-width: 2px !important;
     box-shadow: 2px 2px 0px 0px #000000 !important;
   }
-  button:not(.btn-gaming):not([disabled]):hover {
+  button:not(.btn-neo):not([disabled]):hover {
     transform: translate(-1px, -1px) !important;
     box-shadow: 3px 3px 0px 0px #000000 !important;
   }
-  button:not(.btn-gaming):not([disabled]):active {
+  button:not(.btn-neo):not([disabled]):active {
     transform: translate(1px, 1px) !important;
     box-shadow: 1px 1px 0px 0px #000000 !important;
   }

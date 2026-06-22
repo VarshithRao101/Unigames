@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/common/auth-guard";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, LogOut, MessageSquareCode, Smile } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Loader } from "@/components/ui/loader";
 
 interface MatchDetails {
   _id: string;
@@ -79,14 +80,8 @@ function PlayGameContainer() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <div className="relative w-16 h-16 mb-4">
-          <div className="absolute inset-0 border-4 border-brand-orange/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
-        </div>
-        <p className="text-xs font-bold font-space uppercase tracking-widest text-slate-400">
-          Entering Sector Void...
-        </p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-50">
+        <Loader label="Loading game..." />
       </div>
     );
   }
@@ -100,7 +95,7 @@ function PlayGameContainer() {
           <p className="text-xs text-slate-450 leading-relaxed font-semibold">
             {error || "An unexpected error occurred while linking to the game server."}
           </p>
-          <Button onClick={() => router.push("/games")} className="btn-gaming w-full h-10 font-black uppercase text-[10px] tracking-wider">
+          <Button onClick={() => router.push("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
             Return to Deck
           </Button>
         </div>
@@ -119,7 +114,7 @@ function PlayGameContainer() {
           <p className="text-xs text-slate-450 leading-relaxed font-semibold">
             The game mode "{gameSlug}" is not registered on this platform.
           </p>
-          <Button onClick={() => router.push("/games")} className="btn-gaming w-full h-10 font-black uppercase text-[10px] tracking-wider">
+          <Button onClick={() => router.push("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
             Return to Deck
           </Button>
         </div>

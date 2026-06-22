@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { signIn } from "next-auth/react";
+import { Loader } from "@/components/ui/loader";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -27,8 +28,7 @@ export function AuthGuard({ children, allowedRoles, guestOnly = false }: AuthGua
     }
 
     if (!user) {
-      // Trigger Google OAuth sign-in directly and redirect back here on success
-      signIn("google", { callbackUrl: pathname });
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(pathname)}`);
       return;
     }
 
@@ -42,14 +42,8 @@ export function AuthGuard({ children, allowedRoles, guestOnly = false }: AuthGua
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <div className="relative w-16 h-16 mb-4">
-          <div className="absolute inset-0 border-4 border-brand-amber/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-brand-amber border-t-transparent rounded-full animate-spin" />
-        </div>
-        <p className="text-xs font-bold font-outfit uppercase tracking-widest text-slate-400">
-          Loading Session...
-        </p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-50">
+        <Loader label="Loading Session" />
       </div>
     );
   }

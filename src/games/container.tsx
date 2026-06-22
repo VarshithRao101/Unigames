@@ -9,6 +9,7 @@ import {
   RefreshCw, Award, Info, AlertTriangle, Cpu
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Loader } from "@/components/ui/loader";
 
 interface GameContainerProps {
   gameIdOrSlug: string;
@@ -38,13 +39,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px] bg-slate-800 border-[4px] border-black rounded-[2.5rem] p-8 text-center space-y-4 shadow-[8px_8px_0px_#000000]">
-        <svg className="animate-spin h-10 w-10 text-brand-orange" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
-        <p className="font-outfit font-black text-xs text-slate-400 uppercase tracking-widest">
-          Initializing Game Module...
-        </p>
+        <Loader label="Initializing game..." />
       </div>
     );
   }
@@ -66,7 +61,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
           <button onClick={() => window.location.reload()} className="h-10 px-4 border-[2.5px] border-black bg-slate-800 text-white font-black text-[10px] uppercase tracking-widest shadow-[2.5px_2.5px_0px_#000] cursor-pointer rounded-xl">
             Reload
           </button>
-          <button onClick={() => (window.location.href = "/rooms")} className="btn-gaming h-10 px-4 rounded-xl text-[10px] font-black tracking-widest shadow-[2.5px_2.5px_0px_#000]">
+          <button onClick={() => (window.location.href = "/rooms")} className="btn-neo h-10 px-4 rounded-xl text-[10px] font-black tracking-widest shadow-[2.5px_2.5px_0px_#000]">
             Browse Lobbies
           </button>
         </div>
@@ -93,7 +88,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
             Developer Team: <span className="text-white font-bold">{entry.metadata.developerTeam.teamName}</span>. Contact developer lead to push a new SDK build version.
           </p>
         </div>
-        <button onClick={() => (window.location.href = "/rooms")} className="btn-gaming w-full h-11 text-[10px] font-black tracking-widest shadow-[3px_3px_0px_#000000]">
+        <button onClick={() => (window.location.href = "/rooms")} className="btn-neo w-full h-11 text-[10px] font-black tracking-widest shadow-[3px_3px_0px_#000000]">
           Return to Room Browser
         </button>
       </div>
@@ -164,7 +159,7 @@ export function GameContainer({ gameIdOrSlug, roomCode, onFinish, onBack }: Game
           <button onClick={() => window.history.back()} className="flex-1 h-11 border-[2.5px] border-black bg-slate-800 text-white hover:bg-slate-700 font-black text-xs uppercase tracking-widest rounded-xl shadow-[3px_3px_0px_#000] cursor-pointer animate-none">
             Back to Games
           </button>
-          <button className="btn-gaming flex-1 h-11 uppercase font-black text-xs tracking-widest rounded-xl shadow-[3px_3px_0px_#000]">
+          <button className="btn-neo flex-1 h-11 uppercase font-black text-xs tracking-widest rounded-xl shadow-[3px_3px_0px_#000]">
             Submit Alpha Feedback
           </button>
         </div>
@@ -279,7 +274,7 @@ function GameWorkspaceWrapper({
                 </div>
                 <button 
                   onClick={() => setLifecycleState("in_progress")}
-                  className="btn-gaming h-11 px-6 text-xs font-black uppercase tracking-widest rounded-xl shadow-[3px_3px_0px_#000000]"
+                  className="btn-neo h-11 px-6 text-xs font-black uppercase tracking-widest rounded-xl shadow-[3px_3px_0px_#000000]"
                 >
                   Start Session
                 </button>

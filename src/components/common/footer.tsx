@@ -20,7 +20,7 @@ export function Footer() {
                    <span className="font-outfit text-2xl font-black text-slate-50 uppercase tracking-tighter">UniGame</span>
                 </div>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8">
-                   The world's most advanced strategic gaming hub. 
+                   The world's most advanced strategic board platform. 
                    Enter the arena, dominate the boards, and claim your legacy.
                 </p>
                 <div className="flex gap-4">
@@ -57,12 +57,12 @@ export function Footer() {
 
              {/* Newsletter */}
              <div>
-                <h4 className="font-outfit text-xs font-black text-slate-50 uppercase tracking-[0.2em] mb-8">Intelligence</h4>
-                <p className="text-slate-500 text-xs font-medium mb-6">Stay ahead of the competition with weekly meta updates.</p>
+                <h4 className="font-outfit text-xs font-black text-slate-50 uppercase tracking-[0.2em] mb-8">Newsletter</h4>
+                <p className="text-slate-500 text-xs font-medium mb-6">Stay updated with our newest games and features.</p>
                 <div className="relative">
                    <input 
                      type="text" 
-                     placeholder="ENCRYPTED EMAIL" 
+                     placeholder="YOUR EMAIL" 
                      className="w-full h-14 bg-slate-900 border-3 border-black rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-brand-orange text-slate-50 shadow-[2px_2px_0px_#000000]"
                    />
                    <button className="absolute right-2 top-2 h-10 w-10 rounded-xl bg-brand-orange border-2 border-black flex items-center justify-center text-slate-950 hover:bg-brand-orange shadow-[1px_1px_0px_#000000] cursor-pointer">
@@ -73,10 +73,10 @@ export function Footer() {
           </div>
           
           <div className="pt-10 border-t-3 border-black flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">© 2026 UNIGAME INTERACTIVE. DEPLOYED BY THE ELITE.</p>
+            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">© 2026 UNIGAME INTERACTIVE. ALL RIGHTS RESERVED.</p>
             <div className="flex gap-8 text-[10px] font-black text-slate-600 uppercase tracking-widest">
-               <Link href="#" className="hover:text-slate-50 transition-colors">Privacy Protocol</Link>
-               <Link href="#" className="hover:text-slate-50 transition-colors">Service Terms</Link>
+               <Link href="#" className="hover:text-slate-50 transition-colors">Privacy Policy</Link>
+               <Link href="#" className="hover:text-slate-50 transition-colors">Terms of Service</Link>
             </div>
           </div>
        </div>

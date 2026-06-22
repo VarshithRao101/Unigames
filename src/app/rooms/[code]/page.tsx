@@ -18,14 +18,8 @@ const getGameIcon = (id: string) => {
   switch (id) {
     case "test-arena":
       return <ShieldAlert className="w-6 h-6 text-brand-orange" />;
-    case "chess":
-      return <Crown className="w-6 h-6 text-brand-orange" />;
     case "tictactoe":
       return <Gamepad2 className="w-6 h-6 text-brand-orange" />;
-    case "ludo":
-      return <Trophy className="w-6 h-6 text-brand-orange" />;
-    case "snakes":
-      return <Zap className="w-6 h-6 text-brand-orange" />;
     default:
       return <Gamepad2 className="w-6 h-6 text-brand-orange" />;
   }
@@ -76,22 +70,6 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
       "Check achievements and standings updates."
     ]
   },
-  chess: {
-    id: "chess",
-    name: "Chess Arena",
-    maxPlayers: 2,
-    rules: "Standard checkmate win conditions. 10m timer.",
-    description: "A classic strategy game for 2 players. Control your pieces, protect your king, and checkmate the opponent.",
-    objectives: "Capture the opponent's king or run down their clock.",
-    duration: "10 Minutes per player",
-    winConditions: "Checkmate, Opponent Resignation, or Timeout.",
-    thumb: "♟️",
-    tips: [
-      "Control the center of the board early in the match.",
-      "Knights on the rim are dim; keep them active towards the center.",
-      "Castle early to safeguard your king and activate your rooks.",
-    ],
-  },
   tictactoe: {
     id: "tictactoe",
     name: "Tic-Tac-Toe",
@@ -108,38 +86,6 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
       "Look for double attack opportunities to guarantee a win."
     ]
   },
-  ludo: {
-    id: "ludo",
-    name: "Ludo Rush",
-    maxPlayers: 4,
-    rules: "Navigate 4 tokens to the home pocket. 4-player FFA.",
-    description: "Classic strategy board game for up to 4 players. Roll the dice, move your tokens, and make it home first.",
-    objectives: "Get all 4 of your tokens into the home pocket.",
-    duration: "15-20 Minutes",
-    winConditions: "First player to get all tokens home wins.",
-    thumb: "🎲",
-    tips: [
-      "Prioritize releasing all your tokens from the base.",
-      "Block opponents by forming barriers with two of your tokens on the same spot.",
-      "Watch out for incoming opponent tokens behind you before making high-risk moves.",
-    ],
-  },
-  snakes: {
-    id: "snakes",
-    name: "Snakes & Ladders",
-    maxPlayers: 6,
-    rules: "Climb ladders, avoid snakes, reach square 100.",
-    description: "Traditional board game of luck and strategy. Climb up ladders and avoid sliding down snake tails.",
-    objectives: "Navigate your piece from square 1 to 100.",
-    duration: "10-15 Minutes",
-    winConditions: "First player to reach exactly square 100.",
-    thumb: "🐍",
-    tips: [
-      "Keep an eye on critical ladder bases at lower positions.",
-      "Stay calm; even if you hit a snake near square 99, a quick ladder can bring you back.",
-      "Calculate potential dice roll values to land exactly on square 100.",
-    ],
-  },
 };
 
 const BOT_NAMES = [
@@ -147,11 +93,11 @@ const BOT_NAMES = [
 ];
 
 const ONLINE_FRIENDS = [
-  { id: "f1", name: "GarryChess", status: "Online", avatar: "G" },
+  { id: "f1", name: "XOMaster", status: "Online", avatar: "X" },
   { id: "f2", name: "BoardKing", status: "Playing", avatar: "B" },
-  { id: "f3", name: "DiceRoll", status: "Online", avatar: "D" },
-  { id: "f4", name: "QueenGambit", status: "Offline", avatar: "Q" },
-  { id: "f5", name: "NeoLudo", status: "Online", avatar: "N" },
+  { id: "f3", name: "GridRunner", status: "Online", avatar: "G" },
+  { id: "f4", name: "Tactician", status: "Offline", avatar: "T" },
+  { id: "f5", name: "Nova", status: "Online", avatar: "N" },
 ];
 
 export default function LobbyRoomPage({ params }: { params: Promise<{ code: string }> }) {
@@ -161,8 +107,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const resolvedParams = use(params);
   const roomCode = resolvedParams.code.toUpperCase();
 
-  // Load game config from localStorage or default to chess
-  const [gameId, setGameId] = useState<string>("chess");
+  // Load game config from localStorage or default to tictactoe
+  const [gameId, setGameId] = useState<string>("tictactoe");
   const [roomName, setRoomName] = useState<string>("Battle Room");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [isLocked, setIsLocked] = useState<boolean>(false);
@@ -202,7 +148,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const [isAdOpen, setIsAdOpen] = useState(false);
   const [hasShownStartAd, setHasShownStartAd] = useState(false);
 
-  const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.chess;
+  const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.tictactoe;
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize and sync room data with Pusher presence / private channel
@@ -820,7 +766,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     Cancel
                   </button>
                 </Link>
-                <button type="submit" className="btn-gaming flex-1 h-9 text-[9px] font-black tracking-widest rounded-xl shadow-[2px_2px_0px_#000000]">
+                <button type="submit" className="btn-neo flex-1 h-9 text-[9px] font-black tracking-widest rounded-xl shadow-[2px_2px_0px_#000000]">
                   Unlock Room
                 </button>
               </div>
@@ -1012,7 +958,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           placeholder="Type message..."
                           className="flex-1 bg-[var(--slate-900)] text-[11px] font-bold border-2 border-black rounded-lg px-3 py-1.5 outline-none focus:border-brand-orange placeholder:text-slate-500 text-slate-50 shadow-[1.5px_1.5px_0px_#000000]"
                         />
-                        <button type="submit" className="btn-gaming h-8 px-3 rounded-lg flex items-center justify-center">
+                        <button type="submit" className="btn-neo h-8 px-3 rounded-lg flex items-center justify-center">
                           <Send className="w-3 h-3 text-slate-950 stroke-[3]" />
                         </button>
                       </form>
@@ -1045,7 +991,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           <button
                             onClick={handleStartMatch}
                             disabled={players.length < 2 || !players.every(p => p.isReady)}
-                            className="btn-gaming flex-1 h-9.5 text-slate-950 uppercase font-black text-[11px] tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="btn-neo flex-1 h-9.5 text-slate-950 uppercase font-black text-[11px] tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                           >
                             Start Match
                           </button>
@@ -1288,7 +1234,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         </button>
                         <Link href="/rooms" className="flex-1">
                           <button 
-                            className="btn-gaming w-full uppercase font-black text-[11px] h-9.5 text-slate-950 rounded-lg shadow-[2px_2px_0px_#000000]"
+                            className="btn-neo w-full uppercase font-black text-[11px] h-9.5 text-slate-950 rounded-lg shadow-[2px_2px_0px_#000000]"
                           >
                             Rooms
                           </button>
@@ -1340,7 +1286,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   </div>
                   <button
                     onClick={handleCopyLink}
-                    className="btn-gaming h-11 px-4 rounded-xl flex items-center justify-center shadow-[2px_2px_0px_#000000]"
+                    className="btn-neo h-11 px-4 rounded-xl flex items-center justify-center shadow-[2px_2px_0px_#000000]"
                   >
                     {copied ? <Check className="w-4 h-4 text-slate-950 stroke-[3.5]" /> : <Copy className="w-4 h-4 text-slate-950" />}
                   </button>
@@ -1374,7 +1320,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         className={`h-8 px-3 text-[9px] font-black uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] cursor-pointer ${
                           invitedFriends[friend.id] 
                             ? "bg-slate-800 text-slate-500 border-2 border-transparent" 
-                            : "btn-gaming"
+                            : "btn-neo"
                         }`}
                       >
                         {invitedFriends[friend.id] ? "Invited" : "Invite"}

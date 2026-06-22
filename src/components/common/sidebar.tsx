@@ -45,7 +45,7 @@ export function Sidebar() {
         {
           id: `${Date.now()}-reply`,
           sender: "UniGame AI",
-          text: "Node synchronized. Data broadcast successful.",
+          text: "Connection established.",
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
@@ -57,11 +57,11 @@ export function Sidebar() {
       <button
         onClick={() => setIsOpen((value) => !value)}
         className={`fixed right-0 top-1/2 z-40 flex -translate-y-1/2 flex-col items-center gap-3 rounded-l-2xl border-3 border-r-0 border-black bg-slate-900 px-3 py-6 text-slate-50 shadow-[2px_2px_0px_#000000] transition-all duration-300 ${isOpen ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100 hover:border-brand-orange hover:text-brand-orange'}`}
-        aria-label="Toggle squad panel"
+        aria-label="Toggle friends panel"
       >
         <Users className="h-6 w-6" />
         <span className="font-outfit text-[9px] font-black uppercase tracking-[0.2em] [writing-mode:vertical-lr]">
-          SQUAD HUB
+          FRIENDS HUB
         </span>
       </button>
 
@@ -86,7 +86,7 @@ export function Sidebar() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-outfit text-xl font-black uppercase tracking-widest text-slate-50 mb-2">
-                    Global Squad
+                    Online Users
                   </h3>
                   <div className="flex items-center gap-3">
                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-success/10 border-2 border-black rounded-lg shadow-[1.5px_1.5px_0px_#000000]">
@@ -181,7 +181,7 @@ export function Sidebar() {
                         type="text"
                         value={inputText}
                         onChange={(event) => setInputText(event.target.value)}
-                        placeholder="SEND TRANSMISSION..."
+                        placeholder="Type a message..."
                         className="w-full h-14 bg-slate-900 border-3 border-black rounded-xl px-12 text-[10px] font-black uppercase tracking-widest text-slate-50 focus:outline-none focus:border-brand-orange shadow-[2px_2px_0px_#000000]"
                       />
                       <MessageSquareText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-750" />
@@ -197,10 +197,10 @@ export function Sidebar() {
             <div className="p-8 border-t-3 border-black bg-brand-orange/5">
                 <div className="flex items-center gap-3 mb-2">
                    <Shield className="w-3 h-3 text-brand-orange" />
-                   <span className="text-[8px] font-black text-slate-50 uppercase tracking-widest">Secure Uplink Target</span>
+                   <span className="text-[8px] font-black text-slate-50 uppercase tracking-widest">Secure Connection</span>
                 </div>
                 <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                   Global squad nodes encrypted. Signal integrity verified via UniGame Core.
+                   Connection secure. Verified via UniGame.
                 </p>
             </div>
           </motion.aside>

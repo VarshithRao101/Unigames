@@ -65,13 +65,13 @@ export const ChatBot: React.FC = () => {
   const getBotResponse = (query: string): string => {
     const q = query.toLowerCase();
     if (q.includes("game") || q.includes("play")) {
-      return "We have a variety of games including Tic-Tac-Toe X and Chess Masters. You can find them in the Games Explorer!";
+      return "You can play Tic-Tac-Toe against other players or a bot. Go to the Games Explorer to join or create a room!";
     }
     if (q.includes("leaderboard") || q.includes("rank")) {
       return "The Global Leaderboard shows the top-tier players. Keep winning to climb the ranks!";
     }
     if (q.includes("lobby") || q.includes("room")) {
-      return "Lobbies are spaces where you can join or create matches. Check the Lobbies section for active rooms.";
+      return "Rooms are spaces where you can join or create matches. Check the Game Rooms section for active rooms.";
     }
     return "That's a great question! For specific account issues, you might want to check our Community forums or contact support directly. Is there anything else I can help with?";
   };
@@ -189,7 +189,7 @@ export const ChatBot: React.FC = () => {
                     />
                     <Button 
                       type="submit" 
-                      className="shrink-0 btn-gaming h-10 px-4 rounded-xl shadow-none"
+                      className="shrink-0 btn-neo h-10 px-4 rounded-xl shadow-none"
                       disabled={!input.trim()}
                     >
                       <Send size={16} />

@@ -10,7 +10,7 @@ export const updateProfileSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain alphanumeric characters and underscores")
     .optional(),
   bio: z.string().max(200, "Bio must be at most 200 characters").optional(),
-  avatar: z.string().url("Invalid avatar URL format").or(z.string().length(0)).optional(),
+  avatar: z.string().max(10000, "Avatar too long").optional(),
   settings: z
     .object({
       notifications: z.boolean().optional(),
