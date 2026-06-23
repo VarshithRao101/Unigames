@@ -27,7 +27,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL("https://unigames-five.vercel.app"),
   title: "UniGame - Premium Gaming Hub",
   description: "Play your favorite games at UniGame. The premier destination for competitive strategy, global standings, and friendly multiplayer rooms.",
   manifest: "/manifest.json",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "UniGame - Premium Gaming Hub",
     description: "Play your favorite games at UniGame. The premier destination for competitive strategy and live rooms.",
-    url: "https://unigame.gg",
+    url: "https://unigames-five.vercel.app",
     siteName: "UniGame",
     images: [
       {
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: "https://unigame.gg",
+    canonical: "https://unigames-five.vercel.app",
   },
 };
 
