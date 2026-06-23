@@ -20,10 +20,46 @@ export default function RoomsPage() {
   const [rooms, setRooms] = useState<LobbyRoom[]>([]);
 
   useEffect(() => {
-    const loaded = loadCreatedRooms().filter(
-      (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
-    );
-    setRooms(mergeRooms(loaded, ROOMS_AVAILABLE));
+    async function fetchLobbies() {
+      try {
+        const res = await fetch("/api/rooms");
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const dbRooms: LobbyRoom[] = json.data.map((r: any) => {
+            const hostPlayer = r.players.find((p: any) => p.isHost);
+            return {
+              id: r._id || `custom-${r.code}`,
+              code: r.code,
+              name: r.settings?.name || `${r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
+              gameSlug: r.gameSlug,
+              gameName: r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+              host: hostPlayer ? hostPlayer.username : "Unknown",
+              currentPlayers: r.players.length,
+              maxPlayers: r.maxPlayers,
+              status: r.players.length >= r.maxPlayers ? "full" : "open",
+              isPrivate: r.settings?.isPrivate || false,
+              passcode: r.settings?.passcode,
+              region: r.settings?.region || "Mumbai Hub",
+              note: r.settings?.allowSpectators ? "Spectators allowed." : "Private settings.",
+            };
+          });
+          const loaded = loadCreatedRooms().filter(
+            (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
+          );
+          setRooms(mergeRooms(dbRooms, mergeRooms(loaded, ROOMS_AVAILABLE)));
+        } else {
+          throw new Error();
+        }
+      } catch (err) {
+        console.error("Failed to load database lobbies, using fallback:", err);
+        const loaded = loadCreatedRooms().filter(
+          (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
+        );
+        setRooms(mergeRooms(loaded, ROOMS_AVAILABLE));
+      }
+    }
+    fetchLobbies();
   }, []);
 
   const handleClearRooms = () => {
@@ -190,11 +226,20 @@ export default function RoomsPage() {
                                  {room.status === 'open' ? 'Public' : room.status === 'live' ? 'Live' : 'Locked'}
                               </div>
                              
-                             <Link href={`/rooms/${room.code}`}>
-                                <button className="btn-neo h-7 px-3 rounded font-black uppercase text-[7.5px] cursor-pointer">
-                                   {room.status === 'full' ? 'Watch' : 'Join'}
-                                </button>
-                             </Link>
+                             <div className="flex items-center gap-1.5">
+                               {room.status !== 'full' && (
+                                 <Link href={`/rooms/${room.code}?mode=join`}>
+                                    <button className="btn-neo h-7 px-2.5 rounded font-black uppercase text-[7.5px] cursor-pointer bg-brand-orange text-slate-950">
+                                       Join
+                                    </button>
+                                 </Link>
+                               )}
+                               <Link href={`/rooms/${room.code}?mode=spectate`}>
+                                  <button className="btn-neo h-7 px-2.5 rounded font-black uppercase text-[7.5px] cursor-pointer bg-slate-900 text-slate-300">
+                                     Spectate
+                                  </button>
+                               </Link>
+                             </div>
                           </div>
                        </div>
                     </motion.article>

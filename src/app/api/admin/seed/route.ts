@@ -1,6 +1,8 @@
 import { seedDatabase } from "@/lib/db/seed";
 import { apiSuccess, apiErrors } from "@/lib/utils/api-response";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/admin/seed
  * Triggers the database seeding utility for development testing.

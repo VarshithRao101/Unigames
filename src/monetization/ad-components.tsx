@@ -249,14 +249,14 @@ export function CyberAdBox({ label = "ADVERTISEMENT SPACE", className = "" }: { 
 import { X } from "lucide-react";
 
 export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [countdown, setCountdown] = useState(isOpen ? 5 : 0);
+  const [countdown, setCountdown] = useState(isOpen ? 3 : 0);
   const [canClose, setCanClose] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
     // Initialize states asynchronously to avoid synchronous setState in effect
     setTimeout(() => {
-      setCountdown(5);
+      setCountdown(3);
       setCanClose(false);
     }, 0);
     const timer = setInterval(() => {
@@ -264,7 +264,7 @@ export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         if (prev <= 1) {
           clearInterval(timer);
           setCanClose(true);
-          onClose(); // Automatically close and start match after 5 seconds
+          onClose(); // Automatically close and start match after 3 seconds
           return 0;
         }
         return prev - 1;
@@ -295,13 +295,13 @@ export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         </div>
 
         <p className="text-xs font-semibold text-slate-300 leading-relaxed max-w-sm">
-          "MAXIMIZE YOUR FOCUS. ZERO LAG. RECHARGE YOUR CYBERNETIC COGNITION INSTANTLY."
+          &quot;MAXIMIZE YOUR FOCUS. ZERO LAG. RECHARGE YOUR CYBERNETIC COGNITION INSTANTLY.&quot;
         </p>
 
         <div className="w-full bg-slate-950 border border-slate-850 p-3 rounded-2xl mt-6 flex justify-between items-center text-left">
           <div>
             <span className="text-[9px] font-bold text-slate-500 uppercase">Sponsor Match</span>
-            <p className="font-outfit font-extrabold text-xs text-white uppercase tracking-wide mt-0.5">Use Code "UNIGAMES"</p>
+            <p className="font-outfit font-extrabold text-xs text-white uppercase tracking-wide mt-0.5">Use Code &quot;UNIGAMES&quot;</p>
           </div>
           <Button variant="primary" size="sm" className="h-8 text-[9px] uppercase tracking-wider text-slate-950 font-black">
             Get 20% Off

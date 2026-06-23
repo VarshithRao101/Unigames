@@ -138,6 +138,54 @@ export default function CommunityHubPage() {
   const { user, login } = useAuth();
   const [rooms, setRooms] = useState<LobbyRoom[]>([]);
   const [friends, setFriends] = useState<any[]>([]);
+  const [weeklyLeaderboard, setWeeklyLeaderboard] = useState<any[]>([]);
+  const [currentUserDb, setCurrentUserDb] = useState<any>(null);
+
+  // Poll leaderboard data from database in real-time
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch("/api/leaderboards?game=global&period=weekly");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            setWeeklyLeaderboard(json.data);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading leaderboard data:", err);
+      }
+    };
+
+    fetchLeaderboard();
+    const interval = setInterval(fetchLeaderboard, 10000); // Poll every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // Load actual logged-in user details in real-time
+  useEffect(() => {
+    const fetchCurrentUserDb = async () => {
+      if (!user) {
+        setCurrentUserDb(null);
+        return;
+      }
+      try {
+        const res = await fetch("/api/users/me");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setCurrentUserDb(json.data);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading current user DB stats:", err);
+      }
+    };
+
+    fetchCurrentUserDb();
+    const interval = setInterval(fetchCurrentUserDb, 10000); // Poll every 10 seconds
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     const loaded = loadCreatedRooms().filter(
@@ -228,7 +276,7 @@ export default function CommunityHubPage() {
   };
 
   return (
-    <div className="bg-transparent text-slate-900 min-h-screen">
+    <div className="bg-transparent text-slate-50 min-h-screen">
       <Navbar />
 
       <main suppressHydrationWarning>
@@ -267,7 +315,7 @@ export default function CommunityHubPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h1 className="text-3xl md:text-4xl font-black mb-2.5 leading-[0.9] tracking-tighter uppercase text-slate-950">
+                <h1 className="text-3xl md:text-4xl font-black mb-2.5 leading-[0.9] tracking-tighter uppercase text-white">
                   READY TO <br />
                   <span className="gradient-text">DOMINATE?</span>
                 </h1>
@@ -365,14 +413,14 @@ export default function CommunityHubPage() {
                       initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08 }}
-                      className="glass p-3.5 transition-all text-center group cursor-pointer border-2 bg-white"
+                      className="glass p-3.5 transition-all text-center group cursor-pointer border-2"
                     >
                       <Link href={step.href}>
                         <div>
                            <div className="w-9 h-9 rounded-lg bg-brand-orange/10 flex items-center justify-center mx-auto mb-2.5 border border-brand-orange/20 group-hover:scale-105 group-hover:bg-brand-orange transition-all duration-300 shadow-orange/10">
                               <step.icon className="w-4 h-4 text-brand-orange group-hover:text-slate-950 transition-colors" />
                            </div>
-                           <h3 className="text-sm font-black mb-1 uppercase tracking-tight text-slate-950">{step.title}</h3>
+                           <h3 className="text-sm font-black mb-1 uppercase tracking-tight text-slate-50">{step.title}</h3>
                            <p className="text-[10px] text-slate-500 font-bold leading-relaxed">{step.desc}</p>
                         </div>
                       </Link>
@@ -383,7 +431,7 @@ export default function CommunityHubPage() {
         </section>
 
         {/* ── 3. GLOBAL CHAT & FRIENDS ── */}
-        <section className="py-8 md:py-10 bg-slate-950/5 dark:bg-slate-950/30 border-b-2 border-black relative overflow-hidden" id="chat">
+        <section className="py-8 md:py-10 bg-slate-950/30 border-b-2 border-black relative overflow-hidden" id="chat">
           {/* Floating 2D Cartoon Game Decors */}
           <motion.div 
             animate={{ rotate: [0, 3, -3, 0], y: [0, -6, 0] }}
@@ -399,28 +447,28 @@ export default function CommunityHubPage() {
                       <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
                          <Terminal className="w-3 h-3" /> {activeChannel === "global" ? "Global Chat" : "Direct Chat"}
                       </span>
-                      <h2 className="text-2xl md:text-3xl font-black mb-1.5 tracking-tighter uppercase leading-[0.9] text-slate-950 dark:text-white">
+                      <h2 className="text-2xl md:text-3xl font-black mb-1.5 tracking-tighter uppercase leading-[0.9] text-slate-50">
                          {activeChannel === "global" ? (
                             <>GLOBAL <span className="gradient-text">CHAT</span></>
                            ) : (
                             <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
                            )}
                       </h2>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      <p className="text-[11px] text-slate-400 font-medium">
                          {activeChannel === "global" 
                            ? "Chat with other players, share room codes, and hang out with the community in real-time."
                            : `Secure direct chat with ${activeChannel}.`}
                       </p>
                    </div>
-                   <div className="flex bg-white dark:bg-slate-900 border-2 border-black rounded-lg p-1.5 items-center gap-3 shadow-[2px_2px_0px_#000000]">
+                   <div className="flex bg-slate-800 border-2 border-black rounded-lg p-1.5 items-center gap-3 shadow-[2px_2px_0px_#000000]">
                       <div className="flex items-center gap-1">
                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-[7.5px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-450">Online</span>
+                         <span className="text-[7.5px] font-black uppercase tracking-widest text-emerald-400">Online</span>
                       </div>
-                      <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800" />
+                      <div className="h-4 w-[1px] bg-slate-800" />
                       <div className="flex items-center gap-1">
                          <Users className="w-3 h-3 text-brand-orange" />
-                         <span className="text-xs font-space font-black text-slate-950 dark:text-white">482</span>
+                         <span className="text-xs font-space font-black text-slate-50">482</span>
                       </div>
                    </div>
               </div>
@@ -428,9 +476,9 @@ export default function CommunityHubPage() {
               <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
                 {/* Active Members Sidebar */}
                 <aside className="space-y-4">
-                   <div className="glass p-3 border-2 border-black rounded-xl bg-white dark:bg-slate-900">
+                   <div className="glass p-3 border-2 border-black rounded-xl">
                       <div className="flex items-center justify-between mb-3">
-                         <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-950 dark:text-white">Online Users</h4>
+                         <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50">Online Users</h4>
                          <Activity className="w-3 h-3 text-brand-orange animate-pulse" />
                       </div>
                       
@@ -441,7 +489,7 @@ export default function CommunityHubPage() {
                            className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
                              activeChannel === "global" 
                                ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                               : "border-black bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800"
+                               : "border-black bg-slate-900 hover:bg-slate-800"
                            }`}
                          >
                             <div className="flex items-center gap-2">
@@ -452,9 +500,9 @@ export default function CommunityHubPage() {
                                </div>
                                <div className="flex-1 min-w-0">
                                   <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                    activeChannel === "global" ? "text-brand-orange" : "text-slate-950 dark:text-slate-100 group-hover:text-brand-orange"
+                                    activeChannel === "global" ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
                                   }`}>Global Comms</p>
-                                  <p className="text-[6.5px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest truncate">Public Lobby Chat</p>
+                                  <p className="text-[6.5px] font-black text-slate-400 uppercase tracking-widest truncate">Public Lobby Chat</p>
                                </div>
                                <Globe className={`w-2.5 h-2.5 ${activeChannel === "global" ? "text-brand-orange animate-pulse" : "text-slate-400"}`} />
                             </div>
@@ -470,19 +518,19 @@ export default function CommunityHubPage() {
                                   className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
                                     isSelected 
                                       ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                                      : "border-black bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                      : "border-black bg-slate-900 hover:bg-slate-800"
                                   }`}
                                 >
                                    <div className="flex items-center gap-2">
-                                      <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-black flex items-center justify-center font-black text-[9px] text-slate-700 dark:text-slate-300 shadow-[1px_1px_0px_#000] relative">
+                                      <div className="h-6 w-6 rounded-full bg-slate-800 border border-black flex items-center justify-center font-black text-[9px] text-slate-300 shadow-[1px_1px_0px_#000] relative">
                                          {member.username.charAt(0).toUpperCase()}
                                          <span className="absolute bottom-0 right-0 h-1.5 w-1.5 bg-emerald-500 rounded-full border border-white" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                          <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                           isSelected ? "text-brand-orange" : "text-slate-950 dark:text-slate-100 group-hover:text-brand-orange"
+                                           isSelected ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
                                          }`}>{member.username}</p>
-                                         <p className="text-[6.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate">Online · Idle</p>
+                                         <p className="text-[6.5px] font-black text-slate-400 uppercase tracking-widest truncate">Online · Idle</p>
                                       </div>
                                       <div className="flex items-center gap-1">
                                          <Zap className={`w-2.5 h-2.5 ${isSelected ? "text-brand-orange" : "text-slate-300"}`} />
@@ -492,8 +540,8 @@ export default function CommunityHubPage() {
                               );
                             })
                           ) : (
-                            <div className="p-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg text-center space-y-2">
-                              <p className="text-[8px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">No active operators</p>
+                            <div className="p-3 border-2 border-dashed border-slate-800 rounded-lg text-center space-y-2">
+                              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">No active operators</p>
                               <Link href="/friends" className="block">
                                 <Button className="btn-neo h-7.5 w-full text-[8px] rounded font-black tracking-wider uppercase">
                                   Find Friends
@@ -506,17 +554,17 @@ export default function CommunityHubPage() {
                 </aside>
 
                 {/* Chat Node */}
-                <section className="glass overflow-hidden flex flex-col h-[260px] relative border-2 border-black rounded-xl bg-white dark:bg-slate-950">
+                <section className="glass overflow-hidden flex flex-col h-[260px] relative border-2 border-black rounded-xl bg-slate-950">
                    {/* Blurred Barrier overlay if not logged in */}
                    {!user && (
-                     <div className="absolute inset-0 bg-white/45 dark:bg-slate-900/60 backdrop-blur-md flex flex-col items-center justify-center z-30 p-4 text-center">
+                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md flex flex-col items-center justify-center z-30 p-4 text-center">
                         <div className="w-10 h-10 bg-brand-orange/10 border-2 border-black rounded-xl flex items-center justify-center text-brand-orange shadow-[1.5px_1.5px_0px_#000000] mb-2">
                            <Shield className="w-5 h-5" />
                         </div>
-                        <h4 className="font-outfit font-black text-[10px] uppercase tracking-[0.2em] text-slate-950 dark:text-white mb-1">
+                        <h4 className="font-outfit font-black text-[10px] uppercase tracking-[0.2em] text-slate-50 mb-1">
                            Authentication Required
                         </h4>
-                        <p className="text-[9px] text-slate-500 dark:text-slate-400 mb-3 max-w-[280px] font-bold leading-normal">
+                        <p className="text-[9px] text-slate-400 mb-3 max-w-[280px] font-bold leading-normal">
                            Sign in with Google to synchronize your account, view channels, and broadcast to the lobby.
                         </p>
                         <Button
@@ -547,31 +595,31 @@ export default function CommunityHubPage() {
                                     className={`flex flex-col ${isSelf ? 'items-end' : 'items-start'}`}
                                   >
                                      <div className="flex items-center gap-1 mb-0.5">
-                                        <span className={`text-[8.5px] font-black uppercase tracking-widest ${isSelf ? 'text-brand-orange' : 'text-slate-450 dark:text-slate-500'}`}>
+                                        <span className={`text-[8.5px] font-black uppercase tracking-widest ${isSelf ? 'text-brand-orange' : 'text-slate-500'}`}>
                                            {message.sender}
                                         </span>
-                                        <span className="text-[6.5px] font-black text-slate-400 dark:text-slate-500 tracking-[0.2em]">{message.time}</span>
+                                        <span className="text-[6.5px] font-black text-slate-500 tracking-[0.2em]">{message.time}</span>
                                      </div>
                                      <div className="relative">
                                         <div className={`max-w-[85%] p-2 py-1.5 rounded-lg border-2 border-black transition-all duration-300 relative ${
                                           isSelf 
-                                            ? 'bg-brand-orange/15 dark:bg-brand-orange/20 rounded-tr-none text-slate-950 dark:text-white shadow-[1.5px_1.5px_0px_#000]' 
-                                            : 'bg-slate-50 dark:bg-slate-900 rounded-tl-none text-slate-800 dark:text-slate-200 shadow-[1.5px_1.5px_0px_#000]'
+                                            ? 'bg-brand-orange/20 rounded-tr-none text-slate-50 shadow-[1.5px_1.5px_0px_#000]' 
+                                            : 'bg-slate-800 rounded-tl-none text-slate-50 shadow-[1.5px_1.5px_0px_#000]'
                                         }`}>
                                            <p className="text-[11px] font-medium leading-relaxed">{message.text}</p>
                                         </div>
                                         {/* Comic Speech Bubble Tail */}
                                         {isSelf ? (
-                                          <div className="absolute top-[2px] right-[-3px] w-2 h-2 border-r-2 border-t-2 border-black rotate-[45deg] z-10 bg-brand-orange/15 dark:bg-brand-orange/20" />
+                                          <div className="absolute top-[2px] right-[-3px] w-2 h-2 border-r-2 border-t-2 border-black rotate-[45deg] z-10 bg-brand-orange/20" />
                                         ) : (
-                                          <div className="absolute top-[2px] left-[-3px] w-2 h-2 bg-slate-50 dark:bg-slate-900 border-l-2 border-t-2 border-black rotate-[-45deg] z-10" />
+                                          <div className="absolute top-[2px] left-[-3px] w-2 h-2 bg-slate-800 border-l-2 border-t-2 border-black rotate-[-45deg] z-10" />
                                         )}
                                       </div>
                                   </motion.div>
                                );
                             })
                          ) : (
-                            <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest select-none">
+                            <div className="h-full flex items-center justify-center text-slate-500 text-[10px] font-bold uppercase tracking-widest select-none">
                                No messages in channel
                             </div>
                          )}
@@ -579,16 +627,16 @@ export default function CommunityHubPage() {
                    </div>
 
                    {/* Input Area */}
-                   <div className="p-2 md:p-3 bg-slate-50 dark:bg-slate-900 border-t-2 border-black relative z-20">
+                   <div className="p-2 md:p-3 bg-slate-900 border-t-2 border-black relative z-20">
                       <form onSubmit={handleChatSend} className="flex flex-col sm:flex-row gap-2">
                          <div className="relative flex-1">
-                            <MessageSquare className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-450 dark:text-slate-500" />
+                            <MessageSquare className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
                             <input 
                               value={chatText}
                               onChange={(e) => setChatText(e.target.value)}
                               type="text" 
                               placeholder={activeChannel === "global" ? "Type a message..." : `Send message to ${activeChannel}...`}
-                              className="w-full h-8.5 bg-white dark:bg-slate-950 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-950 dark:text-white focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
+                              className="w-full h-8.5 bg-slate-800 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
                             />
                          </div>
                          <Button type="submit" className="btn-neo h-8.5 px-4 rounded-lg text-[10px]">
@@ -605,15 +653,15 @@ export default function CommunityHubPage() {
         <section className="relative overflow-hidden py-3">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1/2 bg-brand-orange/5 blur-[120px] -rotate-12" />
           
-          <div className="container mx-auto px-6 max-w-7xl relative z-10">
-            <div className="panel p-0.5 border-2 rounded-xl bg-white">
-              <div className="bg-slate-50/40 rounded-[0.8rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-6">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="panel p-0.5 border-2 rounded-xl">
+              <div className="bg-slate-950 rounded-[0.8rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <span className="kicker mb-2 border-brand-orange bg-brand-orange/10 text-brand-orange text-[9px]">Turbo Matchmaking</span>
-                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-[0.9] tracking-tighter uppercase text-slate-950">
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-[0.9] tracking-tighter uppercase text-slate-50">
                     INSTANT <span className="gradient-text">QUICK RUSH</span>
                   </h2>
-                  <p className="text-[11px] text-slate-500 mb-4 font-medium leading-relaxed max-w-sm">
+                  <p className="text-[11px] text-slate-400 mb-4 font-medium leading-relaxed max-w-sm">
                     Zero waiting. Zero lag. Our proprietary rush engine matches you with players 
                     at your exact skill level in under 5 seconds. Ready?
                   </p>
@@ -623,7 +671,7 @@ export default function CommunityHubPage() {
                     </Button>
                   </Link>
                 </div>
-
+ 
                 <div className="flex-1 relative">
                   <div className="relative w-36 h-36 md:w-44 md:h-44 mx-auto">
                     {/* Animated Timer Graphic */}
@@ -635,12 +683,12 @@ export default function CommunityHubPage() {
                     <motion.div 
                       animate={{ rotate: -360 }}
                       transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-2.5 rounded-full border border-dashed border-slate-300" 
+                      className="absolute inset-2.5 rounded-full border border-dashed border-slate-700" 
                     />
-                    <div className="absolute inset-5 rounded-full glass border-2 bg-white flex flex-col items-center justify-center text-center">
+                    <div className="absolute inset-5 rounded-full glass border-2 flex flex-col items-center justify-center text-center">
                       <Timer className="w-6 h-6 text-brand-orange mb-1.5 animate-pulse" />
-                      <span className="text-3xl font-space font-black tracking-tighter text-slate-950">04.2s</span>
-                      <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Avg Match Wait</span>
+                      <span className="text-3xl font-space font-black tracking-tighter text-slate-50">04.2s</span>
+                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Avg Match Wait</span>
                     </div>
                   </div>
                 </div>
@@ -655,13 +703,13 @@ export default function CommunityHubPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               
               {/* Left Column: LIVE ROOM LIST */}
-              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 border-black rounded-xl bg-white dark:bg-slate-900">
+              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 border-black rounded-xl">
                 <div className="flex items-center justify-between mb-4.5">
                   <div>
                     <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
                       <Clock className="w-3 h-3" /> Rooms Available
                     </span>
-                    <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-950 dark:text-white">Live Rooms</h2>
+                    <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-50">Live Rooms</h2>
                   </div>
                   <Link href="/rooms">
                     <Button variant="outline" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest border-2 border-black bg-slate-900 hover:bg-slate-800 text-slate-50 rounded-lg shadow-[1.5px_1.5px_0px_#000]">
@@ -675,17 +723,17 @@ export default function CommunityHubPage() {
                     rooms.map((room) => (
                       <div 
                         key={room.id}
-                        className="p-3 bg-slate-950 rounded-xl border-2 border-black hover:border-brand-orange/45 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group shadow-[1.5px_1.5px_0px_#000000]"
+                        className="p-3 bg-slate-900 rounded-xl border-2 border-black hover:border-brand-orange/45 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group shadow-[1.5px_1.5px_0px_#000000]"
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                             <h3 className="text-sm font-black tracking-tight text-slate-50">{room.name}</h3>
-                            <span className="text-[7.5px] bg-slate-900 border border-black px-1.5 py-0.5 rounded text-slate-400 font-bold uppercase shadow-[1px_1px_0px_#000]">{room.code}</span>
+                            <span className="text-[7.5px] bg-slate-950 border border-black px-1.5 py-0.5 rounded text-slate-400 font-bold uppercase shadow-[1px_1px_0px_#000]">{room.code}</span>
                           </div>
                           <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">
                             {room.gameName} · {room.currentPlayers}/{room.maxPlayers} Players · {room.region}
                           </p>
-                          <p className="text-[8px] text-slate-400 font-semibold line-clamp-1 group-hover:text-brand-orange transition-colors">
+                          <p className="text-[8px] text-slate-500 font-semibold line-clamp-1 group-hover:text-brand-orange transition-colors">
                             {room.note}
                           </p>
                         </div>
@@ -706,11 +754,11 @@ export default function CommunityHubPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 border-2 border-dashed border-slate-350 dark:border-slate-800 rounded-xl text-center bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center h-full min-h-[140px]">
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">
+                    <div className="p-8 border-2 border-dashed border-slate-800 rounded-xl text-center bg-slate-950 flex flex-col justify-center items-center h-full min-h-[140px]">
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
                         No Active Lobbies
                       </p>
-                      <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1 font-bold">
+                      <p className="text-[9px] text-slate-500 mt-1 font-bold">
                         Create a room to initialize battle matchmaking.
                       </p>
                     </div>
@@ -719,12 +767,12 @@ export default function CommunityHubPage() {
               </div>
 
               {/* Right Column: SLEEK BATTLE LOOP */}
-              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 border-black rounded-xl bg-white dark:bg-slate-900">
+              <div className="glass p-5 md:p-6 flex flex-col h-full border-2 border-black rounded-xl">
                 <div className="mb-4.5">
                   <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
                     <Gamepad2 className="w-3.5 h-3.5 text-brand-orange" /> How it Works
                   </span>
-                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-950 dark:text-white">Battle Loop</h2>
+                  <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-50">Battle Loop</h2>
                 </div>
 
                 <div className="space-y-3.5 flex-1 flex flex-col justify-between">
@@ -838,62 +886,135 @@ export default function CommunityHubPage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                 {/* Pavilion / Top Rank */}
-                 <motion.div 
-                   whileHover={{ scale: 1.01 }}
-                   className="lg:col-span-2 relative h-[280px] overflow-hidden glass border-2 rounded-xl bg-white"
-                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-white/80 to-white" />
-                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                       <span className="px-2.5 py-0.5 rounded-full bg-brand-orange text-slate-950 border border-black font-black text-[8px] uppercase tracking-[0.2em] w-fit mb-3">CURRENT CHAMPION</span>
-                       <div className="flex items-center gap-3.5 mb-3">
-                          <div className="h-12 w-12 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center text-xl font-black text-brand-orange shadow-[2px_2px_0px_#000]">
-                             {LEADERBOARD_DATA.weekly?.[0]?.name?.charAt(0) || "G"}
-                          </div>
-                          <div>
-                             <h3 className="text-2xl md:text-3.5xl font-black uppercase tracking-tighter leading-[0.85] text-slate-950">{LEADERBOARD_DATA.weekly?.[0]?.name || "Gamer"}</h3>
-                             <p className="text-[11px] font-space font-black text-brand-orange mt-1 uppercase tracking-widest">LVL 99 • {LEADERBOARD_DATA.weekly?.[0]?.favorite || "Tic-Tac-Toe"} Specialist</p>
-                          </div>
+                 {weeklyLeaderboard.length === 0 ? (
+                    <div className="lg:col-span-3 panel p-8 text-center bg-slate-950 border-2 border-black rounded-xl flex flex-col items-center justify-center min-h-[280px] shadow-[4px_4px_0px_#000]">
+                       <div className="w-14 h-14 bg-brand-orange/10 border-2 border-black rounded-2xl flex items-center justify-center text-brand-orange shadow-[2px_2px_0px_#000] mb-4">
+                          <Trophy className="w-7 h-7 animate-pulse" />
                        </div>
-                       <div className="flex items-center gap-8 text-slate-950 font-black text-[9px] uppercase tracking-[0.15em]">
-                          <div className="flex flex-col gap-0.5">
-                             <span className="text-slate-500">Season XP</span>
-                             <span className="text-lg md:text-xl font-space text-brand-orange">{LEADERBOARD_DATA.weekly?.[0]?.xp || 0}</span>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                             <span className="text-slate-500">Win Rate</span>
-                             <span className="text-lg md:text-xl font-space uppercase">94.2%</span>
-                          </div>
-                       </div>
+                       <h3 className="text-base font-black uppercase tracking-tight text-slate-50 mb-1.5">
+                          The Arena Awaits Its First Legend
+                       </h3>
+                       <p className="text-[10px] text-slate-400 max-w-sm mx-auto mb-4 font-bold leading-normal">
+                          No battles have been recorded on the global weekly leaderboard yet. Create a lobby, invite players, and win matches to claim the absolute top rank!
+                       </p>
+                       <Link href="/rooms">
+                          <Button className="btn-neo h-8 px-4 rounded-lg text-[10px] shadow-neon-orange">
+                             Battle Now
+                          </Button>
+                       </Link>
                     </div>
-                 </motion.div>
-
-                 {/* Top Challengers */}
-                 <div className="flex flex-col gap-3">
-                    {(LEADERBOARD_DATA.weekly || []).slice(1, 4).map((player, i) => (
-                      <div key={i} className="panel p-3 border-2 rounded-xl hover:bg-slate-50/10 transition-all flex flex-col justify-between group shadow-[2px_2px_0px_#000] bg-white">
-                         <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2.5">
-                               <div className="h-6.5 w-6.5 rounded-full bg-slate-900 border border-black flex items-center justify-center font-black text-[10px] text-slate-300 shadow-[1px_1px_0px_#000]">
-                                  {player.name.charAt(0)}
+                 ) : (
+                    <>
+                       {/* Pavilion / Top Rank */}
+                       <motion.div 
+                         whileHover={{ scale: 1.01 }}
+                         className="lg:col-span-2 relative h-[280px] overflow-hidden glass border-2 rounded-xl"
+                       >
+                          <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/20 via-slate-950/80 to-slate-950" />
+                          <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                             <span className="px-2.5 py-0.5 rounded-full bg-brand-orange text-slate-950 border border-black font-black text-[8px] uppercase tracking-[0.2em] w-fit mb-3">CURRENT CHAMPION</span>
+                             <div className="flex items-center gap-3.5 mb-3">
+                                <div className="h-12 w-12 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center text-xl font-black text-brand-orange shadow-[2px_2px_0px_#000]">
+                                   {weeklyLeaderboard?.[0]?.name?.charAt(0) || "G"}
+                                </div>
+                                <div>
+                                   <h3 className="text-2xl md:text-3.5xl font-black uppercase tracking-tighter leading-[0.85] text-slate-50">{weeklyLeaderboard?.[0]?.name || "Gamer"}</h3>
+                                   <p className="text-[11px] font-space font-black text-brand-orange mt-1 uppercase tracking-widest">LVL 99 • {weeklyLeaderboard?.[0]?.favorite || "Tic-Tac-Toe"} Specialist</p>
+                                </div>
+                             </div>
+                             <div className="flex items-center gap-8 text-slate-50 font-black text-[9px] uppercase tracking-[0.15em]">
+                                <div className="flex flex-col gap-0.5">
+                                   <span className="text-slate-500">Season XP</span>
+                                   <span className="text-lg md:text-xl font-space text-brand-orange">{weeklyLeaderboard?.[0]?.xp || 0}</span>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                   <span className="text-slate-500">Victories</span>
+                                   <span className="text-lg md:text-xl font-space">{weeklyLeaderboard?.[0]?.wins || 0} W</span>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                   <span className="text-slate-500">Streak</span>
+                                   <span className="text-lg md:text-xl font-space text-brand-orange flex items-center gap-0.5">{weeklyLeaderboard?.[0]?.streak || 0} <Flame className="w-4.5 h-4.5 text-brand-orange fill-current" /></span>
+                                </div>
+                             </div>
+                          </div>
+                       </motion.div>
+ 
+                       {/* Top Challengers */}
+                       <div className="flex flex-col gap-3">
+                          {(weeklyLeaderboard || []).slice(1, 4).map((player, i) => (
+                            <div key={i} className="panel p-3 border-2 rounded-xl hover:bg-slate-50/10 transition-all flex flex-col justify-between group shadow-[2px_2px_0px_#000]">
+                               <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2.5">
+                                     <div className="h-6.5 w-6.5 rounded-full bg-slate-900 border border-black flex items-center justify-center font-black text-[10px] text-slate-300 shadow-[1px_1px_0px_#000]">
+                                        {player.name.charAt(0)}
+                                     </div>
+                                     <div>
+                                        <h4 className="text-sm font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">{player.name}</h4>
+                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Rank #{i + 2}</p>
+                                      </div>
+                                  </div>
+                                  <div className="text-right">
+                                     <p className="text-sm font-space font-black text-brand-orange leading-none">{player.xp}</p>
+                                     <p className="text-[6.5px] font-black text-slate-400 uppercase">XP</p>
+                                  </div>
                                </div>
-                               <div>
-                                  <h4 className="text-sm font-black uppercase tracking-tighter text-slate-950 group-hover:text-brand-orange transition-colors">{player.name}</h4>
-                                  <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Rank #{i + 2}</p>
+                               <div className="h-1.5 w-full bg-slate-200 border border-black rounded-full overflow-hidden shadow-[0.5px_0.5px_0px_#000]">
+                                  <div className="h-full bg-slate-400 group-hover:bg-brand-orange transition-colors" style={{ width: `${85 - i * 15}%` }} />
                                 </div>
                             </div>
-                            <div className="text-right">
-                               <p className="text-sm font-space font-black text-brand-orange leading-none">{player.xp}</p>
-                               <p className="text-[6.5px] font-black text-slate-500 uppercase">XP</p>
-                            </div>
-                         </div>
-                         <div className="h-1.5 w-full bg-slate-200 border border-black rounded-full overflow-hidden shadow-[0.5px_0.5px_0px_#000]">
-                            <div className="h-full bg-slate-400 group-hover:bg-brand-orange transition-colors" style={{ width: `${85 - i * 15}%` }} />
-                          </div>
-                      </div>
-                    ))}
-                 </div>
+                          ))}
+                       </div>
+                    </>
+                 )}
               </div>
+
+              {/* Logged in User Standings */}
+              {user && (
+                <div className="mt-4 panel p-4 border-2 rounded-xl bg-slate-950/20 text-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[3px_3px_0px_#000000]">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-black text-base text-brand-orange shadow-[1.5px_1.5px_0px_#000] shrink-0">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.username} className="h-full w-full rounded-full object-cover" />
+                      ) : (
+                        user.username.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-1.5 py-0.5 rounded bg-brand-orange text-slate-950 border border-black font-black text-[7px] uppercase tracking-wider">YOUR STANDING</span>
+                        <h4 className="text-sm font-black uppercase tracking-tight">{user.username}</h4>
+                      </div>
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                        LVL {currentUserDb?.level || 1} · {currentUserDb?.bio || "Casually competitive..."}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-6 text-center font-black text-[9px] uppercase tracking-[0.15em] shrink-0">
+                    <div>
+                      <span className="text-slate-400 block">XP</span>
+                      <span className="text-sm font-space text-brand-orange">{(currentUserDb?.xp || 0).toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">Wins</span>
+                      <span className="text-sm font-space">{currentUserDb?.stats?.wins || 0}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">Streak</span>
+                      <span className="text-sm font-space flex items-center gap-0.5">{currentUserDb?.stats?.winStreak || 0} <Flame className="w-3.5 h-3.5 text-brand-orange fill-current" /></span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">Rank</span>
+                      <span className="text-sm font-space text-brand-orange">
+                        {(() => {
+                          const rank = weeklyLeaderboard.find(p => p.userId?.toString() === user.id || p.name === user.username)?.rank;
+                          return rank ? `#${rank}` : "Unranked";
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
            </div>
         </section>
       </main>

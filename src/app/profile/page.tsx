@@ -4,25 +4,25 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/ui/loader";
-import { 
-  User, 
-  Calendar, 
-  Trophy, 
-  Activity, 
-  Users, 
-  Check, 
-  Edit3, 
-  Save, 
-  Bell, 
-  Shield, 
-  Eye, 
-  LogOut, 
-  Mail, 
-  Gamepad2, 
-  Crown, 
-  Flame, 
-  Star, 
-  Clock, 
+import {
+  User,
+  Calendar,
+  Trophy,
+  Activity,
+  Users,
+  Check,
+  Edit3,
+  Save,
+  Bell,
+  Shield,
+  Eye,
+  LogOut,
+  Mail,
+  Gamepad2,
+  Crown,
+  Flame,
+  Star,
+  Clock,
   Sparkles,
   Lock,
   ChevronRight,
@@ -86,16 +86,16 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const { theme: activeTheme, setTheme: setActiveTheme } = useTheme();
-  const { 
-    user, 
+  const {
+    user,
     sessions,
     loginHistory,
     logout,
     logoutDevice,
     logoutAllDevices,
-    updateProfile, 
-    notificationSettings, 
-    privacySettings, 
+    updateProfile,
+    notificationSettings,
+    privacySettings,
     appearanceSettings,
     updateNotificationSettings,
     updatePrivacySettings,
@@ -212,8 +212,9 @@ export default function ProfilePage() {
       toast("Username can only contain letters, numbers, and underscores", "error");
       return;
     }
-    await updateProfile({ 
-      username: trimmed, 
+
+    await updateProfile({
+      username: trimmed,
       bio: tempBio,
       avatarUrl: selectedAvatarPreset
     });
@@ -312,14 +313,14 @@ export default function ProfilePage() {
       </div>
 
       {/* Floating 2D Cartoon Decors */}
-      <motion.div 
+      <motion.div
         animate={{ y: [0, -10, 0], rotate: [0, 4, -4, 0] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         className="absolute left-[8%] top-[25%] w-16 h-16 z-0 pointer-events-none opacity-[0.03] hidden xl:block"
       >
         <img src="/images/cartoon_gamepad.png" alt="Gamepad" className="w-full h-full object-contain filter drop-shadow-[2px_2px_0px_#000]" />
       </motion.div>
-      <motion.div 
+      <motion.div
         animate={{ y: [0, 10, 0], rotate: [0, -4, 4, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         className="absolute right-[8%] top-[45%] w-16 h-16 z-0 pointer-events-none opacity-[0.03] hidden xl:block"
@@ -329,11 +330,11 @@ export default function ProfilePage() {
 
       <main suppressHydrationWarning className="pt-20 pb-12 px-5 container mx-auto max-w-6xl relative z-10">
         <div className="grid gap-4 lg:grid-cols-3">
-          
+
           {/* ── LEFT COLUMN: PROFILE CARD & SUB-TABS ── */}
           <div className="space-y-3 lg:col-span-1">
             {/* PROFILE CARD */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               className="glass p-4 rounded-2xl border-2 border-black shadow-card flex flex-col items-center text-center relative overflow-hidden bg-white/2"
@@ -368,11 +369,10 @@ export default function ProfilePage() {
                           key={preset.id}
                           type="button"
                           onClick={() => setSelectedAvatarPreset(preset.id)}
-                          className={`aspect-square rounded-xl border-2 transition-all cursor-pointer relative overflow-hidden flex items-center justify-center bg-white shadow-[1.5px_1.5px_0px_#000] active:translate-y-px active:shadow-none ${
-                            isSelected 
-                              ? "border-brand-orange scale-105 shadow-[2.5px_2.5px_0px_#000000]" 
+                          className={`aspect-square rounded-xl border-2 transition-all cursor-pointer relative overflow-hidden flex items-center justify-center bg-white shadow-[1.5px_1.5px_0px_#000] active:translate-y-px active:shadow-none ${isSelected
+                              ? "border-brand-orange scale-105 shadow-[2.5px_2.5px_0px_#000000]"
                               : "border-black hover:border-brand-orange/45"
-                          }`}
+                            }`}
                           title={preset.name}
                         >
                           <img
@@ -467,11 +467,11 @@ export default function ProfilePage() {
                     <p className="text-[10px] font-black uppercase tracking-wider text-white">Animations Enabled</p>
                     <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Smooth page and card interactions transition effects</p>
                   </div>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={appearanceSettings.animationsEnabled}
                     onChange={(e) => updateAppearanceSettings({ animationsEnabled: e.target.checked })}
-                    className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                    className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                   />
                 </label>
               </div>
@@ -498,7 +498,7 @@ export default function ProfilePage() {
 
           {/* ── RIGHT COLUMN: DYNAMIC CONTENT PANELS ── */}
           <div className="space-y-4 lg:col-span-2">
-            
+
             {/* TAB 1: COMBAT FILES */}
             <AnimatePresence mode="wait">
               {activeTab === "combat" && (
@@ -512,7 +512,7 @@ export default function ProfilePage() {
                   {/* LEVEL & RADAR CHART HEADER PANEL */}
                   <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
                     <div className="grid gap-4 md:grid-cols-5 items-center">
-                      
+
                       {/* Left: Stats & Level Details */}
                       <div className="md:col-span-3 space-y-3">
                         <div>
@@ -523,14 +523,14 @@ export default function ProfilePage() {
                           <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {currentLevel}</h3>
                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentXP.toLocaleString()} Total XP Earned</p>
                         </div>
-                        
+
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-brand-orange">
                             <span>LEVEL PROGRESS</span>
                             <span>{progressPercent}% TO LVL {nextLevel}</span>
                           </div>
                           <div className="h-2.5 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${progressPercent}%` }}
                               transition={{ duration: 1.2, ease: "easeOut" }}
@@ -565,7 +565,7 @@ export default function ProfilePage() {
                             <polygon points="100,65 129,86 118,121 82,121 71,86" fill="none" stroke="#000000" strokeWidth="2.5" />
                             <polygon points="100,50 142,80 126,130 74,130 58,80" fill="none" stroke="#000000" strokeWidth="2.5" />
                             <polygon points="100,35 156,76 135,140 65,140 44,76" fill="none" stroke="#000000" strokeWidth="2.5" />
-                            
+
                             {/* Web axes */}
                             {Array.from({ length: 5 }).map((_, idx) => {
                               const angle = (idx * 2 * Math.PI / 5) - Math.PI / 2;
@@ -577,11 +577,11 @@ export default function ProfilePage() {
                             })}
 
                             {/* Polygon filled stats */}
-                            <polygon 
-                              points={radarPoints} 
-                              fill="rgba(255, 170, 0, 0.35)" 
-                              stroke="#000000" 
-                              strokeWidth="3.5" 
+                            <polygon
+                              points={radarPoints}
+                              fill="rgba(255, 170, 0, 0.35)"
+                              stroke="#000000"
+                              strokeWidth="3.5"
                             />
 
                             {/* Vertices indicator bullets */}
@@ -602,57 +602,57 @@ export default function ProfilePage() {
                       </div>
 
                     </div>
-                             {/* ACHIEVEMENT BADGES SHOWCASE */}
-                  <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
-                    <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
-                      <Trophy className="w-3 h-3 text-brand-orange" /> Gamer Badges
-                    </h4>
-                    
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                      {ACHIEVEMENT_BADGES.map(badge => {
-                        const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
-                        return (
-                          <div 
-                            key={badge.id} 
-                            className={`flex flex-col items-center text-center p-2 rounded-xl border-2 border-black transition-all group relative cursor-pointer ${badge.unlocked ? badge.color + " hover:scale-105 shadow-[1.5px_1.5px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
-                            onClick={() => {
-                              if (badge.unlocked) toast(`Selected Badge: ${badge.title}`, "info");
-                              else toast(`Locked Badge: ${badge.title} (${badge.desc})`, "warning");
-                            }}
-                          >
-                            <div className="mb-1 filter drop-shadow-[1px_1px_0px_#000]">
-                              <BadgeIcon className="w-5 h-5 stroke-[1.8]" />
-                            </div>
-                            <span className="text-[7px] font-black uppercase tracking-wider text-white truncate max-w-full">{badge.title}</span>
-                            
-                            {/* Tooltip detail */}
-                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-40 p-2.5 rounded-xl bg-slate-950 border-2 border-black text-[8.5px] font-bold text-slate-300 leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-2xl">
-                              <p className="font-black text-brand-orange uppercase mb-1">{badge.title}</p>
-                              <p className="text-slate-400">{badge.desc}</p>
-                              {!badge.unlocked && <p className="text-danger font-black uppercase mt-1.5 flex items-center justify-center gap-1"><Lock className="w-3 h-3" /> Locked</p>}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                    {/* ACHIEVEMENT BADGES SHOWCASE */}
+                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
+                      <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
+                        <Trophy className="w-3 h-3 text-brand-orange" /> Gamer Badges
+                      </h4>
 
-                </div>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                        {ACHIEVEMENT_BADGES.map(badge => {
+                          const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                          return (
+                            <div
+                              key={badge.id}
+                              className={`flex flex-col items-center text-center p-2 rounded-xl border-2 border-black transition-all group relative cursor-pointer ${badge.unlocked ? badge.color + " hover:scale-105 shadow-[1.5px_1.5px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
+                              onClick={() => {
+                                if (badge.unlocked) toast(`Selected Badge: ${badge.title}`, "info");
+                                else toast(`Locked Badge: ${badge.title} (${badge.desc})`, "warning");
+                              }}
+                            >
+                              <div className="mb-1 filter drop-shadow-[1px_1px_0px_#000]">
+                                <BadgeIcon className="w-5 h-5 stroke-[1.8]" />
+                              </div>
+                              <span className="text-[7px] font-black uppercase tracking-wider text-white truncate max-w-full">{badge.title}</span>
+
+                              {/* Tooltip detail */}
+                              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-40 p-2.5 rounded-xl bg-slate-950 border-2 border-black text-[8.5px] font-bold text-slate-300 leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-2xl">
+                                <p className="font-black text-brand-orange uppercase mb-1">{badge.title}</p>
+                                <p className="text-slate-400">{badge.desc}</p>
+                                {!badge.unlocked && <p className="text-danger font-black uppercase mt-1.5 flex items-center justify-center gap-1"><Lock className="w-3 h-3" /> Locked</p>}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
 
 
                   {/* BOTTOM SECTORS: MATCH HISTORY & SQUAD */}
                   <div className="grid gap-3 md:grid-cols-3">
-                    
+
                     {/* Matches log */}
                     <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-2 bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
                         <Activity className="w-3 h-3 text-brand-orange" /> Combat History Logs
                       </h4>
-                      
+
                       <div className="space-y-1.5">
                         {MOCK_MATCH_HISTORY.map(match => (
-                          <div 
-                            key={match.id} 
+                          <div
+                            key={match.id}
                             className="p-2 bg-slate-900/50 border border-black rounded-lg flex items-center justify-between hover:border-brand-orange/40 transition-all duration-200 shadow-[1px_1px_0px_#000]"
                           >
                             <div className="flex items-center gap-2">
@@ -687,7 +687,7 @@ export default function ProfilePage() {
 
                       <div className="space-y-2">
                         {MOCK_FRIENDS.map(friend => (
-                          <div 
+                          <div
                             key={friend.id}
                             className="flex items-center justify-between group relative"
                           >
@@ -707,7 +707,7 @@ export default function ProfilePage() {
                             </div>
 
                             {friend.status === "online" && (
-                              <button 
+                              <button
                                 onClick={() => handleInviteFriend(friend.name)}
                                 className="h-6 px-2 rounded bg-brand-orange hover:bg-brand-orange/90 text-slate-950 font-black uppercase text-[7px] tracking-wider border border-black shadow-[1px_1px_0px_#000] cursor-pointer transition-all"
                               >
@@ -743,7 +743,7 @@ export default function ProfilePage() {
                   className="space-y-6"
                 >
                   <div className="grid gap-4 md:grid-cols-2">
-                    
+
                     {/* Private Details & Credentials */}
                     <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2 flex flex-col justify-between">
                       <div>
@@ -770,8 +770,8 @@ export default function ProfilePage() {
                       <form onSubmit={handlePasswordChange} className="space-y-3">
                         <div className="space-y-1">
                           <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Current Password</label>
-                          <input 
-                            type="password" 
+                          <input
+                            type="password"
                             value={oldPassword}
                             onChange={(e) => setOldPassword(e.target.value)}
                             className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
@@ -780,8 +780,8 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-1">
                           <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">New Password</label>
-                          <input 
-                            type="password" 
+                          <input
+                            type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
@@ -790,8 +790,8 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-1">
                           <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Confirm Password</label>
-                          <input 
-                            type="password" 
+                          <input
+                            type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full h-9 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-bold text-white focus:outline-none focus:border-brand-orange"
@@ -811,18 +811,18 @@ export default function ProfilePage() {
                         <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4 border-b border-black pb-3">
                           <Bell className="w-3.5 h-3.5 text-brand-orange" /> Notification Preferences
                         </h4>
-                        
+
                         <div className="space-y-4">
                           <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Email Subscriptions</p>
                               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Receive news and matchmaking reports</p>
                             </div>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={notificationSettings.emailNotifications}
                               onChange={(e) => updateNotificationSettings({ emailNotifications: e.target.checked })}
-                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                             />
                           </label>
                           <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
@@ -830,11 +830,11 @@ export default function ProfilePage() {
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Push Alerts</p>
                               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Active matchmaking invites notifications</p>
                             </div>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={notificationSettings.pushNotifications}
                               onChange={(e) => updateNotificationSettings({ pushNotifications: e.target.checked })}
-                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                             />
                           </label>
                           <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
@@ -842,11 +842,11 @@ export default function ProfilePage() {
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Lobby Invites</p>
                               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Allow invitations from other players</p>
                             </div>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={notificationSettings.gameInvites}
                               onChange={(e) => updateNotificationSettings({ gameInvites: e.target.checked })}
-                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                             />
                           </label>
                         </div>
@@ -881,11 +881,11 @@ export default function ProfilePage() {
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Online Status</p>
                               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Let friends detect when you are online</p>
                             </div>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={privacySettings.showOnlineStatus}
                               onChange={(e) => updatePrivacySettings({ showOnlineStatus: e.target.checked })}
-                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                             />
                           </label>
 
@@ -894,11 +894,11 @@ export default function ProfilePage() {
                               <p className="text-[10px] font-black uppercase tracking-wider text-white">Broadcast Game Feed</p>
                               <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Permit match outcome streaming to leaderboards</p>
                             </div>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={privacySettings.showGameActivity}
                               onChange={(e) => updatePrivacySettings({ showGameActivity: e.target.checked })}
-                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black" 
+                              className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
                             />
                           </label>
                         </div>
@@ -913,7 +913,7 @@ export default function ProfilePage() {
                         <Laptop className="w-3.5 h-3.5 text-brand-orange" /> Active Sessions
                       </h4>
                       {sessions.length > 1 && (
-                        <button 
+                        <button
                           onClick={handleRevokeAllSessions}
                           className="px-2.5 h-8 bg-danger/15 hover:bg-danger text-danger hover:text-white rounded-lg border-2 border-black font-black uppercase text-[8px] tracking-widest transition-all cursor-pointer shadow-[1.5px_1.5px_0px_#000]"
                         >
@@ -924,7 +924,7 @@ export default function ProfilePage() {
 
                     <div className="grid gap-3 md:grid-cols-3">
                       {sessions.map(session => (
-                        <div 
+                        <div
                           key={session.id}
                           className={`p-3 bg-slate-900/50 border-2 rounded-xl flex flex-col justify-between h-32 shadow-[2px_2px_0px_#000] ${session.isCurrent ? "border-brand-orange" : "border-black"}`}
                         >
@@ -949,7 +949,7 @@ export default function ProfilePage() {
                               <p className="text-[9.5px] font-space font-black text-slate-400">{session.ipAddress}</p>
                             </div>
                             {!session.isCurrent && (
-                              <button 
+                              <button
                                 onClick={() => handleRevokeSession(session.id)}
                                 className="px-2 h-7 bg-white hover:bg-brand-orange text-slate-950 rounded-lg border-2 border-black font-black uppercase text-[8px] tracking-wider transition-all cursor-pointer shadow-[1.5px_1.5px_0px_#000]"
                               >
@@ -967,7 +967,7 @@ export default function ProfilePage() {
                     <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2 mb-4">
                       <Clock className="w-3.5 h-3.5 text-brand-orange" /> Login History
                     </h4>
-                    
+
                     <div className="overflow-x-auto">
                       <table className="w-full text-left min-w-[500px]">
                         <thead>

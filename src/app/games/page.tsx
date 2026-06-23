@@ -196,96 +196,94 @@ export default function GamesPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-2xl glass border-[4px] border-black rounded-[2.5rem] shadow-[10px_10px_0px_#000000] overflow-hidden"
+              className="relative w-full max-w-4xl flex flex-col md:flex-row gap-6 p-1 md:p-2 z-10"
             >
-              {/* Close Button ("Wrong" cancel button) */}
+              {/* Close Button ("Wrong" cancel button) absolute relative to the wrapper */}
               <button 
                 onClick={() => setSelectedGameSlug(null)}
-                className="absolute top-5 right-5 flex items-center justify-center w-9 h-9 rounded-full border-[3px] border-black bg-[#ff4d4d] hover:bg-[#ff6666] text-black shadow-[3px_3px_0px_#000000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000000] transition-all duration-100 cursor-pointer z-50"
+                className="absolute -top-3 -right-3 md:-top-4 md:-right-4 flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-black bg-[#ff4d4d] hover:bg-[#ff6666] text-black shadow-[3px_3px_0px_#000000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000000] transition-all duration-100 cursor-pointer z-50"
               >
-                <X className="w-4 h-4 stroke-[3]" />
+                <X className="w-5 h-5 stroke-[3]" />
               </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
-                {/* Left Side: Game Details & Info */}
-                <div className="md:col-span-7 p-6 md:p-8 flex flex-col justify-between border-b-[4px] md:border-b-0 md:border-r-[4px] border-black">
-                  <div>
-                    <span className="kicker px-3 py-1 text-[8.5px] font-black uppercase tracking-[0.2em]">
-                      {activeGame.category}
+              {/* Left Box: Game Details & Info */}
+              <div className="flex-1 md:w-[60%] panel-grid !p-6 !md:p-8 flex flex-col justify-between">
+                <div>
+                  <span className="kicker px-3 py-1 text-[8.5px] font-black uppercase tracking-[0.2em]">
+                    {activeGame.category}
+                  </span>
+                  <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-slate-50">
+                    {activeGame.name}
+                  </h2>
+                  
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
+                      {activeGame.multiplayerType}
                     </span>
-                    <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-slate-50">
-                      {activeGame.name}
-                    </h2>
-                    
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
-                        {activeGame.multiplayerType}
+                    {(activeGame.tags || []).map((tag) => (
+                      <span key={tag} className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
+                        {tag}
                       </span>
-                      {(activeGame.tags || []).map((tag) => (
-                        <span key={tag} className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 border-2 border-black bg-slate-900/40 px-2 py-0.5 rounded-lg">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <p className="mt-5 text-[11.5px] font-semibold text-slate-400 leading-relaxed">
-                      {activeGame.description}
-                    </p>
+                    ))}
                   </div>
 
-                  <div className="mt-6 p-4 rounded-2xl bg-slate-900/50 border-2 border-black">
-                    <p className="font-outfit text-[10px] font-black uppercase tracking-widest text-brand-orange">
-                      How it plays
-                    </p>
-                    <div className="mt-3 space-y-2.5">
-                      {(activeGame.rules || []).map((rule) => (
-                        <div key={rule} className="flex gap-2">
-                          <span className="w-1.5 h-1.5 bg-brand-orange rounded-full mt-1.5 shrink-0" />
-                          <p className="text-[10px] font-semibold leading-normal text-slate-300">{rule}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <p className="mt-5 text-[11.5px] font-semibold text-slate-400 leading-relaxed">
+                    {activeGame.description}
+                  </p>
                 </div>
 
-                {/* Right Side: Play Panel */}
-                <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center bg-slate-900">
-                  <div className="space-y-6">
-                    <div className="text-center md:text-left">
-                      <h3 className="text-base font-black tracking-wider uppercase">Play Now</h3>
-                      <p className="text-[9px] font-semibold text-slate-500 mt-1">Start a match or join a room</p>
-                    </div>
-
-                    <Button 
-                      onClick={() => {
-                        router.push(`/rooms/create?game=${activeGame.slug}`);
-                        setSelectedGameSlug(null);
-                      }}
-                      className="btn-neo w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
-                    >
-                      Create Room
-                    </Button>
-
-                    <div className="relative flex py-1 items-center">
-                      <div className="flex-grow border-t-2 border-black/50"></div>
-                      <span className="flex-shrink mx-3 text-[8.5px] font-black text-slate-600 uppercase tracking-widest">OR</span>
-                      <div className="flex-grow border-t-2 border-black/50"></div>
-                    </div>
-
-                    <form onSubmit={handleJoinRoom} className="space-y-3.5">
-                      <Input 
-                        label="Join with code"
-                        value={roomCode}
-                        onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                        maxLength={6}
-                        placeholder="ENTER CODE"
-                        className="text-center tracking-[0.2em] font-black uppercase h-11"
-                      />
-                      <Button type="submit" variant="secondary" className="w-full h-11 text-[9.5px] font-black tracking-widest">
-                        Join Room
-                      </Button>
-                    </form>
+                <div className="mt-6 p-4 rounded-2xl bg-slate-900/50 border-2 border-black shadow-[2px_2px_0px_#000000]">
+                  <p className="font-outfit text-[10px] font-black uppercase tracking-widest text-brand-orange">
+                    How it plays
+                  </p>
+                  <div className="mt-3 space-y-2.5">
+                    {(activeGame.rules || []).map((rule) => (
+                      <div key={rule} className="flex gap-2">
+                        <span className="w-1.5 h-1.5 bg-brand-orange rounded-full mt-1.5 shrink-0" />
+                        <p className="text-[10px] font-semibold leading-normal text-slate-300">{rule}</p>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              </div>
+
+              {/* Right Box: Play Panel */}
+              <div className="w-full md:w-[40%] bg-slate-900 border-[3px] border-black rounded-[1.25rem] shadow-[4px_4px_0px_0px_#000000] p-6 md:p-8 flex flex-col justify-center">
+                <div className="space-y-6">
+                  <div className="text-center md:text-left">
+                    <h3 className="text-base font-black tracking-wider uppercase text-slate-50">Play Now</h3>
+                    <p className="text-[9px] font-semibold text-slate-500 mt-1">Start a match or join a room</p>
+                  </div>
+
+                  <Button 
+                    onClick={() => {
+                      router.push(`/rooms/create?game=${activeGame.slug}`);
+                      setSelectedGameSlug(null);
+                    }}
+                    className="btn-neo w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                  >
+                    Create Room
+                  </Button>
+
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t-2 border-black/50"></div>
+                    <span className="flex-shrink mx-3 text-[8.5px] font-black text-slate-650 uppercase tracking-widest">OR</span>
+                    <div className="flex-grow border-t-2 border-black/50"></div>
+                  </div>
+
+                  <form onSubmit={handleJoinRoom} className="space-y-3.5">
+                    <Input 
+                      label="Join with code"
+                      value={roomCode}
+                      onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                      maxLength={6}
+                      placeholder="ENTER CODE"
+                      className="text-center tracking-[0.2em] font-black uppercase h-11"
+                    />
+                    <Button type="submit" variant="secondary" className="w-full h-11 text-[9.5px] font-black tracking-widest">
+                      Join Room
+                    </Button>
+                  </form>
                 </div>
               </div>
             </motion.div>

@@ -28,7 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GameContainer } from "@/games/container";
 import { PlatformAdComponent, PopupAd } from "@/monetization/ad-components";
 import { ROOMS_AVAILABLE } from "@/data/platform";
-import { loadCreatedRooms } from "@/utils/mock-room-store";
+import { loadCreatedRooms, deleteCreatedRoom } from "@/utils/mock-room-store";
 
 interface Player {
   id: string;
@@ -130,7 +130,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   
   // Game states flow
   const [gameState, setGameState] = useState<"lobby" | "countdown" | "loading" | "playing" | "results">("lobby");
-  const [countdown, setCountdown] = useState<number>(5);
+  const [countdown, setCountdown] = useState<number>(3);
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [loadingTip, setLoadingTip] = useState<string>("");
   
@@ -143,6 +143,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Modal UI state
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [invitedFriends, setInvitedFriends] = useState<Record<string, boolean>>({});
+  const [friendsList, setFriendsList] = useState<{ id: string; name: string; avatar: string; status: string }[]>([]);
 
   // Ad interstitial locks
   const [isAdOpen, setIsAdOpen] = useState(false);
@@ -151,16 +152,46 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.tictactoe;
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    async function loadFriends() {
+      try {
+        const res = await fetch("/api/friends");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data?.friends) {
+            const mapped = json.data.friends.map((f: any) => ({
+              id: f._id || f.id,
+              name: f.username || f.name || "Unknown Friend",
+              avatar: f.avatar || (f.username || f.name || "F").charAt(0),
+              status: "Online",
+            }));
+            setFriendsList(mapped);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load active friends for invitation:", err);
+      }
+      setFriendsList(ONLINE_FRIENDS.map(f => ({ ...f, id: f.id })));
+    }
+    loadFriends();
+  }, []);
+
   // Initialize and sync room data with Pusher presence / private channel
   useEffect(() => {
     if (!user) return;
-    const currentUserId = user.id;
+    const currentUser = user;
+    const currentUserId = currentUser.id;
 
     let active = true;
     let pusherChannel: any = null;
 
     async function initRoom() {
       try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const mode = searchParams.get("mode");
+        const isSpectatorMode = mode === "spectate";
+
         const res = await fetch(`/api/rooms/${roomCode}`);
         if (!res.ok) {
           throw new Error("Lobby room not found or expired");
@@ -172,9 +203,9 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
         let currentRoom = json.data;
 
-        // Auto-join if user is not currently in the room
+        // Auto-join if user is not currently in the room (unless spectating)
         const userInRoom = currentRoom.players.some((p: any) => p.userId === currentUserId);
-        if (!userInRoom) {
+        if (!userInRoom && !isSpectatorMode) {
           const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
             method: "POST",
           });
@@ -183,6 +214,14 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
             throw new Error(joinJson.error?.message || "Failed to join room");
           }
           currentRoom = joinJson.data;
+        } else if (userInRoom && isSpectatorMode) {
+          // If they want to spectate but are stored as player in DB, remove them
+          await fetch(`/api/rooms/${roomCode}`, {
+            method: "DELETE",
+          });
+          const reloadRes = await fetch(`/api/rooms/${roomCode}`);
+          const reloadJson = await reloadRes.json();
+          currentRoom = reloadJson.data;
         }
 
         if (!active) return;
@@ -191,6 +230,16 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         setRoomName(currentRoom.name);
         setIsPrivate(currentRoom.settings.isPrivate);
         setRegion(currentRoom.region || "Mumbai Hub");
+
+        if (isSpectatorMode) {
+          setIsSpectatingOnly(true);
+          const userName = currentUser.username || "You";
+          const userAvatar = (currentUser.username || "Y").charAt(0);
+          setSpectators((prev) => {
+            if (prev.some((s) => s.id === currentUserId)) return prev;
+            return [...prev, { id: currentUserId, name: userName, avatar: userAvatar }];
+          });
+        }
 
         // Creator check using host flag
         const hostPlayer = currentRoom.players.find((p: any) => p.isHost);
@@ -301,6 +350,25 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           ...prev,
           { sender: "System", text: "You have unlocked and joined the private lobby room.", time: "Now", isSystem: true }
         ]);
+
+        if (!isSpectatingOnly) {
+          const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
+            method: "POST",
+          });
+          const joinJson = await joinRes.json();
+          if (joinJson.success && joinJson.data) {
+            const mappedPlayers = joinJson.data.players.map((p: any) => ({
+              id: p.userId,
+              name: p.username,
+              isHost: p.isHost,
+              isReady: p.isReady,
+              avatar: p.avatar || p.username.charAt(0),
+              isAI: false,
+              color: p.isHost ? "#FFC107" : "#1971C2",
+            }));
+            setPlayers(mappedPlayers);
+          }
+        }
       } else {
         setPasswordError("Incorrect Passcode. Access Denied.");
       }
@@ -343,12 +411,45 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     };
   }, [gameState, game]);
 
-  // Countdown timer logic (unused but kept for type safety)
+  // Auto start pre-match countdown when everyone is ready
+  useEffect(() => {
+    if (gameState === "lobby") {
+      const allReady = players.length >= 2 && players.every(p => p.isReady);
+      if (allReady) {
+        if (!hasShownStartAd) {
+          setIsAdOpen(true);
+        } else {
+          setGameState("countdown");
+          setCountdown(3);
+        }
+      }
+    }
+  }, [players, gameState, hasShownStartAd]);
+
+  // Cancel countdown if any player exits or unreadies
+  useEffect(() => {
+    const allReady = players.length >= 2 && players.every(p => p.isReady);
+    if (!allReady) {
+      if (gameState === "countdown" || gameState === "loading") {
+        setGameState("lobby");
+      }
+      if (isAdOpen) {
+        setIsAdOpen(false);
+      }
+    }
+  }, [players, gameState, isAdOpen]);
+
+  // Countdown timer logic
   useEffect(() => {
     if (gameState !== "countdown") return;
     if (countdown === 0) {
-      setGameState("loading");
-      setLoadingProgress(0);
+      const isHost = players.find((p) => p.id === user?.id)?.isHost;
+      if (isHost) {
+        handleStartMatch();
+      } else {
+        setGameState("loading");
+        setLoadingProgress(0);
+      }
       return;
     }
 
@@ -357,24 +458,61 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, gameState]);
+  }, [countdown, gameState, players, user]);
 
   // Switch between Player and Spectator Mode
-  const handleToggleSpectatorMode = () => {
+  const handleToggleSpectatorMode = async () => {
     if (isSpectatingOnly) {
       if (players.length >= game.maxPlayers) {
         alert("The game slots are currently full! Remove a bot or wait for a slot.");
         return;
       }
-      setIsSpectatingOnly(false);
-      setSpectators(prev => prev.filter(s => s.name !== (user?.username || "You")));
-      setPlayers(prev => [...prev, { id: user?.id || "p1", name: user?.username || "You", isHost: false, isReady: false, avatar: (user?.username || "Y").charAt(0), isAI: false, color: "#1971C2" }]);
-      setChatMessages(prev => [...prev, { sender: "System", text: "You joined as a player.", time: "Now", isSystem: true }]);
+      try {
+        const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
+          method: "POST",
+        });
+        const joinJson = await joinRes.json();
+        if (!joinJson.success) {
+          throw new Error(joinJson.error?.message || "Failed to join room");
+        }
+        setIsSpectatingOnly(false);
+        setSpectators(prev => prev.filter(s => s.id !== user?.id));
+        const currentRoom = joinJson.data;
+        const mappedPlayers = currentRoom.players.map((p: any) => ({
+          id: p.userId,
+          name: p.username,
+          isHost: p.isHost,
+          isReady: p.isReady,
+          avatar: p.avatar || p.username.charAt(0),
+          isAI: false,
+          color: p.isHost ? "#FFC107" : "#1971C2",
+        }));
+        setPlayers(mappedPlayers);
+        setChatMessages(prev => [...prev, { sender: "System", text: "You joined as a player.", time: "Now", isSystem: true }]);
+      } catch (err: any) {
+        toast(err.message || "Failed to switch to player mode", "error");
+      }
     } else {
-      setIsSpectatingOnly(true);
-      setPlayers(prev => prev.filter(p => p.id !== user?.id));
-      setSpectators(prev => [...prev, { id: user?.id || "spec-you", name: user?.username || "You", avatar: (user?.username || "Y").charAt(0) }]);
-      setChatMessages(prev => [...prev, { sender: "System", text: "You switched to Spectator Mode.", time: "Now", isSystem: true }]);
+      try {
+        const leaveRes = await fetch(`/api/rooms/${roomCode}`, {
+          method: "DELETE",
+        });
+        const leaveJson = await leaveRes.json();
+        if (!leaveJson.success) {
+          throw new Error(leaveJson.error?.message || "Failed to leave player slot");
+        }
+        setIsSpectatingOnly(true);
+        if (leaveJson.data?.empty) {
+          toast("Room was closed because it has no players", "info");
+          router.push("/rooms");
+          return;
+        }
+        setPlayers(prev => prev.filter(p => p.id !== user?.id));
+        setSpectators(prev => [...prev, { id: user?.id || "spec-you", name: user?.username || "You", avatar: (user?.username || "Y").charAt(0) }]);
+        setChatMessages(prev => [...prev, { sender: "System", text: "You switched to Spectator Mode.", time: "Now", isSystem: true }]);
+      } catch (err: any) {
+        toast(err.message || "Failed to switch to spectator mode", "error");
+      }
     }
   };
 
@@ -442,11 +580,6 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
   // Start match immediately via POST /api/matches (tunnel handoff)
   const handleStartMatch = async () => {
-    if (!hasShownStartAd) {
-      setIsAdOpen(true);
-      return;
-    }
-    
     try {
       const res = await fetch("/api/matches", {
         method: "POST",
@@ -467,27 +600,9 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     }
   };
 
-  const handleCloseAd = async () => {
+  const handleCloseAd = () => {
     setIsAdOpen(false);
     setHasShownStartAd(true);
-    
-    try {
-      const res = await fetch("/api/matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomCode }),
-      });
-      const json = await res.json();
-      if (!json.success || !json.data) {
-        throw new Error(json.error?.message || "Failed to initialize match");
-      }
-      
-      const match = json.data;
-      const matchId = match._id;
-      router.push(`/play/${match.gameSlug}?match=${matchId}`);
-    } catch (err: any) {
-      toast(err.message || "Could not launch match arena", "error");
-    }
   };
 
   const handleLeaveRoom = async () => {
@@ -622,7 +737,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Play Again reset
   const handlePlayAgain = () => {
     setGameState("lobby");
-    setCountdown(5);
+    setCountdown(3);
     setPlayers(prev => prev.map(p => ({ ...p, isReady: p.isHost ? false : true })));
     setChatMessages(prev => [
       ...prev,
@@ -862,6 +977,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {renderPlayerSlots()}
                       </div>
+
+                      {players.length === 2 && !players.every(p => p.isReady) && (
+                        <div className="p-3 bg-[var(--slate-900)] border border-black rounded-xl text-center text-[10px] font-bold text-brand-orange animate-pulse">
+                          Waiting for other player to ready up...
+                        </div>
+                      )}
                     </div>
 
                     {/* Game Rules panel */}
@@ -978,16 +1099,16 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           <button
                             onClick={handleToggleReady}
                             className={`flex-1 h-9.5 uppercase font-black text-[11px] rounded-lg border-2 border-black shadow-[2px_2px_0px_#000000] cursor-pointer ${
-                              players.find((p) => p.id === "p1")?.isReady 
+                              players.find((p) => p.id === user?.id)?.isReady 
                                 ? "bg-slate-800 text-slate-50 hover:bg-slate-700" 
                                 : "bg-brand-orange text-slate-950 hover:bg-brand-orange/90"
                             }`}
                           >
-                            {players.find((p) => p.id === "p1")?.isReady ? "Cancel Ready" : "Ready Up"}
+                            {players.find((p) => p.id === user?.id)?.isReady ? "Cancel Ready" : "Ready Up"}
                           </button>
                         )}
 
-                        {players.find((p) => p.id === "p1")?.isHost && (
+                        {players.find((p) => p.id === user?.id)?.isHost && (
                           <button
                             onClick={handleStartMatch}
                             disabled={players.length < 2 || !players.every(p => p.isReady)}
@@ -998,12 +1119,17 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         )}
                       </div>
 
-                      {players.length < 2 && (
+                      {players.length < 2 ? (
                         <p className="text-[9px] text-slate-400 font-bold text-center flex items-center justify-center gap-1">
                           <AlertCircle className="w-3.5 h-3.5 text-brand-orange" />
                           At least 2 players are required to start.
                         </p>
-                      )}
+                      ) : !players.every(p => p.isReady) ? (
+                        <p className="text-[9px] text-brand-orange font-bold text-center flex items-center justify-center gap-1 animate-pulse">
+                          <Clock className="w-3.5 h-3.5" />
+                          Waiting for other player...
+                        </p>
+                      ) : null}
                     </div>
 
                   </div>
@@ -1120,8 +1246,19 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <GameContainer
                   gameIdOrSlug={gameId}
                   roomCode={roomCode}
-                  onFinish={(winnerId, rankings, xp) => {
+                  onFinish={async (winnerId, rankings, xp) => {
                     setGameState("results");
+                    const isHost = players.find(p => p.id === user?.id)?.isHost;
+                    if (isHost) {
+                      try {
+                        await fetch(`/api/rooms/${roomCode}`, {
+                          method: "DELETE",
+                        });
+                      } catch (err) {
+                        console.error("Error closing room on finish:", err);
+                      }
+                    }
+                    deleteCreatedRoom(roomCode);
                   }}
                   onBack={() => {
                     setGameState("lobby");
@@ -1298,7 +1435,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <span className="font-outfit font-bold text-[9px] uppercase tracking-widest text-slate-500">Online Friends</span>
                 
                 <div className="max-h-[180px] overflow-y-auto space-y-2 bg-[var(--slate-900)] p-2.5 rounded-xl border-[3px] border-black shadow-[inset_2px_2px_0px_rgba(0,0,0,0.15)]">
-                  {ONLINE_FRIENDS.map((friend) => (
+                  {friendsList.map((friend) => (
                     <div key={friend.id} className="flex items-center justify-between p-2 hover:bg-black/20 rounded-xl transition-all">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-slate-50 shadow-[1px_1px_0px_#000000]">

@@ -57,29 +57,57 @@ function CreateRoomForm() {
     }
   }, [selectedGame, allowedPlayerCounts, maxPlayers]);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const code = createRoomCode();
-    
-    // Flag this browser as the creator of this room code
-    localStorage.setItem(`room_creator_${code}`, "true");
+    try {
+      const res = await fetch("/api/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameSlug: game.slug,
+          maxPlayers,
+          settings: {
+            isPrivate,
+            passcode: isPrivate ? passcode || "7777" : undefined,
+            allowSpectators,
+            region,
+            name: roomName.trim() || `${game.name} Room`,
+          },
+        }),
+      });
 
-    saveCreatedRoom({
-      id: `custom-${code}`,
-      code,
-      name: roomName.trim() || `${game.name} Room`,
-      gameSlug: game.slug,
-      gameName: game.name,
-      host: "You",
-      currentPlayers: 1,
-      maxPlayers,
-      status: "open",
-      isPrivate,
-      passcode: isPrivate ? passcode || "7777" : undefined,
-      region,
-      note: allowSpectators ? "Spectators allowed." : "Private settings.",
-    });
-    router.push(`/rooms/${code}`);
+      const json = await res.json();
+      if (!json.success || !json.data) {
+        throw new Error(json.error?.message || "Failed to create room in database");
+      }
+
+      const room = json.data;
+      const code = room.code;
+      
+      // Flag this browser as the creator of this room code
+      localStorage.setItem(`room_creator_${code}`, "true");
+
+      saveCreatedRoom({
+        id: room._id || `custom-${code}`,
+        code,
+        name: roomName.trim() || `${game.name} Room`,
+        gameSlug: game.slug,
+        gameName: game.name,
+        host: "You",
+        currentPlayers: 1,
+        maxPlayers,
+        status: "open",
+        isPrivate,
+        passcode: isPrivate ? passcode || "7777" : undefined,
+        region,
+        note: allowSpectators ? "Spectators allowed." : "Private settings.",
+      });
+      router.push(`/rooms/${code}`);
+    } catch (err: any) {
+      alert(err.message || "Failed to establish game room in database");
+    }
   };
 
   if (!mounted) {

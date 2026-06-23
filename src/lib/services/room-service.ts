@@ -186,8 +186,7 @@ export async function setPlayerReady(
 
     const updatedPlayers = room.players.map((p) => {
       if (p.userId === userId) {
-        // Host is always ready
-        return { ...p, isReady: p.isHost ? true : isReady };
+        return { ...p, isReady };
       }
       return p;
     });

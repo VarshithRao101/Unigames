@@ -39,6 +39,24 @@ export function saveCreatedRoom(room: LobbyRoom) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextRooms));
 }
 
+export function deleteCreatedRoom(code: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      const nextRooms = parsed.filter((r: LobbyRoom) => r.code !== code);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextRooms));
+    }
+  } catch (err) {
+    console.error("Error deleting created room:", err);
+  }
+}
+
 export function mergeRooms(primaryRooms: LobbyRoom[], secondaryRooms: LobbyRoom[]) {
   const seen = new Set<string>();
   const merged: LobbyRoom[] = [];

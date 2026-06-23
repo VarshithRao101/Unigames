@@ -182,7 +182,7 @@ html.dark {
   --kicker-bg: #1c1d18;
   --input-bg: #1c1d18;
   --input-color: #ffffff;
-  --grid-line-color: #000000;
+  --grid-line-color: #ffffff;
   --grid-line-opacity: 0.08;
   --scroll-track: #161713;
   --scroll-thumb: #24261f;
@@ -287,6 +287,18 @@ h4, h5, h6 {
   box-shadow: 4px 4px 0px 0px #000000, inset 0px 0px 0px 2px var(--color-brand-orange) !important;
   backdrop-filter: none !important;
   border-radius: 1.25rem !important;
+}
+
+.panel-grid {
+  background-color: var(--panel-bg-hover) !important;
+  background-image: 
+    linear-gradient(color-mix(in srgb, var(--grid-line-color) 8%, transparent) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, color-mix(in srgb, var(--grid-line-color) 8%, transparent) 1.5px, transparent 1.5px) !important;
+  background-size: 30px 30px !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  border-radius: 1.25rem !important;
+  padding: 1.25rem !important;
 }
 
 /* ── Cel-Shaded Panel System ───────────────────────────── */

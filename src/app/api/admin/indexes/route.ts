@@ -1,6 +1,8 @@
 import { createIndexes } from "@/lib/db/indexes";
 import { apiSuccess, apiErrors } from "@/lib/utils/api-response";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/admin/indexes
  * Triggers database index creation for unique constraints and TTL settings.

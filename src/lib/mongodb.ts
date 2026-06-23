@@ -1,9 +1,5 @@
 import { MongoClient, MongoClientOptions } from "mongodb";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-}
-
 const uri = process.env.MONGODB_URI;
 const options: MongoClientOptions = {
   // Connection pool – keep small on free tier to avoid overwhelming Atlas M0
@@ -24,17 +20,24 @@ declare global {
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
-  }
-  clientPromise = global._mongoClientPromise;
+if (!uri) {
+  clientPromise = Promise.reject(
+    new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+  );
+  clientPromise.catch(() => {});
 } else {
-  // In production, a new module instance is created per serverless invocation
-  // but the underlying TCP connection is reused via the pool.
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  if (process.env.NODE_ENV === "development") {
+    if (!global._mongoClientPromise) {
+      client = new MongoClient(uri, options);
+      global._mongoClientPromise = client.connect();
+    }
+    clientPromise = global._mongoClientPromise;
+  } else {
+    // In production, a new module instance is created per serverless invocation
+    // but the underlying TCP connection is reused via the pool.
+    client = new MongoClient(uri, options);
+    clientPromise = client.connect();
+  }
 }
 
 export default clientPromise;

@@ -71,17 +71,26 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-0 relative flex-1">
-            {/* 2D Comic Halftone Background Pattern Overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:10px_10px] opacity-[0.04] pointer-events-none z-0" />
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-0 relative flex-1 bg-[var(--panel-bg)]">
+            {/* 2D Comic Grid Background Pattern Overlay */}
+            <div 
+              className="absolute inset-0 opacity-[0.06] pointer-events-none z-0"
+              style={{
+                backgroundImage: `
+                  linear-gradient(var(--grid-line-color) 1.5px, transparent 1.5px),
+                  linear-gradient(90deg, var(--grid-line-color) 1.5px, transparent 1.5px)
+                `,
+                backgroundSize: '30px 30px',
+              }}
+            />
 
             {/* Left Side: Game Details & Info */}
-            <div className="md:col-span-7 p-6 md:p-8 flex flex-col justify-between border-b-[4px] md:border-b-0 md:border-r-[4px] border-black z-10 relative">
+            <div className="md:col-span-7 p-6 md:p-8 flex flex-col justify-between border-b-[4px] md:border-b-0 md:border-r-[4px] border-black z-10 relative bg-[var(--panel-bg-hover)]/30">
               <div>
                 <span className="kicker px-3 py-1 text-[8.5px] font-black uppercase tracking-[0.2em]">
                   {game.category}
                 </span>
-                <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-white">
+                <h2 className="mt-4 text-3xl font-black uppercase tracking-wider text-slate-50">
                   {game.name}
                 </h2>
                 
@@ -120,7 +129,7 @@ export default function GameDetailsPage({ params }: { params: Promise<{ slug: st
             <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-center z-10 relative bg-slate-900">
               <div className="space-y-6">
                 <div className="text-center md:text-left">
-                  <h3 className="text-base font-black tracking-wider uppercase">Play Now</h3>
+                  <h3 className="text-base font-black tracking-wider uppercase text-slate-50">Play Now</h3>
                   <p className="text-[9px] font-semibold text-slate-500 mt-1">Start a match or join a room</p>
                 </div>
 
