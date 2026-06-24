@@ -161,3 +161,17 @@ export async function endMatch(
     return { success: false };
   }
 }
+
+export async function getPlayerMatchHistory(userId: string, limit = 50): Promise<MatchDoc[]> {
+  try {
+    const collection = await getMatchesCollection();
+    return await collection
+      .find({ "players.userId": userId, status: "completed" })
+      .sort({ completedAt: -1 })
+      .limit(limit)
+      .toArray();
+  } catch (error) {
+    console.error("Error in getPlayerMatchHistory:", error);
+    return [];
+  }
+}

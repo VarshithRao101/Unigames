@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { createMatch } from "@/lib/services/match-service";
+import { createMatch, getPlayerMatchHistory } from "@/lib/services/match-service";
 import { apiSuccess, apiErrors } from "@/lib/utils/api-response";
 import { getPusherServer } from "@/lib/pusher";
 import { NextRequest } from "next/server";
@@ -56,5 +56,21 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error in POST /api/matches:", error);
     return apiErrors.serverError("Failed to initialize match", error);
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return apiErrors.unauthorized();
+  }
+
+  try {
+    const history = await getPlayerMatchHistory(session.user.id);
+    return apiSuccess(history);
+  } catch (error) {
+    console.error("Error in GET /api/matches:", error);
+    return apiErrors.serverError("Failed to retrieve matches history", error);
   }
 }

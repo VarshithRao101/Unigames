@@ -52,34 +52,80 @@ const BADGE_ICONS: Record<string, React.ComponentType<any>> = {
   brain: Brain,
   shield: Shield,
   flame: Flame,
+  star: Star,
 };
 
+// Gamer Level-wise Titles helper
+function getGamerStatusAndLevel(wins: number) {
+  const level = Math.floor(wins / 10) + 1;
+  const progressPercent = (wins % 10) * 10;
+  
+  let status = "Recruit";
+  if (level === 1) status = "Recruit";
+  else if (level === 2) status = "Squire";
+  else if (level === 3) status = "Newbie";
+  else if (level === 4) status = "Contender";
+  else if (level === 5) status = "Skirmisher";
+  else if (level === 6) status = "Fighter";
+  else if (level === 7) status = "Duelist";
+  else if (level === 8) status = "Warrior";
+  else if (level === 9) status = "Veteran";
+  else if (level === 10) status = "Elite";
+  else if (level === 11) status = "Master";
+  else if (level === 12) status = "Champion";
+  else if (level === 13) status = "Grandmaster";
+  else if (level === 14) status = "Warlord";
+  else if (level === 15) status = "Hero";
+  else if (level === 16) status = "Vanquisher";
+  else if (level === 17) status = "Legend";
+  else if (wins >= 650) {
+    status = "Supreme Sovereign";
+  } else {
+    // Generate titles dynamically for other tiers
+    const tiers = ["Specialist", "Gladiator", "Executioner", "Sentinel", "Avenger", "Conqueror", "Titan", "Immortal", "Ascended", "Demigod", "Deity"];
+    const tierIndex = Math.min(tiers.length - 1, Math.floor((level - 18) / 5));
+    const subTier = ((level - 18) % 5) + 1;
+    status = `${tiers[tierIndex]} Tier ${subTier}`;
+  }
 
+  // Cap levels up to 1000
+  const finalLevel = Math.min(1000, level);
+  if (finalLevel === 1000) {
+    status = "Antigravity God";
+  }
 
-// Mock Match History Data
-const MOCK_MATCH_HISTORY = [
-  { id: "m1", game: "Tic-Tac-Toe", outcome: "won", xp: 120, time: "42 mins ago", mode: "1v1 Duel", opponent: "Luna" },
-  { id: "m2", game: "Tic-Tac-Toe", outcome: "lost", xp: 30, time: "2 hours ago", mode: "1v1 Duel", opponent: "Nova" },
-  { id: "m3", game: "Tic-Tac-Toe", outcome: "won", xp: 150, time: "1 day ago", mode: "Tournament Final", opponent: "BoardKing" },
-  { id: "m4", game: "Tic-Tac-Toe", outcome: "won", xp: 90, time: "2 days ago", mode: "1v1 Duel", opponent: "Nova" },
-];
+  return { level: finalLevel, progressPercent, status };
+}
 
-// Mock Achievements / Badges
-const ACHIEVEMENT_BADGES = [
-  { id: "b1", title: "Gold Champion", desc: "Ascend to Rank #1 on any weekly board", icon: "trophy", color: "bg-amber-500/20 border-amber-500 text-amber-300", unlocked: true },
-  { id: "b2", title: "Perfect Align", desc: "Align three markers in under 4 moves", icon: "gamepad", color: "bg-emerald-500/20 border-emerald-500 text-emerald-300", unlocked: true },
-  { id: "b3", title: "Block Master", desc: "Successfully block 5 opponent win patterns", icon: "crown", color: "bg-indigo-500/20 border-indigo-500 text-indigo-300", unlocked: true },
-  { id: "b4", title: "Tactician Elite", desc: "Reach 50 wins across arcade games", icon: "brain", color: "bg-pink-500/20 border-pink-500 text-pink-300", unlocked: true },
-  { id: "b5", title: "Beta Operator", desc: "Active tester during community phases", icon: "shield", color: "bg-cyan-500/20 border-cyan-500 text-cyan-300", unlocked: true },
-  { id: "b6", title: "Unstoppable", desc: "Achieve a 10-match winning streak", icon: "flame", color: "bg-red-500/20 border-red-500 text-red-300", unlocked: false },
-];
+// Relative time helper
+function formatRelativeTime(dateStr: string) {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-// Mock Friends
-const MOCK_FRIENDS = [
-  { id: "f1", name: "Luna", status: "online", game: "Tic-Tac-Toe" },
-  { id: "f2", name: "Nova", status: "online", game: "Tic-Tac-Toe" },
-  { id: "f3", name: "BoardKing", status: "offline", lastActive: "3 hours ago" },
-  { id: "f4", name: "XOMaster", status: "offline", lastActive: "1 day ago" },
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  } catch (e) {
+    return "Recently";
+  }
+}
+
+// Dynamically awarded game-wise badges
+const BADGES_LIST = [
+  { id: "bl_1", title: "Novice", desc: "Win 1 Tic-Tac-Toe game", winsNeeded: 1, gameSlug: "tictactoe", icon: "shield", color: "bg-slate-500/20 border-slate-500 text-slate-300" },
+  { id: "bl_2", title: "Newbie", desc: "Win 20 Tic-Tac-Toe games", winsNeeded: 20, gameSlug: "tictactoe", icon: "gamepad", color: "bg-emerald-500/20 border-emerald-500 text-emerald-300" },
+  { id: "bl_3", title: "Fighter", desc: "Win 50 Tic-Tac-Toe games", winsNeeded: 50, gameSlug: "tictactoe", icon: "flame", color: "bg-orange-500/20 border-orange-500 text-orange-300" },
+  { id: "bl_4", title: "Veteran", desc: "Win 80 Tic-Tac-Toe games", winsNeeded: 80, gameSlug: "tictactoe", icon: "trophy", color: "bg-amber-500/20 border-amber-500 text-amber-300" },
+  { id: "bl_5", title: "Master", desc: "Win 100 Tic-Tac-Toe games", winsNeeded: 100, gameSlug: "tictactoe", icon: "brain", color: "bg-indigo-500/20 border-indigo-500 text-indigo-300" },
+  { id: "bl_6", title: "Warlord", desc: "Win 130 Tic-Tac-Toe games", winsNeeded: 130, gameSlug: "tictactoe", icon: "crown", color: "bg-pink-500/20 border-pink-500 text-pink-300" },
+  { id: "bl_7", title: "Legend", desc: "Win 160 Tic-Tac-Toe games", winsNeeded: 160, gameSlug: "tictactoe", icon: "star", color: "bg-red-500/20 border-red-500 text-red-300" },
+  { id: "bl_8", title: "Sovereign", desc: "Win 650 Tic-Tac-Toe games", winsNeeded: 650, gameSlug: "tictactoe", icon: "crown", color: "bg-cyan-500/20 border-cyan-500 text-cyan-300" },
 ];
 
 export default function ProfilePage() {
@@ -124,20 +170,36 @@ export default function ProfilePage() {
   const [dbUser, setDbUser] = useState<any>(null);
   const [isLoadingDbUser, setIsLoadingDbUser] = useState(true);
 
-  // Calculate SVG Radar Chart coordinates dynamically
-  // Radar metrics: Strategy, Speed, Tactics, Consistency, Adaptability
-  const radarStats = useMemo(() => [85, 90, 75, 80, 95], []);
-  const radarPoints = useMemo(() => {
-    const cx = 100;
-    const cy = 105;
-    const r = 70;
-    return radarStats.map((stat, i) => {
-      const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-      const x = cx + r * (stat / 100) * Math.cos(angle);
-      const y = cy + r * (stat / 100) * Math.sin(angle);
-      return `${x},${y}`;
-    }).join(" ");
-  }, [radarStats]);
+  // Live lists states
+  const [matchHistory, setMatchHistory] = useState<any[]>([]);
+  const [isLoadingMatches, setIsLoadingMatches] = useState(true);
+  const [friends, setFriends] = useState<any[]>([]);
+  const [isLoadingFriends, setIsLoadingFriends] = useState(true);
+
+  const displayedUser = dbUser || user;
+
+  // Format game wins stats for Bar Graph
+  const gameStatsData = useMemo(() => {
+    const statsObj = displayedUser?.stats?.gameStats || {};
+    const list = Object.entries(statsObj).map(([key, data]: [string, any]) => {
+      let displayName = key;
+      if (key === "tictactoe" || key === "tic-tac-toe") displayName = "Tic-Tac-Toe";
+      else if (key === "test-arena" || key === "sandbox") displayName = "Sandbox Arena";
+      else {
+        displayName = key.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+      }
+      return {
+        game: displayName,
+        wins: data.wins || 0,
+        played: data.played || 0,
+      };
+    });
+    // Add default zero state for Tic-Tac-Toe if not played yet to ensure there's at least one bar
+    if (!list.some(item => item.game === "Tic-Tac-Toe")) {
+      list.push({ game: "Tic-Tac-Toe", wins: 0, played: 0 });
+    }
+    return list.sort((a, b) => b.wins - a.wins);
+  }, [displayedUser]);
 
   const fetchDbUser = async () => {
     try {
@@ -166,6 +228,28 @@ export default function ProfilePage() {
       setTempBio(user.bio || "");
       setSelectedAvatarPreset(user.avatarUrl || "preset-1");
       fetchDbUser();
+
+      // Fetch match history from database in real time
+      fetch("/api/matches")
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && Array.isArray(json.data)) {
+            setMatchHistory(json.data);
+          }
+        })
+        .catch(err => console.error("Error loading match history:", err))
+        .finally(() => setIsLoadingMatches(false));
+
+      // Fetch friends list from database in real time
+      fetch("/api/friends")
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && json.data) {
+            setFriends(json.data.friends || []);
+          }
+        })
+        .catch(err => console.error("Error loading friends:", err))
+        .finally(() => setIsLoadingFriends(false));
     }
   }, [user]);
 
@@ -180,20 +264,18 @@ export default function ProfilePage() {
     return () => clearTimeout(timer);
   }, [user, router, toast]);
 
-  // Fallback helper for displayed values
-  const displayedUser = dbUser || user;
-
-  // Level & XP progression values
-  const currentXP = displayedUser?.xp || 0;
-  const currentLevel = displayedUser?.level || 1;
-  const progressPercent = Math.round(((currentXP % 500) / 500) * 100);
-  const nextLevel = currentLevel + 1;
-
   // Stats values
   const gamesPlayed = displayedUser?.stats?.gamesPlayed || 0;
   const victories = displayedUser?.stats?.wins || 0;
   const winStreak = displayedUser?.stats?.winStreak || 0;
   const winRatio = gamesPlayed > 0 ? ((victories / gamesPlayed) * 100).toFixed(1) : "0.0";
+
+  // Level & XP progression values derived dynamically from victories
+  const currentXP = displayedUser?.xp || 0;
+  const { level: computedLevel, progressPercent, status: gamerStatus } = useMemo(() => {
+    return getGamerStatusAndLevel(victories);
+  }, [victories]);
+  const nextLevel = computedLevel + 1;
 
 
 
@@ -460,20 +542,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="h-px bg-slate-900 border-b border-white/5 w-full my-4" />
-
-                <label className="flex items-center justify-between p-3.5 bg-slate-900/40 hover:bg-slate-900/70 border-2 border-black rounded-2xl cursor-pointer transition-all duration-200 select-none shadow-[2px_2px_0px_#000]">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-white">Animations Enabled</p>
-                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Smooth page and card interactions transition effects</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={appearanceSettings.animationsEnabled}
-                    onChange={(e) => updateAppearanceSettings({ animationsEnabled: e.target.checked })}
-                    className="h-4.5 w-4.5 accent-brand-orange rounded border-2 border-black"
-                  />
-                </label>
               </div>
             </div>
 
@@ -516,11 +584,11 @@ export default function ProfilePage() {
                       {/* Left: Stats & Level Details */}
                       <div className="md:col-span-3 space-y-3">
                         <div>
-                          <div className="flex items-center gap-2 mb-1.5">
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                             <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">PLAYER LEVEL</span>
-                            <span className="text-[9px] font-space font-black text-slate-400">GAMER STATUS</span>
+                            <span className="px-1.5 py-0.5 bg-brand-orange border-2 border-black rounded text-[7px] font-black text-slate-950 tracking-widest leading-none uppercase">STATUS: {gamerStatus}</span>
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {currentLevel}</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {computedLevel}</h3>
                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentXP.toLocaleString()} Total XP Earned</p>
                         </div>
 
@@ -557,66 +625,85 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      {/* Right: SVG Radar Attributes Chart */}
-                      <div className="md:col-span-2 flex flex-col items-center justify-center">
-                        <div className="relative w-36 h-36 bg-slate-900 border-3 border-black flex items-center justify-center shadow-[inset_3px_3px_0px_#000000] overflow-hidden rounded-[1.5rem]">
-                          <svg className="w-full h-full" viewBox="0 0 200 200">
-                            {/* Inner web concentric pentagons */}
-                            <polygon points="100,65 129,86 118,121 82,121 71,86" fill="none" stroke="#000000" strokeWidth="2.5" />
-                            <polygon points="100,50 142,80 126,130 74,130 58,80" fill="none" stroke="#000000" strokeWidth="2.5" />
-                            <polygon points="100,35 156,76 135,140 65,140 44,76" fill="none" stroke="#000000" strokeWidth="2.5" />
-
-                            {/* Web axes */}
-                            {Array.from({ length: 5 }).map((_, idx) => {
-                              const angle = (idx * 2 * Math.PI / 5) - Math.PI / 2;
-                              const x = 100 + 70 * Math.cos(angle);
-                              const y = 105 + 70 * Math.sin(angle);
-                              return (
-                                <line key={idx} x1="100" y1="105" x2={x} y2={y} stroke="#000000" strokeWidth="2.5" />
-                              );
-                            })}
-
-                            {/* Polygon filled stats */}
-                            <polygon
-                              points={radarPoints}
-                              fill="rgba(255, 170, 0, 0.35)"
-                              stroke="#000000"
-                              strokeWidth="3.5"
-                            />
-
-                            {/* Vertices indicator bullets */}
-                            {radarPoints.split(" ").map((pt, idx) => {
-                              const [x, y] = pt.split(",");
-                              return (
-                                <circle key={idx} cx={x} cy={y} r="4.5" fill="#ffaa00" stroke="#000000" strokeWidth="2" />
-                              );
-                            })}
-                          </svg>
-                          <span className="absolute top-2 text-[6.5px] font-black text-slate-500 uppercase tracking-widest">STR</span>
-                          <span className="absolute right-2 top-[35%] text-[6.5px] font-black text-slate-500 uppercase tracking-widest">SPD</span>
-                          <span className="absolute right-6 bottom-2 text-[6.5px] font-black text-slate-500 uppercase tracking-widest">TAC</span>
-                          <span className="absolute left-6 bottom-2 text-[6.5px] font-black text-slate-500 uppercase tracking-widest">CNS</span>
-                          <span className="absolute left-2 top-[35%] text-[6.5px] font-black text-slate-500 uppercase tracking-widest">ADP</span>
+                      {/* Right: Neobrutalist Game Win Dominance Bar Graph */}
+                      <div className="md:col-span-2 flex flex-col justify-center">
+                        <div className="bg-slate-900 border-3 border-black p-4 shadow-[inset_3px_3px_0px_#000000] rounded-[1.5rem] space-y-3.5 min-h-[144px]">
+                          <p className="text-[8.5px] font-black text-slate-500 uppercase tracking-widest text-center mb-1">Game Win Dominance</p>
+                          {gameStatsData.map((item, index) => {
+                            const maxWins = Math.max(...gameStatsData.map(g => g.wins), 1);
+                            const percent = Math.max(10, Math.min(100, (item.wins / maxWins) * 100));
+                            return (
+                              <div key={index} className="space-y-1">
+                                <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-300">
+                                  <span>{item.game}</span>
+                                  <span className="text-brand-orange">{item.wins} Wins</span>
+                                </div>
+                                <div className="h-4 w-full bg-slate-950 border-2 border-black rounded-lg overflow-hidden flex items-center pr-1.5 shadow-[1.5px_1.5px_0px_#000]">
+                                  <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${percent}%` }}
+                                    transition={{ duration: 1.0, delay: index * 0.1 }}
+                                    className="h-full bg-brand-orange border-r-2 border-black"
+                                    style={{ backgroundColor: index === 0 ? '#ffaa00' : '#d97706' }}
+                                  />
+                                  <span className="text-[7.5px] font-black text-slate-500 ml-auto pl-1">
+                                    {item.played} PLY
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        <p className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-2">PLAYER ATTRIBUTES</p>
+                        <p className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-2.5 text-center">MASTER TIER DOMINANCE</p>
                       </div>
 
                     </div>
-                    {/* ACHIEVEMENT BADGES SHOWCASE */}
+
+                    {/* Real-time Player Attributes Panel */}
+                    <div className="glass p-3 rounded-xl border-2 border-black bg-white/2">
+                      <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
+                        <Zap className="w-3 h-3 text-brand-orange" /> Player Attributes
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                        {[
+                          { label: "STR", name: "Strength", value: Math.min(99, 45 + victories * 2) },
+                          { label: "SPD", name: "Speed", value: Math.min(99, 50 + winStreak * 5) },
+                          { label: "TAC", name: "Tactics", value: Math.min(99, Math.round(parseFloat(winRatio) || 50)) },
+                          { label: "CNS", name: "Consistency", value: Math.min(99, 40 + Math.round((victories / Math.max(1, gamesPlayed)) * 40) + winStreak * 2) },
+                          { label: "ADP", name: "Adaptability", value: Math.min(99, 60 + Object.keys(displayedUser?.stats?.gameStats || {}).length * 15) },
+                        ].map((attr, idx) => (
+                          <div key={idx} className="p-2 bg-slate-900 border-2 border-black rounded-xl shadow-[2px_2px_0px_#000] text-center flex flex-col justify-between">
+                            <div>
+                              <p className="text-[9px] font-space font-black text-brand-orange">{attr.label}</p>
+                              <p className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">{attr.name}</p>
+                            </div>
+                            <div className="mt-1.5">
+                              <p className="text-sm font-space font-black text-white">{attr.value}</p>
+                              <div className="h-1.5 w-full bg-slate-950 border border-black rounded-full overflow-hidden mt-1 shadow-[0.5px_0.5px_0px_#000]">
+                                <div className="h-full bg-brand-orange" style={{ width: `${attr.value}%` }} />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* GAMER BADGES SHOWCASE */}
                     <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
                         <Trophy className="w-3 h-3 text-brand-orange" /> Gamer Badges
                       </h4>
 
-                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                        {ACHIEVEMENT_BADGES.map(badge => {
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2">
+                        {BADGES_LIST.map(badge => {
                           const BadgeIcon = BADGE_ICONS[badge.icon] || Trophy;
+                          const wins = displayedUser?.stats?.gameStats?.[badge.gameSlug]?.wins || 0;
+                          const unlocked = wins >= badge.winsNeeded;
                           return (
                             <div
                               key={badge.id}
-                              className={`flex flex-col items-center text-center p-2 rounded-xl border-2 border-black transition-all group relative cursor-pointer ${badge.unlocked ? badge.color + " hover:scale-105 shadow-[1.5px_1.5px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
+                              className={`flex flex-col items-center text-center p-2 rounded-xl border-2 border-black transition-all group relative cursor-pointer ${unlocked ? badge.color + " hover:scale-105 shadow-[1.5px_1.5px_0px_#000]" : "bg-white/2 border-slate-800 opacity-40 grayscale"}`}
                               onClick={() => {
-                                if (badge.unlocked) toast(`Selected Badge: ${badge.title}`, "info");
+                                if (unlocked) toast(`Selected Badge: ${badge.title}`, "info");
                                 else toast(`Locked Badge: ${badge.title} (${badge.desc})`, "warning");
                               }}
                             >
@@ -629,7 +716,8 @@ export default function ProfilePage() {
                               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-40 p-2.5 rounded-xl bg-slate-950 border-2 border-black text-[8.5px] font-bold text-slate-300 leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-2xl">
                                 <p className="font-black text-brand-orange uppercase mb-1">{badge.title}</p>
                                 <p className="text-slate-400">{badge.desc}</p>
-                                {!badge.unlocked && <p className="text-danger font-black uppercase mt-1.5 flex items-center justify-center gap-1"><Lock className="w-3 h-3" /> Locked</p>}
+                                <p className="text-slate-500 mt-1.5 font-bold">Progress: {wins}/{badge.winsNeeded} Wins</p>
+                                {!unlocked && <p className="text-danger font-black uppercase mt-1.5 flex items-center justify-center gap-1"><Lock className="w-3 h-3" /> Locked</p>}
                               </div>
                             </div>
                           );
@@ -650,32 +738,58 @@ export default function ProfilePage() {
                       </h4>
 
                       <div className="space-y-1.5">
-                        {MOCK_MATCH_HISTORY.map(match => (
-                          <div
-                            key={match.id}
-                            className="p-2 bg-slate-900/50 border border-black rounded-lg flex items-center justify-between hover:border-brand-orange/40 transition-all duration-200 shadow-[1px_1px_0px_#000]"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className="h-6 w-6 rounded bg-slate-950 border border-black flex items-center justify-center text-[8px] font-black text-brand-orange">
-                                {match.game.slice(0, 2).toUpperCase()}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-1.5 mb-0">
-                                  <span className="text-[9px] font-black uppercase tracking-wider text-white">{match.game}</span>
-                                  <span className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">{match.mode}</span>
-                                </div>
-                                <p className="text-[7px] font-bold text-slate-550 uppercase tracking-widest">VS: {match.opponent}</p>
-                              </div>
-                            </div>
-
-                            <div className="text-right">
-                              <span className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider border border-black inline-block mb-0.5 ${match.outcome === "won" ? "bg-success/20 text-success border-success/40" : "bg-danger/20 text-danger border-danger/40"}`}>
-                                {match.outcome === "won" ? "Win" : "Loss"}
-                              </span>
-                              <p className="text-[7.5px] font-space font-black text-slate-400">+{match.xp} XP</p>
-                            </div>
+                        {isLoadingMatches ? (
+                          <div className="text-center py-6 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                            Syncing database match records...
                           </div>
-                        ))}
+                        ) : matchHistory.length > 0 ? (
+                          matchHistory.map(match => {
+                            const opponent = match.players.find((p: any) => p.userId !== (displayedUser._id?.toString() || displayedUser.id)) || { username: "Opponent" };
+                            const currentPlayer = match.players.find((p: any) => p.userId === (displayedUser._id?.toString() || displayedUser.id)) || {};
+                            
+                            let outcome: "won" | "lost" | "draw" = "lost";
+                            if (match.winnerId === null) {
+                              outcome = "draw";
+                            } else if (match.winnerId === (displayedUser._id?.toString() || displayedUser.id)) {
+                              outcome = "won";
+                            }
+
+                            const gameName = match.gameSlug === "tictactoe" || match.gameSlug === "tic-tac-toe" ? "Tic-Tac-Toe" : match.gameSlug;
+
+                            return (
+                              <div
+                                key={match._id}
+                                className="p-2 bg-slate-900/50 border border-black rounded-lg flex items-center justify-between hover:border-brand-orange/40 transition-all duration-200 shadow-[1px_1px_0px_#000]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="h-6 w-6 rounded bg-slate-950 border border-black flex items-center justify-center text-[8px] font-black text-brand-orange">
+                                    {gameName.slice(0, 2).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-1.5 mb-0">
+                                      <span className="text-[9px] font-black uppercase tracking-wider text-white">{gameName}</span>
+                                      <span className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">1v1 Match</span>
+                                    </div>
+                                    <p className="text-[7px] font-bold text-slate-550 uppercase tracking-widest">VS: {opponent.username}</p>
+                                  </div>
+                                </div>
+
+                                <div className="text-right">
+                                  <span className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider border border-black inline-block mb-0.5 ${outcome === "won" ? "bg-success/20 text-success border-success/40" : outcome === "draw" ? "bg-slate-700 text-slate-300 border-slate-600" : "bg-danger/20 text-danger border-danger/40"}`}>
+                                    {outcome === "won" ? "Win" : outcome === "draw" ? "Draw" : "Loss"}
+                                  </span>
+                                  <p className="text-[7.5px] font-space font-black text-slate-400">+{currentPlayer.xpEarned || 0} XP</p>
+                                  <p className="text-[6px] text-slate-600 mt-0.5 font-bold uppercase">{formatRelativeTime(match.completedAt)}</p>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="text-center py-8 border-2 border-dashed border-slate-900 rounded-lg bg-slate-950/20">
+                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">No match records logged</p>
+                            <p className="text-[8px] text-slate-600 mt-1 font-bold">Initiate matchmaking to record stats.</p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -686,43 +800,49 @@ export default function ProfilePage() {
                       </h4>
 
                       <div className="space-y-2">
-                        {MOCK_FRIENDS.map(friend => (
-                          <div
-                            key={friend.id}
-                            className="flex items-center justify-between group relative"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className="relative">
-                                <div className="h-6 w-6 rounded-full bg-slate-900 border border-black flex items-center justify-center font-space text-[8px] font-black text-slate-400">
-                                  {friend.name.slice(0, 2).toUpperCase()}
+                        {isLoadingFriends ? (
+                          <div className="text-center py-4 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                            Retrieving squad...
+                          </div>
+                        ) : friends.length > 0 ? (
+                          friends.map(friend => (
+                            <div
+                              key={friend._id || friend.id}
+                              className="flex items-center justify-between group relative"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="relative">
+                                  <div className="h-6 w-6 rounded-full bg-slate-900 border border-black flex items-center justify-center font-space text-[8px] font-black text-slate-400">
+                                    {friend.username.slice(0, 2).toUpperCase()}
+                                  </div>
+                                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-slate-950 bg-success" />
                                 </div>
-                                <span className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-slate-950 ${friend.status === "online" ? "bg-success" : "bg-slate-700"}`} />
+                                <div>
+                                  <p className="text-[9px] font-black uppercase tracking-tight text-white">{friend.username}</p>
+                                  <p className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">
+                                    Online · Idle
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-[9px] font-black uppercase tracking-tight text-white">{friend.name}</p>
-                                <p className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">
-                                  {friend.status === "online" ? `In: ${friend.game}` : "offline"}
-                                </p>
-                              </div>
-                            </div>
 
-                            {friend.status === "online" && (
                               <button
-                                onClick={() => handleInviteFriend(friend.name)}
+                                onClick={() => handleInviteFriend(friend.username)}
                                 className="h-6 px-2 rounded bg-brand-orange hover:bg-brand-orange/90 text-slate-950 font-black uppercase text-[7px] tracking-wider border border-black shadow-[1px_1px_0px_#000] cursor-pointer transition-all"
                               >
                                 Invite
                               </button>
-                            )}
-
-                            {/* Offline last active details */}
-                            {friend.status === "offline" && (
-                              <div className="absolute bottom-full mb-1 right-0 p-1.5 rounded-lg bg-slate-950 border border-black text-[7.5px] font-bold text-slate-400 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl">
-                                Last seen: {friend.lastActive}
-                              </div>
-                            )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-6 border-2 border-dashed border-slate-900 rounded-lg bg-slate-950/20 space-y-2">
+                            <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">No friends added</p>
+                            <Link href="/community#chat" className="block">
+                              <Button className="btn-neo h-7 w-full text-[7.5px] rounded font-black tracking-widest uppercase">
+                                Find Squad
+                              </Button>
+                            </Link>
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
 
