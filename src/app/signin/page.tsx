@@ -63,9 +63,11 @@ function SignInForm() {
 
       <main className="flex-grow pt-32 pb-20 px-6 flex items-center justify-center">
         <div className="max-w-md w-full bg-white dark:bg-slate-900 border-[3.5px] border-black p-8 rounded-[2rem] shadow-[6px_6px_0px_#000000] text-center space-y-6">
-          <div className="w-14 h-14 bg-brand-orange/15 dark:bg-brand-orange/10 border-2.5 border-black rounded-2xl flex items-center justify-center mx-auto text-brand-orange shadow-[2px_2px_0px_#000000]">
-            <Shield className="w-6 h-6" />
-          </div>
+          <img
+            src="/images/applogo.png"
+            alt="UniGame Logo"
+            className="w-14 h-14 object-contain rounded-2xl border-[3px] border-black shadow-[2.5px_2.5px_0px_#000000] mx-auto bg-slate-950 p-1"
+          />
 
           <div>
             <span className="text-[8.5px] font-black uppercase tracking-[0.2em] bg-brand-orange text-slate-950 border border-black px-2.5 py-1 rounded shadow-[1.5px_1.5px_0px_#000000] mb-2 inline-block">

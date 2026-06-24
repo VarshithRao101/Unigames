@@ -45,11 +45,11 @@ export function Navbar() {
       <div className="container mx-auto flex items-center justify-between px-6 max-w-7xl">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2">
-          <div className="relative h-8 w-8 overflow-hidden rounded-lg bg-gradient-to-br from-brand-orange to-brand-neon p-px group-hover:shadow-[0_0_15px_rgba(255,107,0,0.4)] transition-all">
-            <div className="flex h-full w-full items-center justify-center rounded-[7px] bg-slate-950 border border-black">
-               <span className="font-outfit text-sm font-black text-brand-orange">U</span>
-            </div>
-          </div>
+          <img
+            src="/images/applogo.png"
+            alt="UniGame Logo"
+            className="h-8 w-8 object-contain rounded-lg border-2 border-black shadow-[1.5px_1.5px_0px_#000]"
+          />
           <span className="font-outfit text-base font-black uppercase tracking-tighter text-slate-50 group-hover:text-brand-orange transition-colors">
             UniGame
           </span>

@@ -14,9 +14,11 @@ export function Footer() {
              {/* Brand */}
              <div className="lg:col-span-1">
                 <div className="flex items-center gap-3 mb-6">
-                   <div className="w-12 h-12 rounded-2xl bg-brand-orange/10 border-2 border-black flex items-center justify-center text-brand-orange font-black text-xl shadow-[1.5px_1.5px_0px_#000000]">
-                      U
-                   </div>
+                   <img
+                      src="/images/applogo.png"
+                      alt="UniGame Logo"
+                      className="h-12 w-12 object-contain rounded-2xl border-2 border-black shadow-[1.5px_1.5px_0px_#000000]"
+                   />
                    <span className="font-outfit text-2xl font-black text-slate-50 uppercase tracking-tighter">UniGame</span>
                 </div>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8">
