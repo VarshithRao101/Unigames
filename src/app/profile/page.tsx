@@ -659,34 +659,6 @@ export default function ProfilePage() {
 
                     </div>
 
-                    {/* Real-time Player Attributes Panel */}
-                    <div className="glass p-3 rounded-xl border-2 border-black bg-white/2">
-                      <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
-                        <Zap className="w-3 h-3 text-brand-orange" /> Player Attributes
-                      </h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                        {[
-                          { label: "STR", name: "Strength", value: Math.min(99, 45 + victories * 2) },
-                          { label: "SPD", name: "Speed", value: Math.min(99, 50 + winStreak * 5) },
-                          { label: "TAC", name: "Tactics", value: Math.min(99, Math.round(parseFloat(winRatio) || 50)) },
-                          { label: "CNS", name: "Consistency", value: Math.min(99, 40 + Math.round((victories / Math.max(1, gamesPlayed)) * 40) + winStreak * 2) },
-                          { label: "ADP", name: "Adaptability", value: Math.min(99, 60 + Object.keys(displayedUser?.stats?.gameStats || {}).length * 15) },
-                        ].map((attr, idx) => (
-                          <div key={idx} className="p-2 bg-slate-900 border-2 border-black rounded-xl shadow-[2px_2px_0px_#000] text-center flex flex-col justify-between">
-                            <div>
-                              <p className="text-[9px] font-space font-black text-brand-orange">{attr.label}</p>
-                              <p className="text-[6.5px] font-bold text-slate-500 uppercase tracking-widest">{attr.name}</p>
-                            </div>
-                            <div className="mt-1.5">
-                              <p className="text-sm font-space font-black text-white">{attr.value}</p>
-                              <div className="h-1.5 w-full bg-slate-950 border border-black rounded-full overflow-hidden mt-1 shadow-[0.5px_0.5px_0px_#000]">
-                                <div className="h-full bg-brand-orange" style={{ width: `${attr.value}%` }} />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                     {/* GAMER BADGES SHOWCASE */}
                     <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
