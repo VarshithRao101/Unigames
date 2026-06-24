@@ -647,16 +647,17 @@ export default function CommunityHubPage() {
                    </div>
 
                    {/* Input Area */}
-                   <div className="p-2 md:p-3 bg-slate-900 border-t-2 border-black relative z-20">
+                   <div className="p-2 md:p-3 border-t-2 border-black relative z-20" style={{ background: "var(--panel-bg)" }}>
                       <form onSubmit={handleChatSend} className="flex flex-col sm:flex-row gap-2">
                          <div className="relative flex-1">
-                            <MessageSquare className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                            <MessageSquare className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
                             <input 
                               value={chatText}
                               onChange={(e) => setChatText(e.target.value)}
                               type="text" 
                               placeholder={activeChannel === "global" ? "Type a message..." : `Send message to ${activeChannel}...`}
-                              className="w-full h-8.5 bg-slate-800 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
+                              className="w-full h-8.5 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
+                              style={{ background: "var(--input-bg)", color: "var(--input-color)" }}
                             />
                          </div>
                          <Button type="submit" className="btn-neo h-8.5 px-4 rounded-lg text-[10px]">
@@ -669,55 +670,7 @@ export default function CommunityHubPage() {
            </div>
         </section>
 
-        {/* ── 4. QUICK RUSH ── */}
-        <section className="relative overflow-hidden py-3">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-1/2 bg-brand-orange/5 blur-[120px] -rotate-12" />
-          
-          <div className="container mx-auto px-6 max-w-7xl">
-            <div className="panel p-0.5 border-2 rounded-xl">
-              <div className="bg-slate-950 rounded-[0.8rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-1">
-                  <span className="kicker mb-2 border-brand-orange bg-brand-orange/10 text-brand-orange text-[9px]">Turbo Matchmaking</span>
-                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-[0.9] tracking-tighter uppercase text-slate-50">
-                    INSTANT <span className="gradient-text">QUICK RUSH</span>
-                  </h2>
-                  <p className="text-[11px] text-slate-400 mb-4 font-medium leading-relaxed max-w-sm">
-                    Zero waiting. Zero lag. Our proprietary rush engine matches you with players 
-                    at your exact skill level in under 5 seconds. Ready?
-                  </p>
-                  <Link href="/rooms">
-                    <Button className="btn-neo h-10 px-6 rounded-lg text-xs shadow-neon-orange">
-                      Start Quick Rush
-                    </Button>
-                  </Link>
-                </div>
- 
-                <div className="flex-1 relative">
-                  <div className="relative w-36 h-36 md:w-44 md:h-44 mx-auto">
-                    {/* Animated Timer Graphic */}
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 rounded-full border border-dashed border-brand-orange/45" 
-                    />
-                    <motion.div 
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-2.5 rounded-full border border-dashed border-slate-700" 
-                    />
-                    <div className="absolute inset-5 rounded-full glass border-2 flex flex-col items-center justify-center text-center">
-                      <Timer className="w-6 h-6 text-brand-orange mb-1.5 animate-pulse" />
-                      <span className="text-3xl font-space font-black tracking-tighter text-slate-50">04.2s</span>
-                      <span className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Avg Match Wait</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── 5. ROOMS AVAILABLE ── */}
+        {/* ── 4. ROOMS AVAILABLE ── */}
         <section className="py-8 md:py-10" id="rooms">
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

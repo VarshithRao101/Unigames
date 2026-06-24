@@ -639,11 +639,11 @@ html.light .text-slate-300 {
     box-shadow: 1px 1px 0px 0px #000000 !important;
   }
 
-  /* Scale down input elements */
+  /* Scale down input elements - use theme variables for light/dark */
   input[type="text"], input[type="password"], input[type="email"], select, textarea {
     border-width: 2px !important;
-    background: #1c1d18 !important;
-    color: #ffffff !important;
+    background: var(--input-bg) !important;
+    color: var(--input-color) !important;
     box-shadow: 2px 2px 0px 0px #000000 !important;
     border-radius: 0.6rem !important;
     height: 2.25rem !important;

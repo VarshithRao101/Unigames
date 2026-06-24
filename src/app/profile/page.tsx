@@ -512,7 +512,7 @@ export default function ProfilePage() {
               )}
 
               {/* Log out */}
-              <Button onClick={handleLogout} className="w-full h-9 bg-white hover:bg-brand-orange text-slate-950 font-black uppercase text-[9px] tracking-widest border-2 border-black rounded-lg transition-all">
+              <Button onClick={handleLogout} className="w-full h-9 font-black uppercase text-[9px] tracking-widest border-2 border-black rounded-lg transition-all" style={{ background: "var(--panel-bg-hover)", color: "var(--foreground)" }}>
                 <LogOut className="w-3.5 h-3.5 mr-1.5" /> Sever Terminal
               </Button>
             </motion.div>
