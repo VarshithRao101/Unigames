@@ -126,10 +126,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
   // Room states
   const [players, setPlayers] = useState<Player[]>([]);
-  const [spectators, setSpectators] = useState<{ id: string; name: string; avatar: string }[]>([
-    { id: "spec1", name: "SpectatorMax", avatar: "M" },
-    { id: "spec2", name: "LurkerPro", avatar: "L" },
-  ]);
+  const [spectators, setSpectators] = useState<{ id: string; name: string; avatar: string }[]>([]);
   const [chatMessages, setChatMessages] = useState<{ id?: string; sender: string; senderId?: string; avatar?: string; text: string; time: string; isSystem?: boolean }[]>([]);
   const [inputText, setInputText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -143,7 +140,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Gameplay simulation states
   const [simulatedRound, setSimulatedRound] = useState<number>(1);
   const [gameLog, setGameLog] = useState<string[]>([]);
-  const [spectatorCount, setSpectatorCount] = useState<number>(2);
+  const [spectatorCount, setSpectatorCount] = useState<number>(0);
   const [isSpectatingOnly, setIsSpectatingOnly] = useState<boolean>(false);
 
   // Modal UI state
@@ -225,25 +222,47 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
         let currentRoom = json.data;
 
-        // Auto-join if user is not currently in the room (unless spectating)
+        // Auto-join/sync based on specified mode
         const userInRoom = currentRoom.players.some((p: any) => p.userId === currentUserId);
-        if (!userInRoom && !isSpectatorMode) {
-          const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
-            method: "POST",
-          });
-          const joinJson = await joinRes.json();
-          if (!joinJson.success || !joinJson.data) {
-            throw new Error(joinJson.error?.message || "Failed to join room");
+        const userInSpectators = currentRoom.spectators?.some((s: any) => s.userId === currentUserId) || false;
+
+        if (isSpectatorMode) {
+          // 1. Remove from players DB list if stored there
+          if (userInRoom) {
+            await fetch(`/api/rooms/${roomCode}`, {
+              method: "DELETE",
+            });
           }
-          currentRoom = joinJson.data;
-        } else if (userInRoom && isSpectatorMode) {
-          // If they want to spectate but are stored as player in DB, remove them
-          await fetch(`/api/rooms/${roomCode}`, {
-            method: "DELETE",
-          });
-          const reloadRes = await fetch(`/api/rooms/${roomCode}`);
-          const reloadJson = await reloadRes.json();
-          currentRoom = reloadJson.data;
+          // 2. Add to spectators DB list if not already registered
+          if (!userInSpectators) {
+            const specRes = await fetch(`/api/rooms/${roomCode}/spectate`, {
+              method: "POST",
+            });
+            const specJson = await specRes.json();
+            if (!specJson.success || !specJson.data) {
+              throw new Error(specJson.error?.message || "Failed to join as spectator");
+            }
+            currentRoom = specJson.data;
+          }
+        } else {
+          // Player Mode
+          // 1. Remove from spectators DB list if stored there
+          if (userInSpectators) {
+            await fetch(`/api/rooms/${roomCode}/spectate`, {
+              method: "DELETE",
+            });
+          }
+          // 2. Add to players DB list if not already registered
+          if (!userInRoom) {
+            const joinRes = await fetch(`/api/rooms/${roomCode}/join`, {
+              method: "POST",
+            });
+            const joinJson = await joinRes.json();
+            if (!joinJson.success || !joinJson.data) {
+              throw new Error(joinJson.error?.message || "Failed to join room");
+            }
+            currentRoom = joinJson.data;
+          }
         }
 
         if (!active) return;
@@ -255,18 +274,15 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
         if (isSpectatorMode) {
           setIsSpectatingOnly(true);
-          const userName = currentUser.username || "You";
-          const userAvatar = (currentUser.username || "Y").charAt(0);
-          setSpectators((prev) => {
-            if (prev.some((s) => s.id === currentUserId)) return prev;
-            return [...prev, { id: currentUserId, name: userName, avatar: userAvatar }];
-          });
         }
 
         // Creator check using host flag
         const hostPlayer = currentRoom.players.find((p: any) => p.isHost);
         const isCreator = hostPlayer?.userId === currentUserId;
-        if (currentRoom.settings.isPrivate && !isCreator && !userInRoom) {
+        const nowInRoom = currentRoom.players.some((p: any) => p.userId === currentUserId);
+        const nowInSpectators = currentRoom.spectators?.some((s: any) => s.userId === currentUserId) || false;
+        
+        if (currentRoom.settings.isPrivate && !isCreator && !nowInRoom && !nowInSpectators) {
           setIsLocked(true);
         } else {
           setIsLocked(false);
@@ -283,6 +299,15 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           color: p.isHost ? "#FFC107" : "#1971C2",
         }));
         setPlayers(mappedPlayers);
+
+        // Map backend spectators list to frontend structure
+        const mappedSpectators = (currentRoom.spectators || []).map((s: any) => ({
+          id: s.userId,
+          name: s.username,
+          avatar: s.avatar || s.username.charAt(0),
+        }));
+        setSpectators(mappedSpectators);
+        setSpectatorCount(mappedSpectators.length);
 
         // Fetch chat history
         try {
@@ -312,6 +337,36 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           setChatMessages((prev) => {
             if (prev.some((m) => m.id === msg.id)) return prev;
             return [...prev, msg];
+          });
+        });
+
+        pusherChannel.bind("spectator-joined", (newSpec: any) => {
+          if (!newSpec) return;
+          setSpectators((prev) => {
+            if (prev.some((s) => s.id === newSpec.userId)) return prev;
+            const updated = [
+              ...prev,
+              {
+                id: newSpec.userId,
+                name: newSpec.username,
+                avatar: newSpec.avatar || newSpec.username.charAt(0),
+              },
+            ];
+            setSpectatorCount(updated.length);
+            return updated;
+          });
+          setChatMessages((prev) => [
+            ...prev,
+            { sender: "System", text: `${newSpec.username} is now spectating.`, time: "Now", isSystem: true }
+          ]);
+        });
+
+        pusherChannel.bind("spectator-left", (data: { userId: string }) => {
+          if (!data) return;
+          setSpectators((prev) => {
+            const filtered = prev.filter((s) => s.id !== data.userId);
+            setSpectatorCount(filtered.length);
+            return filtered;
           });
         });
 
@@ -427,6 +482,20 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
             }));
             setPlayers(mappedPlayers);
           }
+        } else {
+          const specRes = await fetch(`/api/rooms/${roomCode}/spectate`, {
+            method: "POST",
+          });
+          const specJson = await specRes.json();
+          if (specJson.success && specJson.data) {
+            const mappedSpectators = (specJson.data.spectators || []).map((s: any) => ({
+              id: s.userId,
+              name: s.username,
+              avatar: s.avatar || s.username.charAt(0),
+            }));
+            setSpectators(mappedSpectators);
+            setSpectatorCount(mappedSpectators.length);
+          }
         }
       } else {
         setPasswordError("Incorrect Passcode. Access Denied.");
@@ -529,6 +598,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         if (!joinJson.success) {
           throw new Error(joinJson.error?.message || "Failed to join room");
         }
+
+        // Remove from spectators DB list
+        await fetch(`/api/rooms/${roomCode}/spectate`, {
+          method: "DELETE",
+        });
+
         setIsSpectatingOnly(false);
         setSpectators(prev => prev.filter(s => s.id !== user?.id));
         const currentRoom = joinJson.data;
@@ -555,6 +630,16 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         if (!leaveJson.success) {
           throw new Error(leaveJson.error?.message || "Failed to leave player slot");
         }
+
+        // Add to spectators DB list
+        const specRes = await fetch(`/api/rooms/${roomCode}/spectate`, {
+          method: "POST",
+        });
+        const specJson = await specRes.json();
+        if (!specJson.success) {
+          throw new Error(specJson.error?.message || "Failed to join spectator list");
+        }
+
         setIsSpectatingOnly(true);
         if (leaveJson.data?.empty) {
           toast("Room was closed because it has no players", "info");
@@ -562,7 +647,16 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           return;
         }
         setPlayers(prev => prev.filter(p => p.id !== user?.id));
-        setSpectators(prev => [...prev, { id: user?.id || "spec-you", name: user?.username || "You", avatar: (user?.username || "Y").charAt(0) }]);
+
+        const updatedRoom = specJson.data;
+        const mappedSpecs = (updatedRoom.spectators || []).map((s: any) => ({
+          id: s.userId,
+          name: s.username,
+          avatar: s.avatar || s.username.charAt(0),
+        }));
+        setSpectators(mappedSpecs);
+        setSpectatorCount(mappedSpecs.length);
+
         setChatMessages(prev => [...prev, { sender: "System", text: "You switched to Spectator Mode.", time: "Now", isSystem: true }]);
       } catch (err: any) {
         toast(err.message || "Failed to switch to spectator mode", "error");
@@ -694,9 +788,15 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
   const handleLeaveRoom = async () => {
     try {
-      await fetch(`/api/rooms/${roomCode}`, {
-        method: "DELETE",
-      });
+      if (isSpectatingOnly) {
+        await fetch(`/api/rooms/${roomCode}/spectate`, {
+          method: "DELETE",
+        });
+      } else {
+        await fetch(`/api/rooms/${roomCode}`, {
+          method: "DELETE",
+        });
+      }
     } catch (err) {
       console.error("Error leaving room:", err);
     } finally {
@@ -1108,6 +1208,29 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         </div>
                       )}
                     </div>
+
+                    {/* Spectators list system */}
+                    {spectators.length > 0 && (
+                      <div className="bg-[var(--slate-800)] border-2 border-black p-4 rounded-2xl shadow-[3.5px_3.5px_0px_#000000] space-y-3">
+                        <h3 className="font-outfit font-black text-[9px] uppercase tracking-widest text-slate-400 flex items-center gap-1.5 pb-1">
+                          <Eye className="w-3.5 h-3.5 text-brand-orange" />
+                          Spectators ({spectators.length})
+                        </h3>
+                        <div className="flex flex-wrap gap-2.5">
+                          {spectators.map((spec) => (
+                            <div 
+                              key={spec.id}
+                              className="flex items-center gap-1.5 bg-[var(--slate-900)] border border-black rounded-lg px-2.5 py-1 text-[9px] font-black uppercase text-slate-200 shadow-[1px_1px_0px_#000000]"
+                            >
+                              <div className="w-4.5 h-4.5 rounded-full bg-slate-950 border border-black flex items-center justify-center font-outfit text-[8px] text-brand-orange overflow-hidden">
+                                {renderAvatar(spec.avatar, spec.name)}
+                              </div>
+                              <span>{spec.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Game Rules panel */}
                     <div className="bg-[var(--slate-800)] border-2 border-black p-4 rounded-2xl shadow-[3.5px_3.5px_0px_#000000] space-y-4">

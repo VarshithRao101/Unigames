@@ -229,9 +229,21 @@ export default function RoomsPage() {
                        placeholder="ENTER CODE"
                        className="w-full h-9.5 bg-slate-900 border-2 border-black rounded-lg px-3 text-center text-xs font-black uppercase tracking-[0.3em] text-brand-orange focus:outline-none focus:border-brand-orange"
                      />
-                     <button type="submit" className="w-full h-9 rounded-lg bg-slate-950 text-slate-50 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer">
-                        Join Room
-                     </button>
+                     <div className="flex gap-2">
+                        <button type="submit" className="flex-grow h-9 rounded-lg bg-slate-950 text-slate-50 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer">
+                           Join
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            if (!roomCode.trim()) return;
+                            router.push(`/rooms/${roomCode.trim().toUpperCase()}?mode=spectate`);
+                          }}
+                          className="flex-grow h-9 rounded-lg bg-slate-900 text-slate-300 hover:bg-brand-orange hover:text-slate-950 border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer"
+                        >
+                           Spectate
+                        </button>
+                     </div>
                   </form>
                </div>
             </aside>

@@ -21,7 +21,7 @@ function CreateRoomForm() {
   const [roomName, setRoomName] = useState("BATTLE ROOM");
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [isPrivate, setIsPrivate] = useState(false);
-  const [passcode, setPasscode] = useState("7777");
+  const [passcode, setPasscode] = useState("");
   const [region, setRegion] = useState("Mumbai Hub");
   const [allowSpectators, setAllowSpectators] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +61,12 @@ function CreateRoomForm() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (isSubmitting) return;
+    
+    if (isPrivate && passcode.length !== 4) {
+      alert("PLEASE ENTER A 4-DIGIT NUMERIC PASSCODE.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/rooms", {
@@ -73,7 +79,7 @@ function CreateRoomForm() {
           maxPlayers,
           settings: {
             isPrivate,
-            passcode: isPrivate ? passcode || "7777" : undefined,
+            passcode: isPrivate ? passcode : undefined,
             allowSpectators,
             region,
             name: roomName.trim() || `${game.name} Room`,
@@ -103,7 +109,7 @@ function CreateRoomForm() {
         maxPlayers,
         status: "open",
         isPrivate,
-        passcode: isPrivate ? passcode || "7777" : undefined,
+        passcode: isPrivate ? passcode : undefined,
         region,
         note: allowSpectators ? "Spectators allowed." : "Private settings.",
       });
@@ -168,16 +174,16 @@ function CreateRoomForm() {
                                    : 'bg-slate-900 text-slate-400 hover:text-white'
                                }`}
                              >
-                                <div className="flex items-center justify-between mb-2">
-                                   <span className={`font-space text-sm font-black ${selectedGame === item.slug ? 'text-slate-950' : 'text-brand-orange'}`}>
-                                      {item.shortCode}
-                                   </span>
-                                   <span className="text-[7.5px] font-black uppercase tracking-widest opacity-70">
-                                      {item.status}
-                                   </span>
-                                </div>
-                                <h4 className="text-[11px] font-black uppercase tracking-tight mb-0.5">{item.name}</h4>
-                                <p className={`text-[8px] font-bold ${selectedGame === item.slug ? 'text-slate-800' : 'text-slate-500'}`}>{item.multiplayerType}</p>
+                                 <div className="flex items-center justify-between mb-2">
+                                    <span className={`font-space text-sm font-black ${selectedGame === item.slug ? 'text-slate-950' : 'text-brand-orange'}`}>
+                                       {item.shortCode}
+                                    </span>
+                                    <span className="text-[7.5px] font-black uppercase tracking-widest opacity-70">
+                                       {item.status}
+                                    </span>
+                                 </div>
+                                 <h4 className="text-[11px] font-black uppercase tracking-tight mb-0.5">{item.name}</h4>
+                                 <p className={`text-[8px] font-bold ${selectedGame === item.slug ? 'text-slate-800' : 'text-slate-500'}`}>{item.multiplayerType}</p>
                              </button>
                            ))}
                         </div>
@@ -275,8 +281,11 @@ function CreateRoomForm() {
                               <Lock className="absolute left-4.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-brand-orange" />
                               <input 
                                 value={passcode}
-                                onChange={(e) => setPasscode(e.target.value)}
-                                placeholder="XXXX"
+                                onChange={(e) => {
+                                  const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                                  setPasscode(val);
+                                }}
+                                placeholder="xxxx"
                                 className="w-full h-10 bg-slate-900 border-2 border-black rounded-xl px-12 text-center text-xs font-space font-black tracking-[0.5em] text-brand-orange shadow-[2px_2px_0px_#000000] focus:outline-none focus:border-brand-orange focus:shadow-[3px_3px_0px_#000000] transition-all"
                               />
                            </div>

@@ -230,3 +230,90 @@ export async function listOpenRooms(gameSlug?: string): Promise<RoomDoc[]> {
     return [];
   }
 }
+
+export async function addSpectator(
+  code: string,
+  userId: string
+): Promise<{ success: boolean; error?: string; room?: RoomDoc }> {
+  try {
+    const collection = await getRoomsCollection();
+    const room = await collection.findOne({ code: code.toUpperCase() });
+
+    if (!room) {
+      return { success: false, error: "Room not found" };
+    }
+
+    // Check if spectator is already in list
+    const specs = room.spectators || [];
+    const isAlreadyIn = specs.some((s) => s.userId === userId);
+    if (isAlreadyIn) {
+      return { success: true, room };
+    }
+
+    const user = await getUserById(userId);
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    const newSpectator = {
+      userId,
+      username: user.username,
+      avatar: user.avatar || "/avatars/avatar-placeholder.png",
+      isHost: false,
+      isReady: false,
+    };
+
+    const updatedTime = new Date();
+    await collection.updateOne(
+      { code: room.code },
+      {
+        $push: { spectators: newSpectator as any },
+        $set: {
+          updatedAt: updatedTime,
+          expiresAt: new Date(updatedTime.getTime() + 60 * 60 * 1000),
+        },
+      }
+    );
+
+    const updatedRoom = await collection.findOne({ code: room.code });
+    return { success: true, room: updatedRoom || undefined };
+  } catch (error) {
+    console.error("Error in addSpectator:", error);
+    return { success: false, error: "Failed to add spectator" };
+  }
+}
+
+export async function removeSpectator(
+  code: string,
+  userId: string
+): Promise<{ success: boolean; room?: RoomDoc }> {
+  try {
+    const collection = await getRoomsCollection();
+    const room = await collection.findOne({ code: code.toUpperCase() });
+
+    if (!room) {
+      return { success: false };
+    }
+
+    const specs = room.spectators || [];
+    const updatedSpectators = specs.filter((s) => s.userId !== userId);
+
+    const updatedTime = new Date();
+    await collection.updateOne(
+      { code: room.code },
+      {
+        $set: {
+          spectators: updatedSpectators,
+          updatedAt: updatedTime,
+          expiresAt: new Date(updatedTime.getTime() + 60 * 60 * 1000),
+        },
+      }
+    );
+
+    const updatedRoom = await collection.findOne({ code: room.code });
+    return { success: true, room: updatedRoom || undefined };
+  } catch (error) {
+    console.error("Error in removeSpectator:", error);
+    return { success: false };
+  }
+}

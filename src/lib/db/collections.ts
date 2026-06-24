@@ -78,6 +78,7 @@ export interface RoomDoc {
   code: string; // 6-digit uppercase code
   gameSlug: string;
   players: RoomPlayer[];
+  spectators?: RoomPlayer[];
   maxPlayers: number;
   status: "waiting" | "playing";
   settings: {
