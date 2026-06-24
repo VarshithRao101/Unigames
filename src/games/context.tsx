@@ -110,7 +110,7 @@ export function MatchProvider({
         setLifecycleState("finished");
         
         // Redirect to results screen
-        router.push(`/results/${matchId}`);
+        router.replace(`/results/${matchId}`);
       });
 
       return () => {

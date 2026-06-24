@@ -100,6 +100,14 @@ const ONLINE_FRIENDS = [
   { id: "f5", name: "Nova", status: "Online", avatar: "N" },
 ];
 
+const renderAvatar = (avatar: string, name: string) => {
+  const isUrl = avatar && (avatar.startsWith("http") || avatar.startsWith("/") || avatar.includes(".") || avatar.includes("/"));
+  if (isUrl) {
+    return <img src={avatar} alt={name} className="w-full h-full rounded-full object-cover" />;
+  }
+  return <span>{avatar}</span>;
+};
+
 export default function LobbyRoomPage({ params }: { params: Promise<{ code: string }> }) {
   const router = useRouter();
   const { user } = useAuth();
@@ -148,6 +156,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Ad interstitial locks
   const [isAdOpen, setIsAdOpen] = useState(false);
   const [hasShownStartAd, setHasShownStartAd] = useState(false);
+  const [playersInCountdown, setPlayersInCountdown] = useState<string[]>([]);
+  const [roomClosed, setRoomClosed] = useState(false);
 
   const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.tictactoe;
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -177,6 +187,18 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     loadFriends();
   }, []);
 
+  // Prevent browser back button navigation
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
   // Initialize and sync room data with Pusher presence / private channel
   useEffect(() => {
     if (!user) return;
@@ -194,11 +216,13 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
         const res = await fetch(`/api/rooms/${roomCode}`);
         if (!res.ok) {
-          throw new Error("Lobby room not found or expired");
+          setRoomClosed(true);
+          return;
         }
         const json = await res.json();
         if (!json.success || !json.data) {
-          throw new Error("Lobby room not found");
+          setRoomClosed(true);
+          return;
         }
 
         let currentRoom = json.data;
@@ -311,14 +335,25 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
         pusherChannel.bind("match-started", (data: { matchId: string; gameSlug: string }) => {
           // Tunnel redirection to gameplay screen!
-          router.push(`/play/${data.gameSlug}?match=${data.matchId}`);
+          router.replace(`/play/${data.gameSlug}?match=${data.matchId}`);
+        });
+
+        pusherChannel.bind("match-starting", () => {
+          setIsAdOpen(true);
+        });
+
+        pusherChannel.bind("player-entered-countdown", (data: { userId: string }) => {
+          setPlayersInCountdown((prev) => {
+            if (prev.includes(data.userId)) return prev;
+            return [...prev, data.userId];
+          });
         });
 
       } catch (err: any) {
         console.error("Lobby room initialization error:", err);
         if (active) {
           toast(err.message || "Failed to establish link with lobby room", "error");
-          router.push("/rooms");
+          router.replace("/rooms");
         }
       }
     }
@@ -411,20 +446,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     };
   }, [gameState, game]);
 
-  // Auto start pre-match countdown when everyone is ready
-  useEffect(() => {
-    if (gameState === "lobby") {
-      const allReady = players.length >= 2 && players.every(p => p.isReady);
-      if (allReady) {
-        if (!hasShownStartAd) {
-          setIsAdOpen(true);
-        } else {
-          setGameState("countdown");
-          setCountdown(3);
-        }
-      }
-    }
-  }, [players, gameState, hasShownStartAd]);
+  // Auto start pre-match countdown removed (Host must click Start Match manually now)
 
   // Cancel countdown if any player exits or unreadies
   useEffect(() => {
@@ -436,12 +458,20 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       if (isAdOpen) {
         setIsAdOpen(false);
       }
+      setPlayersInCountdown([]);
     }
   }, [players, gameState, isAdOpen]);
 
   // Countdown timer logic
   useEffect(() => {
     if (gameState !== "countdown") return;
+
+    // Countdown only starts when all players are on the timer page
+    const allPlayersReadyInTimer = playersInCountdown.length >= players.length;
+    if (!allPlayersReadyInTimer) {
+      return;
+    }
+
     if (countdown === 0) {
       const isHost = players.find((p) => p.id === user?.id)?.isHost;
       if (isHost) {
@@ -458,7 +488,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, gameState, players, user]);
+  }, [countdown, gameState, players, user, playersInCountdown]);
 
   // Switch between Player and Spectator Mode
   const handleToggleSpectatorMode = async () => {
@@ -504,7 +534,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         setIsSpectatingOnly(true);
         if (leaveJson.data?.empty) {
           toast("Room was closed because it has no players", "info");
-          router.push("/rooms");
+          router.replace("/rooms");
           return;
         }
         setPlayers(prev => prev.filter(p => p.id !== user?.id));
@@ -594,15 +624,48 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
       const match = json.data;
       const matchId = match._id;
       // Host immediately redirects (other guests will be redirected by Pusher 'match-started' broadcast)
-      router.push(`/play/${match.gameSlug}?match=${matchId}`);
+      router.replace(`/play/${match.gameSlug}?match=${matchId}`);
     } catch (err: any) {
       toast(err.message || "Could not launch match arena", "error");
     }
   };
 
-  const handleCloseAd = () => {
+  const handleCloseAd = async () => {
     setIsAdOpen(false);
     setHasShownStartAd(true);
+    setGameState("countdown");
+    setCountdown(3);
+
+    // Add ourselves locally
+    if (user?.id) {
+      setPlayersInCountdown((prev) => {
+        if (prev.includes(user.id)) return prev;
+        return [...prev, user.id];
+      });
+    }
+
+    // Call the server to notify others that we've entered the countdown timer page
+    try {
+      await fetch(`/api/rooms/${roomCode}/enter-countdown`, {
+        method: "POST",
+      });
+    } catch (err) {
+      console.error("Failed to register countdown entry", err);
+    }
+  };
+
+  // Host triggers match start sequence (notifies all players to show ad)
+  const handleTriggerStart = async () => {
+    try {
+      const res = await fetch(`/api/rooms/${roomCode}/start`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to trigger match start");
+      }
+    } catch (err: any) {
+      toast(err.message || "Could not start match sequence", "error");
+    }
   };
 
   const handleLeaveRoom = async () => {
@@ -613,7 +676,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     } catch (err) {
       console.error("Error leaving room:", err);
     } finally {
-      router.push("/rooms");
+      router.replace("/rooms");
     }
   };
 
@@ -738,6 +801,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const handlePlayAgain = () => {
     setGameState("lobby");
     setCountdown(3);
+    setPlayersInCountdown([]);
+    setHasShownStartAd(false);
     setPlayers(prev => prev.map(p => ({ ...p, isReady: p.isHost ? false : true })));
     setChatMessages(prev => [
       ...prev,
@@ -763,10 +828,10 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           >
             <div className="flex items-center gap-2">
               <div 
-                className="w-8 h-8 rounded-full border border-black text-slate-950 font-outfit font-black flex items-center justify-center text-xs shadow-[1px_1px_0px_#000000]"
+                className="w-8 h-8 rounded-full border border-black text-slate-950 font-outfit font-black flex items-center justify-center text-xs shadow-[1px_1px_0px_#000000] overflow-hidden shrink-0"
                 style={{ backgroundColor: player.color || "#FFC107" }}
               >
-                {player.avatar}
+                {renderAvatar(player.avatar, player.name)}
               </div>
               <div>
                 <p className="font-outfit font-extrabold text-xs text-slate-50 flex items-center gap-1">
@@ -835,6 +900,52 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     }
     return slots;
   };
+
+  // ROOM CLOSED VIEW
+  if (roomClosed) {
+    return (
+      <>
+        <Navbar />
+        <Sidebar />
+        <main className="flex-1 pt-24 bg-[var(--slate-950)] text-slate-55 min-h-screen pb-20 flex items-center justify-center font-outfit select-none">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-md w-full bg-[var(--slate-800)] border-[4px] border-black p-8 rounded-[2.5rem] space-y-6 text-center shadow-[8px_8px_0px_#000000] relative overflow-hidden"
+          >
+            {/* Halftone Overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:8px_8px] opacity-[0.05] pointer-events-none" />
+            
+            <div className="w-16 h-16 bg-[#ff4d4d]/15 border-3 border-black rounded-2xl flex items-center justify-center mx-auto text-[#ff4d4d] shadow-[3px_3px_0px_#000000]">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            
+            <div>
+              <h1 className="font-outfit font-black text-xl uppercase tracking-wide text-slate-50">Lobby Closed</h1>
+              <p className="text-[11px] text-slate-400 mt-2 font-semibold leading-relaxed">
+                This game lobby has been closed or terminated because the match has concluded.
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.replace("/rooms")}
+                className="flex-grow h-11 text-[9px] font-black uppercase tracking-widest bg-slate-900 text-slate-350 border-2 border-black rounded-xl shadow-[3px_3px_0px_#000000] hover:bg-slate-850 active:translate-y-0.5 transition-all cursor-pointer"
+              >
+                Browse Lobbies
+              </button>
+              <button
+                onClick={() => router.replace("/")}
+                className="flex-grow h-11 text-[9px] font-black uppercase tracking-widest bg-brand-orange text-slate-955 border-2 border-black rounded-xl shadow-[3px_3px_0px_#000000] hover:bg-brand-orange/95 active:translate-y-0.5 transition-all cursor-pointer"
+              >
+                Go Home
+              </button>
+            </div>
+          </motion.div>
+        </main>
+      </>
+    );
+  }
 
   // PRIVATE ROOM LOCK PAGE
   if (isLocked) {
@@ -1110,7 +1221,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                         {players.find((p) => p.id === user?.id)?.isHost && (
                           <button
-                            onClick={handleStartMatch}
+                            onClick={handleTriggerStart}
                             disabled={players.length < 2 || !players.every(p => p.isReady)}
                             className="btn-neo flex-1 h-9.5 text-slate-950 uppercase font-black text-[11px] tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                           >
@@ -1160,8 +1271,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 <div className="flex items-center gap-6 my-6 z-10">
                   {players.slice(0, 3).map((p) => (
                     <div key={p.id} className="relative flex flex-col items-center">
-                      <div className="w-12 h-12 rounded-full border-2 border-black bg-[var(--slate-900)] flex items-center justify-center font-outfit font-black text-base relative shadow-[2px_2px_0px_#000000]">
-                        {p.avatar}
+                      <div className="w-12 h-12 rounded-full border-2 border-black bg-[var(--slate-900)] flex items-center justify-center font-outfit font-black text-base relative shadow-[2px_2px_0px_#000000] overflow-hidden shrink-0">
+                        {renderAvatar(p.avatar, p.name)}
                       </div>
                       <span className="text-[9px] font-black text-slate-450 mt-1.5">{p.name}</span>
                     </div>
@@ -1175,12 +1286,12 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                 <div className="relative flex items-center justify-center w-24 h-24 my-3 z-10">
                   <div className="w-18 h-18 rounded-full bg-brand-orange border-3 border-black text-slate-950 flex items-center justify-center font-outfit font-black text-3xl shadow-[2.5px_2.5px_0px_#000000]">
-                    {countdown}
+                    {playersInCountdown.length >= players.length ? countdown : "⏳"}
                   </div>
                 </div>
 
-                <p className="text-[10px] text-slate-400 font-extrabold tracking-wider uppercase mt-3 z-10">
-                  Game Starts In A Moment...
+                <p className="text-[10px] text-slate-400 font-extrabold tracking-wider uppercase mt-3 z-10 animate-pulse">
+                  {playersInCountdown.length >= players.length ? "Game Starts In A Moment..." : "Waiting for other player..."}
                 </p>
               </motion.div>
             )}
@@ -1329,8 +1440,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                             <tr key={p.id} className="text-slate-50 hover:bg-black/10">
                               <td className="py-2.5 font-outfit font-black text-brand-orange">#{idx + 1}</td>
                               <td className="py-2.5 flex items-center gap-1.5">
-                                <div className="w-6 h-6 rounded-full bg-slate-950 border border-black flex items-center justify-center font-outfit font-black text-[9px] shadow-[1px_1px_0px_#000000]">
-                                  {p.avatar}
+                                <div className="w-6 h-6 rounded-full bg-slate-950 border border-black flex items-center justify-center font-outfit font-black text-[9px] shadow-[1px_1px_0px_#000000] overflow-hidden shrink-0">
+                                  {renderAvatar(p.avatar, p.name)}
                                 </div>
                                 <span className="font-bold">{p.name}</span>
                               </td>
@@ -1438,8 +1549,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   {friendsList.map((friend) => (
                     <div key={friend.id} className="flex items-center justify-between p-2 hover:bg-black/20 rounded-xl transition-all">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-slate-50 shadow-[1px_1px_0px_#000000]">
-                          {friend.avatar}
+                        <div className="w-8 h-8 rounded-full bg-slate-950 border-2 border-black flex items-center justify-center font-outfit font-black text-xs text-slate-50 shadow-[1px_1px_0px_#000000] overflow-hidden shrink-0">
+                          {renderAvatar(friend.avatar, friend.name)}
                         </div>
                         <div>
                           <p className="font-outfit font-black text-xs text-slate-50 leading-none">{friend.name}</p>

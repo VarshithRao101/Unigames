@@ -49,6 +49,18 @@ function PlayGameContainer() {
   // Quick Emotes list
   const quickEmotes = ["😂", "🔥", "👑", "👍", "🤔", "GG", "Well Played", "Oops!", "Noooo"];
 
+  // Prevent back button navigation during active game session
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
   useEffect(() => {
     if (!matchId) {
       setError("No Match ID provided in request parameters");
@@ -95,7 +107,7 @@ function PlayGameContainer() {
           <p className="text-xs text-slate-450 leading-relaxed font-semibold">
             {error || "An unexpected error occurred while linking to the game server."}
           </p>
-          <Button onClick={() => router.push("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
+          <Button onClick={() => router.replace("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
             Return to Deck
           </Button>
         </div>
@@ -114,7 +126,7 @@ function PlayGameContainer() {
           <p className="text-xs text-slate-450 leading-relaxed font-semibold">
             The game mode "{gameSlug}" is not registered on this platform.
           </p>
-          <Button onClick={() => router.push("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
+          <Button onClick={() => router.replace("/games")} className="btn-neo w-full h-10 font-black uppercase text-[10px] tracking-wider">
             Return to Deck
           </Button>
         </div>
@@ -158,7 +170,7 @@ function PlayGameContainer() {
       } catch (err) {
         console.error("Failed to leave match cleanly:", err);
       } finally {
-        router.push("/games");
+        router.replace("/games");
       }
     }
   };

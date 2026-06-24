@@ -14,8 +14,10 @@ export default function TicTacToeGame() {
   // Destructure or assign defaults for board state
   const board = gameState.board || Array(9).fill("");
   const currentTurnPlayerId = gameState.currentTurnPlayerId || (players[0]?.id || "");
-  const winnerId = gameState.winnerId || null;
-  const isDraw = gameState.isDraw || false;
+  const scores = gameState.scores || { [players[0]?.id || "p1"]: 0, [players[1]?.id || "p2"]: 0 };
+  const roundWinnerId = gameState.roundWinnerId || null;
+  const isRoundDraw = gameState.isRoundDraw || false;
+  const roundOver = gameState.roundOver || false;
 
   // Map players to X and O symbols
   const getSymbol = (playerId: string) => {
@@ -25,7 +27,7 @@ export default function TicTacToeGame() {
   };
 
   const localSymbol = localPlayer ? getSymbol(localPlayer.id) : "";
-  const isMyTurn = localPlayer && currentTurnPlayerId === localPlayer.id && !winnerId && !isDraw;
+  const isMyTurn = localPlayer && currentTurnPlayerId === localPlayer.id && !roundOver;
 
   // Initialize board state if empty
   useEffect(() => {
@@ -33,8 +35,13 @@ export default function TicTacToeGame() {
       sdk.updateState({
         board: Array(9).fill(""),
         currentTurnPlayerId: players[0]?.id,
-        winnerId: null,
-        isDraw: false
+        roundWinnerId: null,
+        isRoundDraw: false,
+        roundOver: false,
+        scores: {
+          [players[0]?.id]: 0,
+          [players[1]?.id]: 0
+        }
       });
     }
   }, [players, gameState.board]);
@@ -60,19 +67,26 @@ export default function TicTacToeGame() {
   };
 
   const handleCellClick = (index: number) => {
-    if (!isMyTurn || board[index] !== "" || winnerId || isDraw) return;
+    if (!isMyTurn || board[index] !== "" || roundOver) return;
 
     const nextBoard = [...board];
     nextBoard[index] = localSymbol;
 
     const winnerSymbol = checkWinner(nextBoard);
-    let nextWinnerId = null;
-    let nextIsDraw = false;
+    let nextRoundWinnerId = null;
+    let nextIsRoundDraw = false;
+    let nextRoundOver = false;
+    const nextScores = { ...scores };
 
     if (winnerSymbol) {
-      nextWinnerId = winnerSymbol === "X" ? players[0]?.id : players[1]?.id;
+      nextRoundWinnerId = winnerSymbol === "X" ? players[0]?.id : players[1]?.id;
+      nextRoundOver = true;
+      if (nextRoundWinnerId) {
+        nextScores[nextRoundWinnerId] = (nextScores[nextRoundWinnerId] || 0) + 1;
+      }
     } else if (nextBoard.every(cell => cell !== "")) {
-      nextIsDraw = true;
+      nextIsRoundDraw = true;
+      nextRoundOver = true;
     }
 
     const nextTurnPlayerId = currentTurnPlayerId === players[0]?.id 
@@ -86,51 +100,80 @@ export default function TicTacToeGame() {
     sdk.updateState({
       board: nextBoard,
       currentTurnPlayerId: nextTurnPlayerId,
-      winnerId: nextWinnerId,
-      isDraw: nextIsDraw
+      roundWinnerId: nextRoundWinnerId,
+      isRoundDraw: nextIsRoundDraw,
+      roundOver: nextRoundOver,
+      scores: nextScores
     });
-
-    // If game has concluded, declare result
-    if (nextWinnerId) {
-      sdk.declareWinner(nextWinnerId, [nextWinnerId, players.find(p => p.id !== nextWinnerId)?.id || ""], {
-        [nextWinnerId]: 150,
-        [players.find(p => p.id !== nextWinnerId)?.id || ""]: 40
-      });
-    } else if (nextIsDraw) {
-      sdk.declareWinner("", players.map(p => p.id), {
-        [players[0]?.id]: 75,
-        [players[1]?.id || ""]: 75
-      });
-    }
   };
 
-  const handleRestart = () => {
+  const handleReplayRound = () => {
     sdk.updateState({
       board: Array(9).fill(""),
       currentTurnPlayerId: players[0]?.id,
-      winnerId: null,
-      isDraw: false
+      roundWinnerId: null,
+      isRoundDraw: false,
+      roundOver: false
     });
-    sdk.submitMove("restart_match");
+    sdk.submitMove("replay_round");
+  };
+
+  const handleFinishMatch = () => {
+    const p1 = players[0]?.id || "";
+    const p2 = players[1]?.id || "";
+    const s1 = scores[p1] || 0;
+    const s2 = scores[p2] || 0;
+
+    let finalWinnerId = "";
+    if (s1 > s2) {
+      finalWinnerId = p1;
+    } else if (s2 > s1) {
+      finalWinnerId = p2;
+    }
+
+    // Call sdk.declareWinner to finalize match and redirect to scorecards
+    sdk.declareWinner(finalWinnerId, [p1, p2], {
+      [p1]: s1,
+      [p2]: s2
+    });
   };
 
   // Resolve status text
   let statusText = "";
-  if (winnerId) {
-    const winnerName = players.find(p => p.id === winnerId)?.name || "Opponent";
-    statusText = `🎉 Concluded: ${winnerName} Wins!`;
-  } else if (isDraw) {
-    statusText = "🤝 Match Drawn!";
+  if (roundWinnerId) {
+    const winnerName = players.find(p => p.id === roundWinnerId)?.name || "Opponent";
+    statusText = `🎉 Round Won by ${winnerName}!`;
+  } else if (isRoundDraw) {
+    statusText = "🤝 Round Drawn!";
   } else {
     const activeName = players.find(p => p.id === currentTurnPlayerId)?.name || "Waiting...";
     statusText = currentTurnPlayerId === localPlayer?.id ? "🟢 Your Turn!" : `Waiting for ${activeName}...`;
   }
 
-  const isPlayer1Active = currentTurnPlayerId === players[0]?.id && !winnerId && !isDraw;
-  const isPlayer2Active = currentTurnPlayerId === players[1]?.id && !winnerId && !isDraw;
+  const isPlayer1Active = currentTurnPlayerId === players[0]?.id && !roundOver;
+  const isPlayer2Active = currentTurnPlayerId === players[1]?.id && !roundOver;
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6 max-w-md mx-auto py-4 select-none w-full">
+      
+      {/* Scoreboard HUD */}
+      <div className="w-full grid grid-cols-3 items-center p-3 bg-slate-900 border-3 border-black rounded-2xl shadow-[4px_4px_0px_#000000] relative overflow-hidden">
+        {/* Halftone Overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px] opacity-[0.06] pointer-events-none" />
+        <div className="text-left px-2 relative z-10">
+          <p className="font-outfit font-extrabold text-[8px] text-slate-500 uppercase tracking-widest">X PLAYER</p>
+          <p className="font-outfit font-black text-xs text-brand-orange truncate">{players[0]?.name || "Player 1"}</p>
+        </div>
+        <div className="text-center bg-slate-950/40 border border-black rounded-lg py-1 px-2.5 shadow-[inset_1px_1px_0px_rgba(0,0,0,0.2)] relative z-10">
+          <p className="font-space font-black text-sm text-slate-100 tracking-wider">
+            {scores[players[0]?.id || "p1"] || 0} - {scores[players[1]?.id || "p2"] || 0}
+          </p>
+        </div>
+        <div className="text-right px-2 relative z-10">
+          <p className="font-outfit font-extrabold text-[8px] text-slate-500 uppercase tracking-widest">O PLAYER</p>
+          <p className="font-outfit font-black text-xs text-success truncate">{players[1]?.name || "Player 2"}</p>
+        </div>
+      </div>
       
       {/* Status banner */}
       <div className="w-full text-center p-4 bg-slate-900 border-3 border-black rounded-2xl shadow-[4px_4px_0px_#000000] relative overflow-hidden">
@@ -151,7 +194,7 @@ export default function TicTacToeGame() {
         {/* Board grid lines and backing */}
         <div className="grid grid-cols-3 gap-3 w-full h-full">
           {board.map((cell: string, idx: number) => {
-            const isClickable = !isSpectator && isMyTurn && cell === "" && !winnerId && !isDraw;
+            const isClickable = !isSpectator && isMyTurn && cell === "" && !roundOver;
             return (
               <button
                 key={idx}
@@ -250,14 +293,22 @@ export default function TicTacToeGame() {
         </div>
       </div>
 
-      {/* Restart / Reset for Dev tests */}
-      {localPlayer?.isHost && (winnerId || isDraw) && (
-        <Button
-          onClick={handleRestart}
-          className="btn-neo h-10 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] mt-2 relative z-10"
-        >
-          <RefreshCw className="w-3.5 h-3.5 mr-1" /> Reset Board
-        </Button>
+      {/* Dev Reset fallback or Round over panel */}
+      {roundOver && !isSpectator && (
+        <div className="flex gap-3 w-full relative z-10">
+          <Button
+            onClick={handleReplayRound}
+            className="flex-1 btn-neo h-11 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] bg-slate-900 border-2 border-black text-slate-350 hover:bg-slate-800"
+          >
+            <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin-slow" /> Replay Round
+          </Button>
+          <Button
+            onClick={handleFinishMatch}
+            className="flex-1 btn-neo h-11 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] bg-brand-orange text-slate-955 hover:bg-brand-orange/95"
+          >
+            <Trophy className="w-3.5 h-3.5 mr-1" /> Finish Match
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -9,6 +9,14 @@ import { Trophy, ArrowRight, Home, RefreshCw, Star, Flame } from "lucide-react";
 import { motion } from "framer-motion";
 import { Loader } from "@/components/ui/loader";
 
+const renderAvatar = (avatar: string | undefined, username: string) => {
+  const isUrl = avatar && (avatar.startsWith("http") || avatar.startsWith("/") || avatar.includes(".") || avatar.includes("/"));
+  if (isUrl) {
+    return <img src={avatar} alt={username} className="w-full h-full rounded-full object-cover" />;
+  }
+  return <span>{username.slice(0, 2).toUpperCase()}</span>;
+};
+
 interface MatchResult {
   _id: string;
   roomCode: string;
@@ -162,8 +170,8 @@ function MatchResults() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-slate-900 border border-black flex items-center justify-center font-black text-xs text-slate-350">
-                      {player.username.slice(0, 2).toUpperCase()}
+                    <div className="h-8 w-8 rounded-full bg-slate-900 border border-black flex items-center justify-center font-black text-xs text-slate-350 overflow-hidden shrink-0">
+                      {renderAvatar(player.avatar, player.username)}
                     </div>
                     <div>
                       <p className="text-[11px] font-black uppercase tracking-tight text-white">

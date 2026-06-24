@@ -146,28 +146,8 @@ export async function endMatch(
       }
     );
 
-    // Reset room state so players can play again
-    const room = await roomsCollection.findOne({ code: match.roomCode });
-    if (room) {
-      const resetPlayers = room.players.map((p) => ({
-        ...p,
-        // Keep host ready, reset others to not ready
-        isReady: p.isHost,
-      }));
-
-      const updatedTime = new Date();
-      await roomsCollection.updateOne(
-        { code: match.roomCode },
-        {
-          $set: {
-            status: "waiting",
-            players: resetPlayers,
-            updatedAt: updatedTime,
-            expiresAt: new Date(updatedTime.getTime() + 60 * 60 * 1000), // Reset 1h expiry timer
-          },
-        }
-      );
-    }
+    // Permanently terminate the room after match ends
+    await roomsCollection.deleteOne({ code: match.roomCode });
 
     const updatedMatch = await matchesCollection.findOne({ _id: new ObjectId(matchId) });
 

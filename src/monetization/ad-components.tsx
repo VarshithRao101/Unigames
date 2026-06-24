@@ -264,7 +264,6 @@ export function PopupAd({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
         if (prev <= 1) {
           clearInterval(timer);
           setCanClose(true);
-          onClose(); // Automatically close and start match after 3 seconds
           return 0;
         }
         return prev - 1;
