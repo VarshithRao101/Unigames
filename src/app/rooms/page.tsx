@@ -64,13 +64,20 @@ export default function RoomsPage() {
       channel.bind("room-created", (newRoom: any) => {
         setRooms((prev) => {
           if (prev.some((r) => r.code === newRoom.code)) return prev;
+          
+          const hostUsername = newRoom.host || (newRoom.players && newRoom.players[0]?.username) || "Unknown";
+          const mockUsernames = ["Nova", "BoardKing", "Luna", "RookStar"];
+          if (mockUsernames.includes(hostUsername)) {
+            return prev;
+          }
+
           const formattedRoom: LobbyRoom = {
             id: newRoom.id || newRoom._id || `custom-${newRoom.code}`,
             code: newRoom.code,
             name: newRoom.name || newRoom.settings?.name || `${newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
             gameSlug: newRoom.gameSlug,
             gameName: newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
-            host: newRoom.host || "Unknown",
+            host: hostUsername,
             currentPlayers: newRoom.currentPlayers || 1,
             maxPlayers: newRoom.maxPlayers || 2,
             status: newRoom.status || "open",
@@ -91,15 +98,21 @@ export default function RoomsPage() {
           return prev.map((room) => {
             if (room.code === updatedInfo.code) {
               const nextPlayersCount = updatedInfo.playersCount !== undefined ? updatedInfo.playersCount : room.currentPlayers;
+              const nextHost = updatedInfo.host || room.host;
+              const mockUsernames = ["Nova", "BoardKing", "Luna", "RookStar"];
+              if (mockUsernames.includes(nextHost)) {
+                return null as any;
+              }
               return {
                 ...room,
                 ...updatedInfo,
+                host: nextHost,
                 currentPlayers: nextPlayersCount,
                 status: nextPlayersCount >= room.maxPlayers ? "full" : "open",
               };
             }
             return room;
-          });
+          }).filter(Boolean);
         });
       });
 

@@ -213,9 +213,11 @@ export async function setPlayerReady(
 export async function listOpenRooms(gameSlug?: string): Promise<RoomDoc[]> {
   try {
     const collection = await getRoomsCollection();
+    const mockUsernames = ["Nova", "BoardKing", "Luna", "RookStar"];
     const query: any = {
       status: "waiting",
       "settings.isPrivate": false,
+      "players.0.username": { $nin: mockUsernames }
     };
     
     if (gameSlug) {

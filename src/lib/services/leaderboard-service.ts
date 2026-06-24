@@ -60,11 +60,17 @@ export async function getLeaderboard(
     const usersColl = await getUsersCollection();
     const matchesColl = await getMatchesCollection();
 
+    const mockEmails = ["nova@uniplay.gg", "boardking@uniplay.gg", "luna@uniplay.gg", "rookstar@uniplay.gg"];
+    const mockUsernames = ["Nova", "BoardKing", "Luna", "RookStar"];
+
     if (period === "all-time") {
       if (gameSlug === "global") {
-        // Query overall all-time rankings directly from the users collection
+        // Query overall all-time rankings directly from the users collection, excluding mock users
         const users = await usersColl
-          .find({})
+          .find({
+            email: { $nin: mockEmails },
+            username: { $nin: mockUsernames }
+          })
           .sort({ xp: -1 })
           .limit(limit)
           .toArray();
@@ -99,7 +105,11 @@ export async function getLeaderboard(
         // Game-specific all-time:
         // Find users where stats.gameStats[gameSlug] exists, compute game-specific XP in-memory, and sort
         const users = await usersColl
-          .find({ [`stats.gameStats.${gameSlug}`]: { $exists: true } })
+          .find({
+            [`stats.gameStats.${gameSlug}`]: { $exists: true },
+            email: { $nin: mockEmails },
+            username: { $nin: mockUsernames }
+          })
           .toArray();
 
         const list = users.map((userDoc) => {
@@ -167,6 +177,23 @@ export async function getLeaderboard(
           }
         },
         {
+          $lookup: {
+            from: "users",
+            localField: "_id",
+            foreignField: "_id",
+            as: "userDoc"
+          }
+        },
+        {
+          $unwind: "$userDoc"
+        },
+        {
+          $match: {
+            "userDoc.email": { $nin: mockEmails },
+            "userDoc.username": { $nin: mockUsernames }
+          }
+        },
+        {
           $sort: { weeklyXP: -1 }
         },
         {
@@ -178,20 +205,8 @@ export async function getLeaderboard(
         return [];
       }
 
-      const userObjectIds = weeklyAgg.map(item => {
-        try {
-          return new ObjectId(item._id);
-        } catch {
-          return item._id;
-        }
-      });
-
-      const users = await usersColl.find({ _id: { $in: userObjectIds } }).toArray();
-      const userMap = new Map(users.map(u => [u._id?.toString() || "", u]));
-
       return weeklyAgg.map((item, index) => {
-        const userIdStr = item._id.toString();
-        const userDoc = userMap.get(userIdStr);
+        const userDoc = item.userDoc;
         
         let favoriteGame = "Tic-Tac-Toe";
         if (userDoc?.stats?.gameStats) {
