@@ -50,6 +50,13 @@ export async function POST(req: NextRequest) {
           return apiErrors.unauthorized("Cannot subscribe to another user's private channel.");
         }
       }
+      if (channelName.startsWith("private-direct-")) {
+        const directKey = channelName.substring("private-direct-".length);
+        const ids = directKey.split("_");
+        if (!ids.includes(session.user.id)) {
+          return apiErrors.unauthorized("Cannot subscribe to this direct chat channel.");
+        }
+      }
       authResponse = pusher.authorizeChannel(socketId, channelName);
     }
 

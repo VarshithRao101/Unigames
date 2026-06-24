@@ -5,7 +5,7 @@ export const TEST_ARENA_META: GameMetadata = {
   slug: "test-arena",
   name: "UniGames Test Arena",
   description: "A fully integrated testing arena used to validate game registry, container components, match context, and reward loops.",
-  thumbnail: "🛡️",
+  thumbnail: "SANDBOX",
   category: "Testing",
   status: "released",
   version: "1.0.0",

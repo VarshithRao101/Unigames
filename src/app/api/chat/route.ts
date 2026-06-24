@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
       } else if (channel.startsWith("room:")) {
         const roomCode = channel.split(":")[1];
         await pusher.trigger(`private-room-${roomCode}`, "room-message", payload);
+      } else if (channel.startsWith("direct:")) {
+        const directKey = channel.split(":")[1];
+        await pusher.trigger(`private-direct-${directKey}`, "direct-message", payload);
       }
     } catch (pushErr) {
       console.warn("Pusher chat message broadcast warning:", pushErr);

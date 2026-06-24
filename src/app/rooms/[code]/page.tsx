@@ -63,7 +63,7 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
     objectives: "Trigger match results using simulators.",
     duration: "Real-time interactive",
     winConditions: "Simulate Winner A or Winner B action buttons.",
-    thumb: "🛡️",
+    thumb: "SANDBOX",
     tips: [
       "Select a winner button to simulate reward calculations.",
       "Verify live spectator counts update dynamically.",
@@ -79,7 +79,7 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
     objectives: "Make a line of three to win.",
     duration: "Fast Rounds",
     winConditions: "Instant line of 3, or draw if full.",
-    thumb: "❌",
+    thumb: "GRID",
     tips: [
       "Try to secure the center cell on your first move if possible.",
       "Always block your opponent if they have two in a row.",

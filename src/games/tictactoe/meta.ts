@@ -5,7 +5,7 @@ export const TICTACTOE_META: GameMetadata = {
   slug: "tictactoe",
   name: "Tic-Tac-Toe Arena",
   description: "A fast-paced arena for the classic game of noughts and crosses. Perfect for quick matches and breaks.",
-  thumbnail: "🎲",
+  thumbnail: "GRID",
   category: "Arcade",
   status: "released",
   version: "1.0.0",

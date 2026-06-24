@@ -36,6 +36,7 @@ import {
   LobbyRoom,
 } from "@/data/platform";
 import { loadCreatedRooms, mergeRooms } from "@/utils/mock-room-store";
+import { getPusherClient } from "@/lib/pusher";
 
 /* ── REUSABLE ANIMATED COMPONENTS ── */
 
@@ -208,25 +209,82 @@ export default function CommunityHubPage() {
   }, [user]);
 
   const [activeChannel, setActiveChannel] = useState("global");
-  const [chatFeeds, setChatFeeds] = useState<{ [key: string]: Array<{ id: string; sender: string; text: string; time: string }> }>({
-    global: GLOBAL_CHAT_SEED,
-    VARSHITH: [
-      { id: "v1", sender: "VARSHITH", text: "Hey bro! Ready to play Tic-Tac-Toe? I am waiting in lobby TIC881.", time: "19:35" },
-      { id: "v2", sender: "You", text: "Just finalizing the operational setup, will join in 2 minutes!", time: "19:37" },
-      { id: "v3", sender: "VARSHITH", text: "Awesome! Let me know when you hit ready.", time: "19:38" },
-    ],
-    NOVA: [
-      { id: "n1", sender: "NOVA", text: "Is the new leaderboard updated? I want to see if I made the top 3 weekly.", time: "19:40" },
-      { id: "n2", sender: "You", text: "Yes, looks like you are Rank #3 right below Boardking!", time: "19:41" },
-    ],
-    BOARDKING: [
-      { id: "b1", sender: "BOARDKING", text: "Yo, I need one more player for a Tic-Tac-Toe lobby. You up?", time: "19:42" },
-    ],
-    LUNA: [
-      { id: "l1", sender: "LUNA", text: "GG on the match earlier! Your strategy was amazing.", time: "19:30" },
-      { id: "l2", sender: "You", text: "Thanks LUNA! That was a close game. Let's run a rematch soon.", time: "19:32" },
-    ]
+  const [chatFeeds, setChatFeeds] = useState<{ [key: string]: Array<{ id: string; sender: string; senderId?: string; avatar?: string; text: string; time: string }> }>({
+    global: [],
   });
+
+  // Helper to determine the database channel string
+  const getChannelString = (activeChan: string, currentUserId: string, friendsList: any[]) => {
+    if (activeChan === "global") return "global";
+    const friend = friendsList.find(f => f.username === activeChan);
+    if (!friend) return `direct:${activeChan}`;
+    const friendId = friend._id || friend.id;
+    const sortedIds = [currentUserId, friendId].sort().join("_");
+    return `direct:${sortedIds}`;
+  };
+
+  // Synchronize history and subscribe to real-time events
+  useEffect(() => {
+    if (!user) return;
+    const currentUserId = user.id;
+    const dbChannel = getChannelString(activeChannel, currentUserId, friends);
+    
+    // 1. Fetch chat history from database
+    async function loadHistory() {
+      try {
+        const res = await fetch(`/api/chat?channel=${dbChannel}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data)) {
+            setChatFeeds((prev) => ({
+              ...prev,
+              [activeChannel]: json.data,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load community chat history:", err);
+      }
+    }
+    loadHistory();
+
+    // 2. Setup Pusher channel
+    const pusher = getPusherClient();
+    let pusherChannel: any = null;
+    let pusherChannelName = "";
+
+    if (activeChannel === "global") {
+      pusherChannelName = "presence-global-chat";
+      pusherChannel = pusher.subscribe(pusherChannelName);
+      pusherChannel.bind("new-message", (msg: any) => {
+        setChatFeeds((prev) => ({
+          ...prev,
+          global: prev.global ? (prev.global.some(m => m.id === msg.id) ? prev.global : [...prev.global, msg]) : [msg],
+        }));
+      });
+    } else {
+      const friend = friends.find(f => f.username === activeChannel);
+      if (friend) {
+        const friendId = friend._id || friend.id;
+        const sortedIds = [currentUserId, friendId].sort().join("_");
+        pusherChannelName = `private-direct-${sortedIds}`;
+        pusherChannel = pusher.subscribe(pusherChannelName);
+        pusherChannel.bind("direct-message", (msg: any) => {
+          setChatFeeds((prev) => ({
+            ...prev,
+            [activeChannel]: prev[activeChannel] ? (prev[activeChannel].some(m => m.id === msg.id) ? prev[activeChannel] : [...prev[activeChannel], msg]) : [msg],
+          }));
+        });
+      }
+    }
+
+    return () => {
+      if (pusherChannel && pusherChannelName) {
+        pusherChannel.unbind_all();
+        pusher.unsubscribe(pusherChannelName);
+      }
+    };
+  }, [activeChannel, user, friends]);
 
   const tickerEvents = useMemo(() => [
     "NOVA CREATED LOBBY TIC442 — TIC-TAC-TOE · SINGAPORE",
@@ -257,22 +315,37 @@ export default function CommunityHubPage() {
     }
   }, [currentMessages]);
 
-  const handleChatSend = (event: React.FormEvent) => {
+  const handleChatSend = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!chatText.trim()) return;
+    if (!chatText.trim() || !user) return;
 
-    const newMessage = {
-      id: `${Date.now()}`,
-      sender: user?.username || "You",
-      text: chatText.trim(),
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setChatFeeds((prev) => ({
-      ...prev,
-      [activeChannel]: [...(prev[activeChannel] || []), newMessage]
-    }));
+    const textToSend = chatText.trim();
     setChatText("");
+
+    const dbChannel = getChannelString(activeChannel, user.id, friends);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: dbChannel,
+          text: textToSend,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to send message");
+      }
+      const json = await res.json();
+      if (json.success && json.data) {
+        setChatFeeds((prev) => ({
+          ...prev,
+          [activeChannel]: prev[activeChannel] ? (prev[activeChannel].some(m => m.id === json.data.id) ? prev[activeChannel] : [...prev[activeChannel], json.data]) : [json.data],
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to send chat message:", err);
+    }
   };
 
   return (
@@ -443,112 +516,59 @@ export default function CommunityHubPage() {
 
            <div className="container mx-auto px-6 max-w-7xl relative z-10">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-4.5 gap-4">
-                   <div className="max-w-2xl">
-                      <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
-                         <Terminal className="w-3 h-3" /> {activeChannel === "global" ? "Global Chat" : "Direct Chat"}
-                      </span>
-                      <h2 className="text-2xl md:text-3xl font-black mb-1.5 tracking-tighter uppercase leading-[0.9] text-slate-50">
-                         {activeChannel === "global" ? (
-                            <>GLOBAL <span className="gradient-text">CHAT</span></>
-                           ) : (
-                            <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
-                           )}
-                      </h2>
-                      <p className="text-[11px] text-slate-400 font-medium">
-                         {activeChannel === "global" 
-                           ? "Chat with other players, share room codes, and hang out with the community in real-time."
-                           : `Secure direct chat with ${activeChannel}.`}
-                      </p>
-                   </div>
-                   <div className="flex bg-slate-800 border-2 border-black rounded-lg p-1.5 items-center gap-3 shadow-[2px_2px_0px_#000000]">
-                      <div className="flex items-center gap-1">
-                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-[7.5px] font-black uppercase tracking-widest text-emerald-400">Online</span>
-                      </div>
-                      <div className="h-4 w-[1px] bg-slate-800" />
-                      <div className="flex items-center gap-1">
-                         <Users className="w-3 h-3 text-brand-orange" />
-                         <span className="text-xs font-space font-black text-slate-50">482</span>
-                      </div>
-                   </div>
+                 <div className="max-w-2xl">
+                    <span className="kicker mb-1 inline-flex items-center gap-1.5 text-[9px]">
+                       <Terminal className="w-3 h-3" /> {activeChannel === "global" ? "Global Chat" : "Direct Chat"}
+                    </span>
+                    <h2 className="text-2xl md:text-3xl font-black mb-1.5 tracking-tighter uppercase leading-[0.9] text-slate-55">
+                       {activeChannel === "global" ? (
+                          <>GLOBAL <span className="gradient-text">CHAT</span></>
+                         ) : (
+                          <>DIRECT CHAT <span className="gradient-text">{activeChannel}</span></>
+                         )}
+                    </h2>
+                    <p className="text-[11px] text-slate-400 font-medium">
+                       {activeChannel === "global" 
+                         ? "Chat with other players, share room codes, and hang out with the community in real-time."
+                         : `Secure direct chat with ${activeChannel}.`}
+                    </p>
+                 </div>
               </div>
 
               <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-                {/* Active Members Sidebar */}
+                {/* Active Members Sidebar (Dropdown selector list) */}
                 <aside className="space-y-4">
-                   <div className="glass p-3 border-2 border-black rounded-xl">
-                      <div className="flex items-center justify-between mb-3">
-                         <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50">Online Users</h4>
-                         <Activity className="w-3 h-3 text-brand-orange animate-pulse" />
+                   <div className="glass p-4 border-2 border-black rounded-xl bg-slate-950 shadow-[3px_3px_0px_#000000]">
+                      <div className="flex items-center justify-between mb-4">
+                         <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-slate-50">Friends</h4>
+                         <Users className="w-3.5 h-3.5 text-brand-orange animate-pulse" />
                       </div>
                       
-                      <div className="space-y-2 max-h-[180px] overflow-y-auto scrollbar-hide pr-1">
-                         {/* Global Lobby Chat */}
-                         <div 
-                           onClick={() => setActiveChannel("global")}
-                           className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
-                             activeChannel === "global" 
-                               ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                               : "border-black bg-slate-900 hover:bg-slate-800"
-                           }`}
-                         >
-                            <div className="flex items-center gap-2">
-                               <div className={`h-6 w-6 rounded-md flex items-center justify-center font-black text-[9px] shadow-[1px_1px_0px_#000] relative transition-all ${
-                                 activeChannel === "global" ? "bg-brand-orange text-slate-950" : "bg-slate-950 border border-black text-brand-orange"
-                               }`}>
-                                  G
-                               </div>
-                               <div className="flex-1 min-w-0">
-                                  <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                    activeChannel === "global" ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
-                                  }`}>Global Comms</p>
-                                  <p className="text-[6.5px] font-black text-slate-400 uppercase tracking-widest truncate">Public Lobby Chat</p>
-                               </div>
-                               <Globe className={`w-2.5 h-2.5 ${activeChannel === "global" ? "text-brand-orange animate-pulse" : "text-slate-400"}`} />
-                            </div>
-                         </div>
+                      <div className="relative">
+                        <select
+                          value={activeChannel}
+                          onChange={(e) => setActiveChannel(e.target.value)}
+                          className="w-full h-11 bg-slate-900 border-2 border-black rounded-lg px-3 text-[10px] font-black uppercase tracking-wider text-slate-50 focus:outline-none focus:border-brand-orange shadow-[2px_2px_0px_#000000] cursor-pointer appearance-none"
+                        >
+                          <option value="global">Global Comms</option>
+                          {friends.map((member) => (
+                            <option key={member._id || member.id} value={member.username}>
+                              {member.username} (Direct)
+                            </option>
+                          ))}
+                        </select>
+                        
+                        {/* Dropdown custom arrow for neobrutalist look */}
+                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 font-extrabold text-[8px]">
+                          ▼
+                        </div>
+                      </div>
 
-                                               {friends.length > 0 ? (
-                            friends.map((member) => {
-                              const isSelected = activeChannel === member.username;
-                              return (
-                                <div 
-                                  key={member._id} 
-                                  onClick={() => setActiveChannel(member.username)}
-                                  className={`group p-1.5 rounded-lg border-2 cursor-pointer transition-all ${
-                                    isSelected 
-                                      ? "border-brand-orange bg-brand-orange/10 shadow-premium" 
-                                      : "border-black bg-slate-900 hover:bg-slate-800"
-                                  }`}
-                                >
-                                   <div className="flex items-center gap-2">
-                                      <div className="h-6 w-6 rounded-full bg-slate-800 border border-black flex items-center justify-center font-black text-[9px] text-slate-300 shadow-[1px_1px_0px_#000] relative">
-                                         {member.username.charAt(0).toUpperCase()}
-                                         <span className="absolute bottom-0 right-0 h-1.5 w-1.5 bg-emerald-500 rounded-full border border-white" />
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                         <p className={`text-[10px] font-black uppercase tracking-tighter transition-colors truncate ${
-                                           isSelected ? "text-brand-orange" : "text-slate-50 group-hover:text-brand-orange"
-                                         }`}>{member.username}</p>
-                                         <p className="text-[6.5px] font-black text-slate-400 uppercase tracking-widest truncate">Online · Idle</p>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                         <Zap className={`w-2.5 h-2.5 ${isSelected ? "text-brand-orange" : "text-slate-300"}`} />
-                                      </div>
-                                   </div>
-                                </div>
-                              );
-                            })
-                          ) : (
-                            <div className="p-3 border-2 border-dashed border-slate-800 rounded-lg text-center space-y-2">
-                              <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">No active operators</p>
-                              <Link href="/friends" className="block">
-                                <Button className="btn-neo h-7.5 w-full text-[8px] rounded font-black tracking-wider uppercase">
-                                  Find Friends
-                                </Button>
-                              </Link>
-                            </div>
-                          )}
+                      {/* Direct Chat instructions info box */}
+                      <div className="mt-4 p-3 bg-slate-900/40 border border-black/50 rounded-lg text-center">
+                        <p className="text-[8px] text-slate-450 font-bold uppercase tracking-wider leading-relaxed">
+                          Select a channel or friend from the drop-down to start messaging.
+                        </p>
                       </div>
                    </div>
                 </aside>
@@ -586,7 +606,7 @@ export default function CommunityHubPage() {
                       <AnimatePresence initial={false}>
                          {currentMessages.length > 0 ? (
                             currentMessages.map((message, i) => {
-                               const isSelf = message.sender === 'You' || (user && message.sender === user.username);
+                               const isSelf = message.sender === 'You' || message.senderId === user?.id || (user && message.sender === user.username);
                                return (
                                   <motion.div 
                                     key={message.id}
@@ -596,15 +616,15 @@ export default function CommunityHubPage() {
                                   >
                                      <div className="flex items-center gap-1 mb-0.5">
                                         <span className={`text-[8.5px] font-black uppercase tracking-widest ${isSelf ? 'text-brand-orange' : 'text-slate-500'}`}>
-                                           {message.sender}
+                                           {isSelf ? 'You' : message.sender}
                                         </span>
                                         <span className="text-[6.5px] font-black text-slate-500 tracking-[0.2em]">{message.time}</span>
                                      </div>
                                      <div className="relative">
                                         <div className={`max-w-[85%] p-2 py-1.5 rounded-lg border-2 border-black transition-all duration-300 relative ${
                                           isSelf 
-                                            ? 'bg-brand-orange/20 rounded-tr-none text-slate-50 shadow-[1.5px_1.5px_0px_#000]' 
-                                            : 'bg-slate-800 rounded-tl-none text-slate-50 shadow-[1.5px_1.5px_0px_#000]'
+                                            ? 'bg-brand-orange/20 rounded-tr-none text-slate-55 shadow-[1.5px_1.5px_0px_#000]' 
+                                            : 'bg-slate-800 rounded-tl-none text-slate-55 shadow-[1.5px_1.5px_0px_#000]'
                                         }`}>
                                            <p className="text-[11px] font-medium leading-relaxed">{message.text}</p>
                                         </div>

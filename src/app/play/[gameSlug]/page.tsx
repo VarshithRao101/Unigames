@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { getGameRegistryEntry } from "@/games/registry";
-import { MatchProvider } from "@/games/context";
+import { MatchProvider, useMatchContext } from "@/games/context";
 import { AuthGuard } from "@/components/common/auth-guard";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, LogOut, MessageSquareCode, Smile } from "lucide-react";
@@ -176,6 +176,47 @@ function PlayGameContainer() {
   };
 
   return (
+    <MatchProvider
+      matchId={matchId || ""}
+      initialRoom={mappedRoomData}
+      initialPlayers={mappedPlayers}
+    >
+      <PlayGameLayout
+        matchDetails={matchDetails}
+        registryEntry={registryEntry}
+        GameComponent={GameComponent}
+        handleQuit={handleQuit}
+        quickEmotes={quickEmotes}
+        showEmoteTray={showEmoteTray}
+        setShowEmoteTray={setShowEmoteTray}
+        matchId={matchId}
+      />
+    </MatchProvider>
+  );
+}
+
+function PlayGameLayout({
+  matchDetails,
+  registryEntry,
+  GameComponent,
+  handleQuit,
+  quickEmotes,
+  showEmoteTray,
+  setShowEmoteTray,
+  matchId,
+}: {
+  matchDetails: MatchDetails;
+  registryEntry: any;
+  GameComponent: any;
+  handleQuit: () => void;
+  quickEmotes: string[];
+  showEmoteTray: boolean;
+  setShowEmoteTray: (show: boolean) => void;
+  matchId: string | null;
+}) {
+  const context = useMatchContext();
+
+  return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between select-none relative overflow-hidden font-outfit">
       
       {/* Dynamic Background Gradients */}
@@ -203,13 +244,7 @@ function PlayGameContainer() {
 
       {/* ACTIVE MULTIPLAYER PLAYGROUND CONTAINER */}
       <main className="flex-1 w-full flex items-center justify-center p-6 relative z-10 overflow-y-auto">
-        <MatchProvider
-          matchId={matchId || ""}
-          initialRoom={mappedRoomData}
-          initialPlayers={mappedPlayers}
-        >
-          <GameComponent />
-        </MatchProvider>
+        <GameComponent />
       </main>
 
       {/* EMOTE DRAWER QUICK CHAT TRAY */}
@@ -235,13 +270,7 @@ function PlayGameContainer() {
                   <button
                     key={emote}
                     onClick={() => {
-                      // We'll log emotes via custom game moves
-                      const movesEndpoint = `/api/matches/${matchId}/moves`;
-                      fetch(movesEndpoint, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ action: "send_emote", data: { emote } }),
-                      });
+                      context.sendAction("send_emote", { emote });
                       setShowEmoteTray(false);
                     }}
                     className="p-2 bg-slate-900 border-2 border-black hover:border-brand-orange hover:bg-brand-orange/10 rounded-lg text-xs font-black uppercase tracking-wider text-slate-200 cursor-pointer active:translate-y-px transition-all"
