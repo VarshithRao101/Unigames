@@ -178,7 +178,7 @@ export default function ProfilePage() {
 
   const displayedUser = dbUser || user;
 
-  // Format game wins stats for Bar Graph
+  // Format game wins stats for Bar Graph (top 3 games)
   const gameStatsData = useMemo(() => {
     const statsObj = displayedUser?.stats?.gameStats || {};
     const list = Object.entries(statsObj).map(([key, data]: [string, any]) => {
@@ -198,7 +198,7 @@ export default function ProfilePage() {
     if (!list.some(item => item.game === "Tic-Tac-Toe")) {
       list.push({ game: "Tic-Tac-Toe", wins: 0, played: 0 });
     }
-    return list.sort((a, b) => b.wins - a.wins);
+    return list.sort((a, b) => b.wins - a.wins).slice(0, 3);
   }, [displayedUser]);
 
   const fetchDbUser = async () => {
@@ -414,7 +414,7 @@ export default function ProfilePage() {
         <div className="grid gap-4 lg:grid-cols-3">
 
           {/* ── LEFT COLUMN: PROFILE CARD & SUB-TABS ── */}
-          <div className="space-y-3 lg:col-span-1">
+          <div className="space-y-4 lg:col-span-1">
             {/* PROFILE CARD */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -575,92 +575,94 @@ export default function ProfilePage() {
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -15 }}
-                  className="space-y-6"
+                  className="space-y-4"
                 >
-                  {/* LEVEL & RADAR CHART HEADER PANEL */}
-                  <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
-                    <div className="grid gap-4 md:grid-cols-5 items-center">
+                  {/* LEVEL & GAME WIN DOMINANCE PANEL */}
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
 
-                      {/* Left: Stats & Level Details */}
-                      <div className="md:col-span-3 space-y-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                            <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">PLAYER LEVEL</span>
-                            <span className="px-1.5 py-0.5 bg-brand-orange border-2 border-black rounded text-[7px] font-black text-slate-950 tracking-widest leading-none uppercase">STATUS: {gamerStatus}</span>
-                          </div>
-                          <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {computedLevel}</h3>
-                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentXP.toLocaleString()} Total XP Earned</p>
+                    {/* Left: Stats & Level Details Card */}
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2 md:col-span-2 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className="px-1.5 py-0.5 bg-slate-950 border-2 border-black rounded text-[7px] font-black text-brand-orange tracking-widest leading-none">PLAYER LEVEL</span>
+                          <span className="px-1.5 py-0.5 bg-brand-orange border-2 border-black rounded text-[7px] font-black text-slate-950 tracking-widest leading-none uppercase">STATUS: {gamerStatus}</span>
                         </div>
+                        <h3 className="text-xl font-black uppercase tracking-tighter">Player Level {computedLevel}</h3>
+                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentXP.toLocaleString()} Total XP Earned</p>
+                      </div>
 
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-brand-orange">
-                            <span>LEVEL PROGRESS</span>
-                            <span>{progressPercent}% TO LVL {nextLevel}</span>
-                          </div>
-                          <div className="h-2.5 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${progressPercent}%` }}
-                              transition={{ duration: 1.2, ease: "easeOut" }}
-                              className="h-full bg-brand-orange shadow-[0_0_8px_rgba(255,193,7,0.4)]"
-                            />
-                          </div>
+                      <div className="space-y-1.5 mt-3">
+                        <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-brand-orange">
+                          <span>LEVEL PROGRESS</span>
+                          <span>{progressPercent}% TO LVL {nextLevel}</span>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-2 pt-1">
-                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
-                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Victories</p>
-                            <p className="text-sm font-space font-black text-white">{victories}</p>
-                          </div>
-                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
-                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Ratio</p>
-                            <p className="text-sm font-space font-black text-brand-orange">{winRatio}%</p>
-                          </div>
-                          <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
-                            <p className="text-[7px] font-black text-slate-550 uppercase tracking-widest mb-0.5">Win Streak</p>
-                            <p className="text-sm font-space font-black text-white flex items-center justify-center gap-1 leading-none">
-                              {winStreak} <Flame className="w-3.5 h-3.5 text-brand-orange fill-current" />
-                            </p>
-                          </div>
+                        <div className="h-2.5 w-full bg-slate-950 border-2 border-black rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progressPercent}%` }}
+                            transition={{ duration: 1.2, ease: "easeOut" }}
+                            className="h-full bg-brand-orange shadow-[0_0_8px_rgba(255,193,7,0.4)]"
+                          />
                         </div>
                       </div>
 
-                      {/* Right: Neobrutalist Game Win Dominance Bar Graph */}
-                      <div className="md:col-span-2 flex flex-col justify-center">
-                        <div className="bg-slate-900 border-3 border-black p-4 shadow-[inset_3px_3px_0px_#000000] rounded-[1.5rem] space-y-3.5 min-h-[144px]">
-                          <p className="text-[8.5px] font-black text-slate-500 uppercase tracking-widest text-center mb-1">Game Win Dominance</p>
-                          {gameStatsData.map((item, index) => {
-                            const maxWins = Math.max(...gameStatsData.map(g => g.wins), 1);
-                            const percent = Math.max(10, Math.min(100, (item.wins / maxWins) * 100));
-                            return (
-                              <div key={index} className="space-y-1">
-                                <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-300">
-                                  <span>{item.game}</span>
-                                  <span className="text-brand-orange">{item.wins} Wins</span>
-                                </div>
-                                <div className="h-4 w-full bg-slate-950 border-2 border-black rounded-lg overflow-hidden flex items-center pr-1.5 shadow-[1.5px_1.5px_0px_#000]">
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${percent}%` }}
-                                    transition={{ duration: 1.0, delay: index * 0.1 }}
-                                    className="h-full bg-brand-orange border-r-2 border-black"
-                                    style={{ backgroundColor: index === 0 ? '#ffaa00' : '#d97706' }}
-                                  />
-                                  <span className="text-[7.5px] font-black text-slate-500 ml-auto pl-1">
-                                    {item.played} PLY
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
+                      <div className="grid grid-cols-3 gap-2 pt-3 mt-1">
+                        <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                          <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Victories</p>
+                          <p className="text-sm font-space font-black text-white">{victories}</p>
                         </div>
-                        <p className="text-[7.5px] font-black text-slate-500 uppercase tracking-widest mt-2.5 text-center">MASTER TIER DOMINANCE</p>
+                        <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                          <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Win Ratio</p>
+                          <p className="text-sm font-space font-black text-brand-orange">{winRatio}%</p>
+                        </div>
+                        <div className="text-center p-2 bg-slate-900/50 border border-black rounded-lg shadow-[2px_2px_0px_#000]">
+                          <p className="text-[7px] font-black text-slate-550 uppercase tracking-widest mb-0.5">Win Streak</p>
+                          <p className="text-sm font-space font-black text-white flex items-center justify-center gap-1 leading-none">
+                            {winStreak} <Flame className="w-3.5 h-3.5 text-brand-orange fill-current" />
+                          </p>
+                        </div>
                       </div>
-
                     </div>
 
+                    {/* Right: Neobrutalist Game Win Dominance Card */}
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2 md:col-span-1 flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2 border-b border-black pb-2">
+                        <h4 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-white">Game Win Dominance</h4>
+                        <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Master Tier</span>
+                      </div>
+
+                      <div className="space-y-3.5 flex-1 flex flex-col justify-center">
+                        {gameStatsData.map((item, index) => {
+                          const maxWins = Math.max(...gameStatsData.map(g => g.wins), 1);
+                          const percent = Math.max(10, Math.min(100, (item.wins / maxWins) * 100));
+                          return (
+                            <div key={index} className="space-y-1">
+                              <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-350">
+                                <span>{item.game}</span>
+                                <span className="text-brand-orange">{item.wins} Wins</span>
+                              </div>
+                              <div className="h-4.5 w-full bg-slate-900 border-2 border-black rounded-lg overflow-hidden flex items-center pr-1.5 shadow-[1.5px_1.5px_0px_#000]">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${percent}%` }}
+                                  transition={{ duration: 1.0, delay: index * 0.1 }}
+                                  className="h-full bg-brand-orange border-r-2 border-black"
+                                  style={{ backgroundColor: index === 0 ? '#ffaa00' : index === 1 ? '#e11d48' : '#d97706' }}
+                                />
+                                <span className="text-[7px] font-black text-slate-500 ml-auto pl-1">
+                                  {item.played} PLY
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+
                     {/* GAMER BADGES SHOWCASE */}
-                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card bg-white/2">
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
                         <Trophy className="w-3 h-3 text-brand-orange" /> Gamer Badges
                       </h4>
@@ -697,14 +699,12 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                  </div>
-
 
                   {/* BOTTOM SECTORS: MATCH HISTORY & SQUAD */}
-                  <div className="grid gap-3 md:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-3">
 
                     {/* Matches log */}
-                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-2 bg-white/2">
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card md:col-span-2 bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
                         <Activity className="w-3 h-3 text-brand-orange" /> Combat History Logs
                       </h4>
@@ -766,7 +766,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Active Squad (Friends) */}
-                    <div className="glass p-3 rounded-xl border-2 border-black shadow-card md:col-span-1 bg-white/2">
+                    <div className="glass p-4 rounded-2xl border-2 border-black shadow-card md:col-span-1 bg-white/2">
                       <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-1.5 mb-3">
                         <Users className="w-3 h-3 text-brand-orange" /> Friends List
                       </h4>
@@ -832,7 +832,7 @@ export default function ProfilePage() {
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -15 }}
-                  className="space-y-6"
+                  className="space-y-4"
                 >
                   <div className="grid gap-4 md:grid-cols-2">
 
