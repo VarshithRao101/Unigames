@@ -153,6 +153,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const [hasShownStartAd, setHasShownStartAd] = useState(false);
   const [playersInCountdown, setPlayersInCountdown] = useState<string[]>([]);
   const [roomClosed, setRoomClosed] = useState(false);
+  const [isAiGame, setIsAiGame] = useState(false);
+  const [showAiConfirm, setShowAiConfirm] = useState(false);
 
   const game = GAME_CONFIGS[gameId] || GAME_CONFIGS.tictactoe;
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -664,7 +666,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     }
   };
 
-  // Lobby slot logic
+  // Lobby slot logic — standard bot (shown for all games)
   const handleAddAI = () => {
     if (players.length >= game.maxPlayers) return;
     const botIndex = Math.floor(Math.random() * BOT_NAMES.length);
@@ -686,6 +688,35 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     setChatMessages(prev => [
       ...prev,
       { sender: "System", text: `${botName} entered the room.`, time: "Now", isSystem: true }
+    ]);
+  };
+
+  // Play vs AI — adds unbeatable minimax bot and starts immediately
+  const handlePlayVsAI = () => {
+    setShowAiConfirm(false);
+    if (players.length >= game.maxPlayers) {
+      // Remove any existing non-user players first
+      setPlayers(prev => prev.filter(p => p.id === user?.id));
+    }
+
+    const aiBot: Player = {
+      id: `ai-minimax-${Date.now()}`,
+      name: "NeuroBot 🤖",
+      isHost: false,
+      isReady: true,
+      avatar: "🤖",
+      isAI: true,
+      color: "#7c3aed",
+    };
+
+    setPlayers(prev => {
+      const filtered = prev.filter(p => p.id === user?.id);
+      return [...filtered, aiBot];
+    });
+    setIsAiGame(true);
+    setChatMessages(prev => [
+      ...prev,
+      { sender: "System", text: "NeuroBot 🤖 joined! This is a practice match — results won't count toward stats.", time: "Now", isSystem: true }
     ]);
   };
 
@@ -996,23 +1027,126 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 +
               </div>
               <div>
-                <p className="font-outfit font-bold text-xs text-slate-650">Vacant Slot</p>
-                <p className="text-[9px] text-slate-800 font-semibold mt-0.5">Waiting for player...</p>
+                <p className="font-outfit font-bold text-xs" style={{ color: "var(--foreground)" }}>Vacant Slot</p>
+                <p className="text-[9px] font-semibold mt-0.5" style={{ color: "var(--text-muted)" }}>Waiting for player...</p>
               </div>
             </div>
 
-            <button
-              onClick={handleAddAI}
-              className="h-7 px-2.5 border border-black text-[8px] font-black bg-white text-slate-950 uppercase tracking-widest shadow-[1.5px_1.5px_0px_#000000] hover:bg-brand-orange hover:text-slate-950 transition-all cursor-pointer active:translate-y-0.5"
-            >
-              Add Bot
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Play vs AI — prominent */}
+              <button
+                onClick={() => setShowAiConfirm(true)}
+                className="h-7 px-3 border-2 border-black text-[8px] font-black uppercase tracking-widest shadow-[1.5px_1.5px_0px_#000000] hover:-translate-y-0.5 hover:shadow-[2.5px_2.5px_0px_#000000] transition-all cursor-pointer active:translate-y-0.5 rounded-lg"
+                style={{ background: "var(--color-brand-orange)", color: "#000" }}
+              >
+                🤖 vs AI
+              </button>
+              {/* Standard add bot */}
+              <button
+                onClick={handleAddAI}
+                className="h-7 px-2.5 border-2 border-black text-[8px] font-black uppercase tracking-widest shadow-[1.5px_1.5px_0px_#000000] hover:-translate-y-0.5 hover:shadow-[2.5px_2.5px_0px_#000000] transition-all cursor-pointer active:translate-y-0.5 rounded-lg"
+                style={{ background: "var(--panel-bg-hover)", color: "var(--foreground)" }}
+              >
+                Add Bot
+              </button>
+            </div>
           </div>
         );
       }
     }
     return slots;
   };
+
+  // AI Confirmation Modal
+  const AIConfirmModal = () => (
+    <AnimatePresence>
+      {showAiConfirm && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm"
+            onClick={() => setShowAiConfirm(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 22 }}
+            className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+          >
+            <div
+              className="w-full max-w-sm rounded-[2rem] border-[3px] border-black shadow-[8px_8px_0px_#000] relative overflow-hidden"
+              style={{ background: "var(--panel-bg)" }}
+            >
+              {/* Halftone overlay */}
+              <div className="absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:8px_8px] opacity-[0.04] pointer-events-none" />
+
+              {/* Header */}
+              <div className="p-6 pb-4 relative">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-14 h-14 rounded-2xl border-3 border-black shadow-[3px_3px_0px_#000] bg-purple-500/10 flex items-center justify-center text-3xl shrink-0">
+                    🤖
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border-2 border-black" style={{ background: "#7c3aed", color: "#fff" }}>
+                        ADVANCED AI
+                      </span>
+                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border-2 border-black" style={{ background: "var(--color-brand-orange)", color: "#000" }}>
+                        MINIMAX ENGINE
+                      </span>
+                    </div>
+                    <h3 className="font-outfit font-black text-lg uppercase tracking-tight" style={{ color: "var(--foreground)" }}>
+                      NeuroBot 🤖
+                    </h3>
+                    <p className="text-[10px] font-bold mt-0.5" style={{ color: "#7c3aed" }}>Unbeatable • IQ ∞ • Zero Mistakes</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {[
+                    { icon: "🧠", label: "Engine", val: "Minimax + Alpha-Beta Pruning" },
+                    { icon: "⚡", label: "Depth", val: "Full game tree (9 levels)" },
+                    { icon: "🎯", label: "Strategy", val: "Corner → Center → Edge" },
+                    { icon: "🚫", label: "Stats", val: "Practice only — no leaderboard" },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center justify-between px-3 py-1.5 rounded-xl border-2 border-black" style={{ background: "var(--panel-bg-hover)" }}>
+                      <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>{item.icon} {item.label}</span>
+                      <span className="text-[9px] font-black" style={{ color: "var(--foreground)" }}>{item.val}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-4 text-[10px] font-semibold leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  Challenge NeuroBot for pure satisfaction! This bot uses the most advanced Minimax algorithm — it <strong>never loses</strong>. Best outcome you can hope for is a draw. Can you do it?
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="px-6 pb-6 flex gap-3 relative">
+                <button
+                  onClick={() => setShowAiConfirm(false)}
+                  className="flex-1 h-11 rounded-xl border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[2px_2px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#000] active:translate-y-0.5 cursor-pointer"
+                  style={{ background: "var(--panel-bg-hover)", color: "var(--foreground)" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePlayVsAI}
+                  className="flex-[2] h-11 rounded-xl border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[2px_2px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#000] active:translate-y-0.5 cursor-pointer"
+                  style={{ background: "#7c3aed", color: "#fff" }}
+                >
+                  ⚔️ Challenge NeuroBot!
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
 
   // ROOM CLOSED VIEW
   if (roomClosed) {
@@ -1120,6 +1254,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     <>
       <Navbar />
       <Sidebar />
+      <AIConfirmModal />
 
       <main className="flex-1 pt-24 bg-[var(--slate-950)] text-slate-50 min-h-screen pb-20 selection:bg-brand-orange selection:text-slate-950">
         <div className="max-w-7xl mx-auto px-6">
@@ -1337,6 +1472,25 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                     {/* Launch / Start Panel */}
                     <div className="bg-[var(--slate-800)] border-2 border-black p-4 rounded-2xl shadow-[3.5px_3.5px_0px_#000000] space-y-3">
+
+                      {/* AI Game Mode Banner */}
+                      {isAiGame && (
+                        <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-black" style={{ background: "#7c3aed15" }}>
+                          <span className="text-xl">🤖</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#7c3aed" }}>AI Practice Mode</p>
+                            <p className="text-[8px] font-bold mt-0.5 text-slate-400">Results won't count toward stats or leaderboard</p>
+                          </div>
+                          <button
+                            onClick={() => { setIsAiGame(false); setPlayers(prev => prev.filter(p => !p.isAI)); }}
+                            className="text-[8px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border-2 border-black cursor-pointer"
+                            style={{ background: "var(--panel-bg-hover)", color: "var(--foreground)" }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+
                       <div className="flex justify-between items-center text-[11px]">
                         <span className="text-slate-400 font-outfit font-black uppercase tracking-wider">Ready Check</span>
                         <span className="text-brand-orange font-mono font-black">
@@ -1358,7 +1512,20 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                           </button>
                         )}
 
-                        {players.find((p) => p.id === user?.id)?.isHost && (
+                        {/* AI Game: direct launch */}
+                        {isAiGame && players.find((p) => p.id === user?.id)?.isHost && (
+                          <button
+                            onClick={() => router.push(`/play/${gameId}?ai=true&room=${roomCode}`)}
+                            disabled={!players.find(p => p.id === user?.id)?.isReady}
+                            className="btn-neo flex-1 h-9.5 text-slate-950 uppercase font-black text-[11px] tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            style={{ background: "#7c3aed" }}
+                          >
+                            ⚔️ Start AI Match
+                          </button>
+                        )}
+
+                        {/* Normal match: host start */}
+                        {!isAiGame && players.find((p) => p.id === user?.id)?.isHost && (
                           <button
                             onClick={handleTriggerStart}
                             disabled={players.length < 2 || !players.every(p => p.isReady)}
@@ -1369,7 +1536,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                         )}
                       </div>
 
-                      {players.length < 2 ? (
+                      {players.length < 2 && !isAiGame ? (
                         <p className="text-[9px] text-slate-400 font-bold text-center flex items-center justify-center gap-1">
                           <AlertCircle className="w-3.5 h-3.5 text-brand-orange" />
                           At least 2 players are required to start.
@@ -1377,7 +1544,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                       ) : !players.every(p => p.isReady) ? (
                         <p className="text-[9px] text-brand-orange font-bold text-center flex items-center justify-center gap-1 animate-pulse">
                           <Clock className="w-3.5 h-3.5" />
-                          Waiting for other player...
+                          {isAiGame ? "Ready up to start vs NeuroBot!" : "Waiting for other player..."}
                         </p>
                       ) : null}
                     </div>
