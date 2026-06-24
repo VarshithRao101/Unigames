@@ -130,9 +130,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     { id: "spec1", name: "SpectatorMax", avatar: "M" },
     { id: "spec2", name: "LurkerPro", avatar: "L" },
   ]);
-  const [chatMessages, setChatMessages] = useState<{ sender: string; text: string; time: string; isSystem?: boolean }[]>([
-    { sender: "System", text: "Match room ready. Share the code to invite players.", time: "12:00", isSystem: true },
-  ]);
+  const [chatMessages, setChatMessages] = useState<{ id?: string; sender: string; senderId?: string; avatar?: string; text: string; time: string; isSystem?: boolean }[]>([]);
   const [inputText, setInputText] = useState("");
   const [copied, setCopied] = useState(false);
   
@@ -286,11 +284,37 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         }));
         setPlayers(mappedPlayers);
 
+        // Fetch chat history
+        try {
+          const chatRes = await fetch(`/api/chat?channel=room:${roomCode}`);
+          if (chatRes.ok) {
+            const chatJson = await chatRes.json();
+            if (chatJson && chatJson.success && Array.isArray(chatJson.data)) {
+              if (chatJson.data.length > 0) {
+                setChatMessages(chatJson.data);
+              } else {
+                setChatMessages([
+                  { sender: "System", text: "Match room ready. Share the code to invite players.", time: "Now", isSystem: true }
+                ]);
+              }
+            }
+          }
+        } catch (chatErr) {
+          console.error("Failed to load chat history:", chatErr);
+        }
+
         // Subscribe to Pusher Room channel
         const pusher = getPusherClient();
         pusherChannel = pusher.subscribe(`private-room-${roomCode}`);
 
         // Listeners for real-time room sync
+        pusherChannel.bind("room-message", (msg: any) => {
+          setChatMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+        });
+
         pusherChannel.bind("player-joined", (newPlayer: any) => {
           setPlayers((prev) => {
             if (prev.some((p) => p.id === newPlayer.userId)) return prev;
@@ -719,40 +743,29 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   };
 
   // Chat message send
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    const newMsg = {
-      sender: "You",
-      text: inputText,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setChatMessages((prev) => [...prev, newMsg]);
+    const textToSend = inputText.trim();
     setInputText("");
 
-    // Bot response
-    setTimeout(() => {
-      const activePlayers = players.filter(p => !p.isHost && !p.isAI);
-      if (activePlayers.length > 0) {
-        const randomPlayer = activePlayers[Math.floor(Math.random() * activePlayers.length)];
-        const botMessages = [
-          "Let's play! I've been practicing.",
-          "Ready when you are!",
-          "This game is going to be epic.",
-          "Add some AI players to fill up slots if you want!",
-        ];
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            sender: randomPlayer.name,
-            text: botMessages[Math.floor(Math.random() * botMessages.length)],
-            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          },
-        ]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: `room:${roomCode}`,
+          text: textToSend,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to send message");
       }
-    }, 1500);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      toast("Failed to send message", "error");
+    }
   };
 
   // Gameplay simulation loop
@@ -1145,39 +1158,42 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
                       {/* Messages scroll box */}
                       <div className="flex-1 overflow-y-auto bg-[var(--slate-900)] border-2 border-black rounded-xl p-3 flex flex-col gap-2 mb-3 shadow-[inset_2px_2px_0px_rgba(0,0,0,0.2)]">
-                        {chatMessages.map((msg, idx) => (
-                          <div
-                            key={idx}
-                            className={`flex flex-col max-w-[90%] ${
-                              msg.isSystem
-                                ? "self-center text-center max-w-full w-full"
-                                : msg.sender === "You"
-                                ? "self-end items-end"
-                                : "self-start"
-                            }`}
-                          >
-                            {!msg.isSystem && (
-                              <div className="flex items-center gap-1 mb-0.5">
-                                <span className="text-[8.5px] font-bold font-outfit text-slate-500">
-                                  {msg.sender}
-                                </span>
-                                <span className="text-[7.5px] text-slate-650 font-semibold">{msg.time}</span>
-                              </div>
-                            )}
-
+                        {chatMessages.map((msg, idx) => {
+                          const isSelf = msg.sender === "You" || (msg.senderId && msg.senderId === user?.id);
+                          return (
                             <div
-                              className={`text-[10px] font-semibold leading-relaxed rounded-xl p-2 ${
+                              key={idx}
+                              className={`flex flex-col max-w-[90%] ${
                                 msg.isSystem
-                                  ? "bg-slate-900/30 text-slate-550 border border-slate-900/40 text-[8.5px] font-mono py-0.5 rounded"
-                                  : msg.sender === "You"
-                                  ? "bg-brand-orange text-slate-950 border-2 border-black font-extrabold rounded-xl rounded-tr-none shadow-[1.5px_1.5px_0px_#000000]"
-                                  : "bg-[var(--slate-950)] text-slate-50 border-2 border-black font-bold rounded-xl rounded-tl-none shadow-[1.5px_1.5px_0px_#000000]"
+                                  ? "self-center text-center max-w-full w-full"
+                                  : isSelf
+                                  ? "self-end items-end"
+                                  : "self-start"
                               }`}
                             >
-                              {msg.text}
+                              {!msg.isSystem && (
+                                <div className="flex items-center gap-1 mb-0.5">
+                                  <span className="text-[8.5px] font-bold font-outfit text-slate-500">
+                                    {isSelf ? "You" : msg.sender}
+                                  </span>
+                                  <span className="text-[7.5px] text-slate-650 font-semibold">{msg.time}</span>
+                                </div>
+                              )}
+
+                              <div
+                                className={`text-[10px] font-semibold leading-relaxed rounded-xl p-2 ${
+                                  msg.isSystem
+                                    ? "bg-slate-900/30 text-slate-550 border border-slate-900/40 text-[8.5px] font-mono py-0.5 rounded"
+                                    : isSelf
+                                    ? "bg-brand-orange text-slate-950 border-2 border-black font-extrabold rounded-xl rounded-tr-none shadow-[1.5px_1.5px_0px_#000000]"
+                                    : "bg-[var(--slate-950)] text-slate-50 border-2 border-black font-bold rounded-xl rounded-tl-none shadow-[1.5px_1.5px_0px_#000000]"
+                                }`}
+                              >
+                                {msg.text}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         <div ref={chatEndRef} />
                       </div>
 
