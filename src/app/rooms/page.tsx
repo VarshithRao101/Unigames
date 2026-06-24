@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Search, Plus, Globe, Shield, Users } from "lucide-react";
+import { Lock, Search, Plus, Globe, Shield, Users, RefreshCw } from "lucide-react";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { Button } from "@/components/ui/button";
-import { LobbyRoom, PLATFORM_GAMES, ROOMS_AVAILABLE } from "@/data/platform";
-import { loadCreatedRooms, mergeRooms } from "@/utils/mock-room-store";
+import { LobbyRoom, PLATFORM_GAMES } from "@/data/platform";
 import { motion } from "framer-motion";
 import { AuthGuard } from "@/components/common/auth-guard";
+import { getPusherClient } from "@/lib/pusher";
 
 export default function RoomsPage() {
   const router = useRouter();
@@ -19,55 +19,107 @@ export default function RoomsPage() {
   const [roomCode, setRoomCode] = useState("");
   const [rooms, setRooms] = useState<LobbyRoom[]>([]);
 
-  useEffect(() => {
-    async function fetchLobbies() {
-      try {
-        const res = await fetch("/api/rooms");
-        if (!res.ok) throw new Error();
-        const json = await res.json();
-        if (json.success && Array.isArray(json.data)) {
-          const dbRooms: LobbyRoom[] = json.data.map((r: any) => {
-            const hostPlayer = r.players.find((p: any) => p.isHost);
-            return {
-              id: r._id || `custom-${r.code}`,
-              code: r.code,
-              name: r.settings?.name || `${r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
-              gameSlug: r.gameSlug,
-              gameName: r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
-              host: hostPlayer ? hostPlayer.username : "Unknown",
-              currentPlayers: r.players.length,
-              maxPlayers: r.maxPlayers,
-              status: r.players.length >= r.maxPlayers ? "full" : "open",
-              isPrivate: r.settings?.isPrivate || false,
-              passcode: r.settings?.passcode,
-              region: r.settings?.region || "Mumbai Hub",
-              note: r.settings?.allowSpectators ? "Spectators allowed." : "Private settings.",
-            };
-          });
-          const loaded = loadCreatedRooms().filter(
-            (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
-          );
-          setRooms(mergeRooms(dbRooms, mergeRooms(loaded, ROOMS_AVAILABLE)));
-        } else {
-          throw new Error();
-        }
-      } catch (err) {
-        console.error("Failed to load database lobbies, using fallback:", err);
-        const loaded = loadCreatedRooms().filter(
-          (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
-        );
-        setRooms(mergeRooms(loaded, ROOMS_AVAILABLE));
+  const fetchLobbies = async () => {
+    try {
+      const res = await fetch("/api/rooms");
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        const dbRooms: LobbyRoom[] = json.data.map((r: any) => {
+          const hostPlayer = r.players.find((p: any) => p.isHost);
+          return {
+            id: r._id || `custom-${r.code}`,
+            code: r.code,
+            name: r.settings?.name || `${r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
+            gameSlug: r.gameSlug,
+            gameName: r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+            host: hostPlayer ? hostPlayer.username : "Unknown",
+            currentPlayers: r.players.length,
+            maxPlayers: r.maxPlayers,
+            status: r.players.length >= r.maxPlayers ? "full" : "open",
+            isPrivate: r.settings?.isPrivate || false,
+            passcode: r.settings?.passcode,
+            region: r.settings?.region || "Mumbai Hub",
+            note: r.settings?.allowSpectators ? "Spectators allowed." : "Private settings.",
+          };
+        });
+        setRooms(dbRooms);
+      } else {
+        throw new Error();
       }
-    }
-    fetchLobbies();
-  }, []);
-
-  const handleClearRooms = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem("unigames-created-rooms");
+    } catch (err) {
+      console.error("Failed to load database lobbies:", err);
       setRooms([]);
     }
   };
+
+  useEffect(() => {
+    fetchLobbies();
+
+    let channel: any = null;
+    try {
+      const pusher = getPusherClient();
+      channel = pusher.subscribe("rooms-list");
+
+      channel.bind("room-created", (newRoom: any) => {
+        setRooms((prev) => {
+          if (prev.some((r) => r.code === newRoom.code)) return prev;
+          const formattedRoom: LobbyRoom = {
+            id: newRoom.id || newRoom._id || `custom-${newRoom.code}`,
+            code: newRoom.code,
+            name: newRoom.name || newRoom.settings?.name || `${newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
+            gameSlug: newRoom.gameSlug,
+            gameName: newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+            host: newRoom.host || "Unknown",
+            currentPlayers: newRoom.currentPlayers || 1,
+            maxPlayers: newRoom.maxPlayers || 2,
+            status: newRoom.status || "open",
+            isPrivate: newRoom.isPrivate || false,
+            passcode: newRoom.passcode,
+            region: newRoom.region || "Mumbai Hub",
+            note: newRoom.note || "Private settings.",
+          };
+          return [formattedRoom, ...prev];
+        });
+      });
+
+      channel.bind("room-updated", (updatedInfo: any) => {
+        setRooms((prev) => {
+          if (updatedInfo.status === "playing" || updatedInfo.status === "completed") {
+            return prev.filter((r) => r.code !== updatedInfo.code);
+          }
+          return prev.map((room) => {
+            if (room.code === updatedInfo.code) {
+              const nextPlayersCount = updatedInfo.playersCount !== undefined ? updatedInfo.playersCount : room.currentPlayers;
+              return {
+                ...room,
+                ...updatedInfo,
+                currentPlayers: nextPlayersCount,
+                status: nextPlayersCount >= room.maxPlayers ? "full" : "open",
+              };
+            }
+            return room;
+          });
+        });
+      });
+
+      channel.bind("room-deleted", (deletedInfo: any) => {
+        setRooms((prev) => prev.filter((room) => room.code !== deletedInfo.code));
+      });
+    } catch (pusherErr) {
+      console.warn("Pusher client lobbies subscription error:", pusherErr);
+    }
+
+    return () => {
+      if (channel) {
+        channel.unbind_all();
+      }
+      try {
+        const pusher = getPusherClient();
+        pusher.unsubscribe("rooms-list");
+      } catch (e) {}
+    };
+  }, []);
 
   const gameOptions = useMemo(
     () => [{ slug: "all", name: "All Games" }, ...PLATFORM_GAMES.map((game) => ({ slug: game.slug, name: game.name }))],
@@ -108,10 +160,10 @@ export default function RoomsPage() {
                      </Button>
                   </Link>
                   <button 
-                    onClick={handleClearRooms}
-                    className="w-full h-9 rounded-lg bg-red-650/10 hover:bg-red-650/20 text-red-500 border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer"
+                    onClick={fetchLobbies}
+                    className="w-full h-9 rounded-lg bg-brand-orange/10 hover:bg-brand-orange/20 text-brand-orange border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[1.5px_1.5px_0px_#000] cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                     Clear My Lobbies
+                     <RefreshCw className="w-3.5 h-3.5" /> Refresh Lobbies
                   </button>
                </div>
                

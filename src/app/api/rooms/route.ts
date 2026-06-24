@@ -20,6 +20,8 @@ export async function GET(req: NextRequest) {
 
 import { rateLimit } from "@/lib/utils/rate-limit";
 
+import { getRoomsCollection } from "@/lib/db/collections";
+
 export async function POST(req: NextRequest) {
   const session = await auth();
 
@@ -42,6 +44,29 @@ export async function POST(req: NextRequest) {
     }
 
     const { gameSlug, maxPlayers, settings } = validation.data;
+
+    // Clean up any existing active/waiting lobbies hosted by this user
+    try {
+      const roomsCollection = await getRoomsCollection();
+      const existingRooms = await roomsCollection.find({
+        "players.userId": session.user.id,
+        "players.isHost": true,
+        status: { $in: ["waiting", "playing"] }
+      }).toArray();
+
+      const pusher = getPusherServer();
+      for (const oldRoom of existingRooms) {
+        await roomsCollection.deleteOne({ _id: oldRoom._id });
+        try {
+          await pusher.trigger("rooms-list", "room-deleted", { code: oldRoom.code });
+        } catch (pushErr) {
+          console.warn("Pusher delete broadcast warning:", pushErr);
+        }
+      }
+    } catch (dbErr) {
+      console.error("Error cleaning up user existing rooms:", dbErr);
+    }
+
     const room = await createRoom(session.user.id, gameSlug, maxPlayers, settings);
 
     if (!room) {
@@ -51,15 +76,24 @@ export async function POST(req: NextRequest) {
     // Broadcast room creation to lobbies lists in real-time
     try {
       const pusher = getPusherServer();
-      await pusher.trigger("rooms-list", "room-created", {
+      const hostPlayer = room.players.find((p: any) => p.isHost);
+      const lobbyRoomPayload = {
+        id: room._id?.toString() || `custom-${room.code}`,
         code: room.code,
+        name: room.settings?.name || `${room.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
         gameSlug: room.gameSlug,
-        playersCount: room.players.length,
+        gameName: room.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+        host: hostPlayer ? hostPlayer.username : "Unknown",
+        currentPlayers: room.players.length,
         maxPlayers: room.maxPlayers,
-        settings: room.settings,
-      });
+        status: room.players.length >= room.maxPlayers ? "full" : "open",
+        isPrivate: room.settings?.isPrivate || false,
+        passcode: room.settings?.passcode,
+        region: room.settings?.region || "Mumbai Hub",
+        note: room.settings?.allowSpectators ? "Spectators allowed." : "Private settings.",
+      };
+      await pusher.trigger("rooms-list", "room-created", lobbyRoomPayload);
     } catch (pushErr) {
-      // Don't crash request if Pusher logs fail during compilation/test
       console.warn("Pusher broadcast warning:", pushErr);
     }
 

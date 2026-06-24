@@ -90,8 +90,15 @@ export async function PATCH(
         scores,
         xpUpdates: result.xpUpdates,
       });
+
+      // Broadcast room deletion to lobbies list in real-time
+      if (match.roomCode) {
+        await pusher.trigger("rooms-list", "room-deleted", {
+          code: match.roomCode,
+        });
+      }
     } catch (pushErr) {
-      console.warn("Pusher match-end broadcast warning:", pushErr);
+      console.warn("Pusher match-end/rooms-list broadcast warning:", pushErr);
     }
 
     return apiSuccess(result.match, "Match results finalized successfully");

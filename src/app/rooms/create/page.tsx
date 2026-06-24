@@ -22,8 +22,9 @@ function CreateRoomForm() {
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [isPrivate, setIsPrivate] = useState(false);
   const [passcode, setPasscode] = useState("7777");
-  const [allowSpectators, setAllowSpectators] = useState(true);
   const [region, setRegion] = useState("Mumbai Hub");
+  const [allowSpectators, setAllowSpectators] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync state if query parameter changes
   useEffect(() => {
@@ -59,6 +60,8 @@ function CreateRoomForm() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const res = await fetch("/api/rooms", {
         method: "POST",
@@ -107,6 +110,7 @@ function CreateRoomForm() {
       router.push(`/rooms/${code}`);
     } catch (err: any) {
       alert(err.message || "Failed to establish game room in database");
+      setIsSubmitting(false);
     }
   };
 
@@ -293,8 +297,8 @@ function CreateRoomForm() {
                      </label>
                   </div>
 
-                  <Button type="submit" className="btn-neo w-full rounded-xl h-11 text-xs font-black tracking-widest shadow-[3px_3px_0px_#000000]">
-                     Create Room
+                  <Button type="submit" disabled={isSubmitting} className="btn-neo w-full rounded-xl h-11 text-xs font-black tracking-widest shadow-[3px_3px_0px_#000000]">
+                     {isSubmitting ? "Creating Lobbies..." : "Create Room"}
                   </Button>
                </form>
             </div>
