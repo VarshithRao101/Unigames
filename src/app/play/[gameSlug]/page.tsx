@@ -46,8 +46,15 @@ function PlayGameContainer() {
   const [error, setError] = useState<string | null>(null);
   const [showEmoteTray, setShowEmoteTray] = useState(false);
 
-  // Quick Emotes list
-  const quickEmotes = ["😂", "🔥", "👑", "👍", "🤔", "GG", "Well Played", "Oops!", "Noooo"];
+  // Quick Emotes & Messages list
+  const quickEmotes = [
+    "😂", "🔥", "👑", "👍", "🤔", "😤", "🎯", "💀", "😈", "🫡",
+    "🙌", "😱", "🤯", "😎", "🥳", "😤", "💪", "👀", "⚡", "🏆",
+    "GG", "Well Played!", "Ez Clap 😏", "Oops! 😬", "Noooo 😭",
+    "My Bad 🤦", "Let's Go! 🚀", "Too Easy 😎", "Close One! 😅",
+    "Rematch! ⚔️", "I'm on Fire! 🔥", "Respect ✊", "Lucky... 🍀",
+    "Next time 💪", "Unbelievable! 😱", "gg wp 🤝"
+  ];
 
   // Prevent back button navigation during active game session
   useEffect(() => {

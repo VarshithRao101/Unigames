@@ -14,9 +14,15 @@ export const TICTACTOE_META: GameMetadata = {
   supportsRooms: true,
   supportsSpectators: true,
   rulesList: [
-    "Players take turns placing their marker (X or O) in an empty square on the 3x3 grid.",
-    "The first player to align 3 markers horizontally, vertically, or diagonally wins.",
-    "If all squares are filled and no player has 3 in a row, the match is a draw."
+    "The game is played on a 3×3 grid. Player 1 is X and Player 2 is O.",
+    "Players alternate turns placing their marker (X or O) in any empty square.",
+    "The first player to align 3 of their markers — horizontally, vertically, or diagonally — wins the round and earns 1 point.",
+    "If all 9 squares are filled with no 3-in-a-row, the round ends in a DRAW. No points are awarded to either player.",
+    "After each round ends (win or draw), both players can choose to Replay or Finish the Match.",
+    "On replay, the player who went SECOND in the previous round goes FIRST in the next round — turns alternate fairly.",
+    "The overall match winner is whoever has the higher score when 'Finish Match' is clicked. If scores are equal, the match ends as a draw.",
+    "Spectators can watch but cannot place markers or use Replay/Finish controls.",
+    "Quit Game counts as a forfeit — the opponent is declared the match winner."
   ],
   developerTeam: {
     developerName: "Alice W.",

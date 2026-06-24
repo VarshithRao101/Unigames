@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useUnigamesSDK } from "../sdk";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Play, Trophy, Users } from "lucide-react";
+import { RefreshCw, Trophy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function TicTacToeGame() {
@@ -18,6 +18,8 @@ export default function TicTacToeGame() {
   const roundWinnerId = gameState.roundWinnerId || null;
   const isRoundDraw = gameState.isRoundDraw || false;
   const roundOver = gameState.roundOver || false;
+  // Track who went first this round so we alternate on replay
+  const roundFirstPlayerId: string = gameState.roundFirstPlayerId || (players[0]?.id || "");
 
   // Track active emotes to display under user names
   const [activeEmotes, setActiveEmotes] = React.useState<Record<string, { text: string; id: number }>>({});
@@ -68,6 +70,7 @@ export default function TicTacToeGame() {
       sdk.updateState({
         board: Array(9).fill(""),
         currentTurnPlayerId: players[0]?.id,
+        roundFirstPlayerId: players[0]?.id,
         roundWinnerId: null,
         isRoundDraw: false,
         roundOver: false,
@@ -106,23 +109,29 @@ export default function TicTacToeGame() {
     nextBoard[index] = localSymbol;
 
     const winnerSymbol = checkWinner(nextBoard);
-    let nextRoundWinnerId = null;
+    // STRICT: only award a point on a real win, never on draw
+    let nextRoundWinnerId: string | null = null;
     let nextIsRoundDraw = false;
     let nextRoundOver = false;
     const nextScores = { ...scores };
 
     if (winnerSymbol) {
-      nextRoundWinnerId = winnerSymbol === "X" ? players[0]?.id : players[1]?.id;
+      // Map symbol back to the correct player id
+      nextRoundWinnerId = winnerSymbol === "X" ? (players[0]?.id || null) : (players[1]?.id || null);
       nextRoundOver = true;
+      // +1 point ONLY for the actual winner
       if (nextRoundWinnerId) {
         nextScores[nextRoundWinnerId] = (nextScores[nextRoundWinnerId] || 0) + 1;
       }
     } else if (nextBoard.every(cell => cell !== "")) {
+      // DRAW — board full, no winner → no points awarded
       nextIsRoundDraw = true;
       nextRoundOver = true;
+      // Do NOT touch nextScores — draw awards 0 points to anyone
     }
 
-    const nextTurnPlayerId = currentTurnPlayerId === players[0]?.id 
+    // Alternate turns (only relevant when game is still going)
+    const nextTurnPlayerId = currentTurnPlayerId === players[0]?.id
       ? (players[1]?.id || players[0]?.id)
       : players[0]?.id;
 
@@ -136,14 +145,21 @@ export default function TicTacToeGame() {
       roundWinnerId: nextRoundWinnerId,
       isRoundDraw: nextIsRoundDraw,
       roundOver: nextRoundOver,
-      scores: nextScores
+      scores: nextScores,
+      roundFirstPlayerId
     });
   };
 
   const handleReplayRound = () => {
+    // Alternate: whoever went first LAST round, the OTHER player goes first this round
+    const nextFirstPlayerId = roundFirstPlayerId === players[0]?.id
+      ? (players[1]?.id || players[0]?.id)
+      : players[0]?.id;
+
     sdk.updateState({
       board: Array(9).fill(""),
-      currentTurnPlayerId: players[0]?.id,
+      currentTurnPlayerId: nextFirstPlayerId,
+      roundFirstPlayerId: nextFirstPlayerId,
       roundWinnerId: null,
       isRoundDraw: false,
       roundOver: false
@@ -171,16 +187,17 @@ export default function TicTacToeGame() {
     });
   };
 
-  // Resolve status text (Emojis removed per requirements)
+  // Resolve status text
   let statusText = "";
   if (roundWinnerId) {
     const winnerName = players.find(p => p.id === roundWinnerId)?.name || "Opponent";
-    statusText = `Round Won by ${winnerName}!`;
+    const isLocalWin = roundWinnerId === localPlayer?.id;
+    statusText = isLocalWin ? `🏆 You Win This Round!` : `Round Won by ${winnerName}!`;
   } else if (isRoundDraw) {
-    statusText = "Round Drawn!";
+    statusText = "🤝 It's a Draw! No Points.";
   } else {
     const activeName = players.find(p => p.id === currentTurnPlayerId)?.name || "Waiting...";
-    statusText = currentTurnPlayerId === localPlayer?.id ? "Your Turn!" : `Waiting for ${activeName}...`;
+    statusText = currentTurnPlayerId === localPlayer?.id ? "⚡ Your Turn! Make a Move!" : `⏳ ${activeName}'s Turn...`;
   }
 
   const isPlayer1Active = currentTurnPlayerId === players[0]?.id && !roundOver;
