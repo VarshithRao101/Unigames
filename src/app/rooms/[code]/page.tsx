@@ -1618,7 +1618,6 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                     </div>
                     <div className="text-left">
                       <h4 className="font-outfit font-black text-xs uppercase tracking-wide">{game.name}</h4>
-                      <p className="text-[9px] text-brand-orange font-bold uppercase tracking-widest mt-0.5">Region: {region}</p>
                     </div>
                   </div>
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Room: #{roomCode}</span>

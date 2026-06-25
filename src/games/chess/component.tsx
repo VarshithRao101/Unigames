@@ -304,6 +304,7 @@ export default function ChessGame() {
         const nextScores = { ...scores };
         let msg = "";
 
+        let nextDrawReason = "";
         if (chess.isGameOver()) {
           nextRoundOver = true;
           if (chess.isCheckmate()) {
@@ -312,6 +313,10 @@ export default function ChessGame() {
             msg = AI_WIN_TAUNTS[Math.floor(Math.random() * AI_WIN_TAUNTS.length)];
           } else {
             nextIsRoundDraw = true;
+            if (chess.isStalemate()) nextDrawReason = "Stalemate";
+            else if (chess.isThreefoldRepetition()) nextDrawReason = "Repetition";
+            else if (chess.isInsufficientMaterial()) nextDrawReason = "Insufficient Material";
+            else nextDrawReason = "Draw";
             msg = AI_DRAW_TAUNTS[Math.floor(Math.random() * AI_DRAW_TAUNTS.length)];
           }
         }
@@ -322,6 +327,7 @@ export default function ChessGame() {
           currentTurnPlayerId: nextTurnPlayerId,
           roundWinnerId: nextRoundWinnerId,
           isRoundDraw: nextIsRoundDraw,
+          drawReason: nextDrawReason,
           roundOver: nextRoundOver,
           scores: nextScores,
           roundFirstPlayerId,
@@ -391,6 +397,7 @@ export default function ChessGame() {
         let nextRoundOver = false;
         const nextScores = { ...scores };
 
+        let nextDrawReason = "";
         if (chess.isGameOver()) {
           nextRoundOver = true;
           if (chess.isCheckmate()) {
@@ -400,6 +407,10 @@ export default function ChessGame() {
             }
           } else {
             nextIsRoundDraw = true;
+            if (chess.isStalemate()) nextDrawReason = "Stalemate";
+            else if (chess.isThreefoldRepetition()) nextDrawReason = "Repetition";
+            else if (chess.isInsufficientMaterial()) nextDrawReason = "Insufficient Material";
+            else nextDrawReason = "Draw";
           }
         }
 
@@ -409,6 +420,7 @@ export default function ChessGame() {
           currentTurnPlayerId: nextTurnPlayerId,
           roundWinnerId: nextRoundWinnerId,
           isRoundDraw: nextIsRoundDraw,
+          drawReason: nextDrawReason,
           roundOver: nextRoundOver,
           scores: nextScores,
           roundFirstPlayerId,
@@ -471,7 +483,8 @@ export default function ChessGame() {
       ? (aiMessage || "NeuroBot wins by checkmate!")
       : `Round won by ${winnerName}!`;
   } else if (isRoundDraw) {
-    statusText = aiMessage || "Draw! Game Over.";
+    const drawReason = gameState.drawReason || "";
+    statusText = aiMessage || (drawReason ? `Draw by ${drawReason}! Match Over.` : "Draw! Match Over.");
   } else if (isAiTurn) {
     statusText = aiMessage || "NeuroBot is analyzing board...";
   } else {
