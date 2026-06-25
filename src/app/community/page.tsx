@@ -188,11 +188,107 @@ export default function CommunityHubPage() {
     return () => clearInterval(interval);
   }, [user]);
 
+  const fetchLobbies = async () => {
+    try {
+      const res = await fetch("/api/rooms");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const dbRooms: LobbyRoom[] = json.data.map((r: any) => {
+            const hostPlayer = r.players.find((p: any) => p.isHost);
+            return {
+              id: r._id || `custom-${r.code}`,
+              code: r.code,
+              name: r.settings?.name || `${r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
+              gameSlug: r.gameSlug,
+              gameName: r.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+              host: hostPlayer ? hostPlayer.username : "Unknown",
+              currentPlayers: r.players.length,
+              maxPlayers: r.maxPlayers,
+              status: r.players.length >= r.maxPlayers ? "full" : "open",
+              isPrivate: r.settings?.isPrivate || false,
+              passcode: r.settings?.passcode,
+              region: r.settings?.region || "Mumbai Hub",
+              note: r.settings?.allowSpectators ? "Spectators allowed." : "Private settings.",
+            };
+          });
+          setRooms(dbRooms);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load lobbies for community:", err);
+    }
+  };
+
   useEffect(() => {
-    const loaded = loadCreatedRooms().filter(
-      (room) => !["TIC442", "TIC881", "TIC339"].includes(room.code)
-    );
-    setRooms(mergeRooms(loaded, ROOMS_AVAILABLE));
+    fetchLobbies();
+
+    let channel: any = null;
+    try {
+      const pusher = getPusherClient();
+      channel = pusher.subscribe("rooms-list");
+
+      channel.bind("room-created", (newRoom: any) => {
+        setRooms((prev) => {
+          if (prev.some((r) => r.code === newRoom.code)) return prev;
+          const hostUsername = newRoom.host || (newRoom.players && newRoom.players[0]?.username) || "Unknown";
+          const formattedRoom: LobbyRoom = {
+            id: newRoom.id || newRoom._id || `custom-${newRoom.code}`,
+            code: newRoom.code,
+            name: newRoom.name || newRoom.settings?.name || `${newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox"} Room`,
+            gameSlug: newRoom.gameSlug,
+            gameName: newRoom.gameSlug === "tictactoe" ? "Tic-Tac-Toe" : "Sandbox",
+            host: hostUsername,
+            currentPlayers: newRoom.currentPlayers || 1,
+            maxPlayers: newRoom.maxPlayers || 2,
+            status: newRoom.status || "open",
+            isPrivate: newRoom.isPrivate || false,
+            passcode: newRoom.passcode,
+            region: newRoom.region || "Mumbai Hub",
+            note: newRoom.note || "Private settings.",
+          };
+          return [formattedRoom, ...prev];
+        });
+      });
+
+      channel.bind("room-updated", (updatedInfo: any) => {
+        setRooms((prev) => {
+          if (updatedInfo.status === "playing" || updatedInfo.status === "completed") {
+            return prev.filter((r) => r.code !== updatedInfo.code);
+          }
+          return prev.map((room) => {
+            if (room.code === updatedInfo.code) {
+              const nextPlayersCount = updatedInfo.playersCount !== undefined ? updatedInfo.playersCount : room.currentPlayers;
+              const nextHost = updatedInfo.host || room.host;
+              return {
+                ...room,
+                ...updatedInfo,
+                host: nextHost,
+                currentPlayers: nextPlayersCount,
+                status: nextPlayersCount >= room.maxPlayers ? "full" : "open",
+              };
+            }
+            return room;
+          });
+        });
+      });
+
+      channel.bind("room-deleted", (deletedInfo: any) => {
+        setRooms((prev) => prev.filter((room) => room.code !== deletedInfo.code));
+      });
+    } catch (pusherErr) {
+      console.warn("Pusher client lobbies subscription error in community:", pusherErr);
+    }
+
+    return () => {
+      if (channel) {
+        channel.unbind_all();
+      }
+      try {
+        const pusher = getPusherClient();
+        pusher.unsubscribe("rooms-list");
+      } catch (e) {}
+    };
   }, []);
 
   useEffect(() => {
