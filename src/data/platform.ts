@@ -99,6 +99,30 @@ export const PLATFORM_GAMES: PlatformGame[] = [
     ],
     features: ["AI practice partner", "Real-time sync", "Spectator view"],
     votes: 940,
+  },
+  {
+    id: "g3",
+    slug: "ludo",
+    name: "Ludo Arena",
+    shortCode: "🎲",
+    tone: "emerald",
+    spotlight: "Classic 4-player board race",
+    category: "Board Games",
+    multiplayerType: "2-4 Players",
+    status: "released",
+    progressPercent: 100,
+    developerName: "UniGames",
+    tags: ["multiplayer", "classic", "party"],
+    description: "Classic 4-player board race. Roll the 3D dice, release your tokens, capture opponents, and reach the center home first!",
+    rules: [
+      "Roll a 6 to release a token from HOME.",
+      "Roll the 3D dice, click on a token to move it forward.",
+      "Rolling a 6, cutting an opponent, or finishing a token grants a bonus roll.",
+      "Star cells are Safe Zones where no cuts can occur.",
+      "Two same-colored tokens on a space form a blockade."
+    ],
+    features: ["Strategic bot players", "3D animated dice", "Retro sound synth"],
+    votes: 860,
   }
 ];
 

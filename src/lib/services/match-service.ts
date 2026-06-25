@@ -49,6 +49,7 @@ export async function createMatch(
       userId: p.userId,
       username: p.username,
       avatar: p.avatar,
+      isAI: p.isAI,
     }));
 
     const newMatch: MatchDoc = {

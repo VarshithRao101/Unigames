@@ -6,6 +6,8 @@ import { TEST_ARENA_META, TEST_ARENA_RULES, TEST_ARENA_SETTINGS } from "./test-a
 import TestArenaGame from "./test-arena/component";
 import { CHESS_META, CHESS_RULES, CHESS_SETTINGS } from "./chess/meta";
 import ChessGame from "./chess/component";
+import { LUDO_META, LUDO_RULES, LUDO_SETTINGS } from "./ludo/meta";
+import LudoGame from "./ludo/component";
 
 export interface RegistryEntry {
   metadata: GameMetadata;
@@ -32,6 +34,12 @@ export const GAMES_REGISTRY: Record<string, RegistryEntry> = {
     component: ChessGame,
     rules: CHESS_RULES,
     settings: CHESS_SETTINGS
+  },
+  ludo: {
+    metadata: LUDO_META,
+    component: LudoGame,
+    rules: LUDO_RULES,
+    settings: LUDO_SETTINGS
   },
 };
 

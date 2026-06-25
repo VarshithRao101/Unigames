@@ -86,6 +86,38 @@ const GAME_CONFIGS: Record<string, GameConfig> = {
       "Look for double attack opportunities to guarantee a win."
     ]
   },
+  chess: {
+    id: "chess",
+    name: "Chess Arena",
+    maxPlayers: 2,
+    rules: "Command the chessboard according to official rules.",
+    description: "timeless clash of kings. Perfect your tactics in real-time or practice with NeuroBot.",
+    objectives: "Checkmate the opponent's king.",
+    duration: "10-30 Mins",
+    winConditions: "Checkmate, stalemate, draw by agreement/repetition.",
+    thumb: "CHESS",
+    tips: [
+      "Develop your pieces early.",
+      "Control the center.",
+      "Always castle early to secure your king."
+    ]
+  },
+  ludo: {
+    id: "ludo",
+    name: "Ludo Arena",
+    maxPlayers: 4,
+    rules: "Roll 3D dice, release tokens, blockade paths, and race home.",
+    description: "Classic 4-player Ludo board race with bots, captures, safe zones, and 3D dice rolling animations.",
+    objectives: "Race all 4 tokens to the center home space.",
+    duration: "15-45 Mins",
+    winConditions: "Be the first to race all 4 tokens to the center.",
+    thumb: "LUDO",
+    tips: [
+      "Always release tokens from Home first if you roll a 6.",
+      "Group two tokens on the same square to form a blockade.",
+      "Linger in safe zones to avoid being captured."
+    ]
+  }
 };
 
 const BOT_NAMES = [
@@ -123,6 +155,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   const [passwordInput, setPasswordInput] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [region, setRegion] = useState<string>("Mumbai Hub");
+  const [maxPlayersLimit, setMaxPlayersLimit] = useState<number>(2);
 
   // Room states
   const [players, setPlayers] = useState<Player[]>([]);
@@ -273,6 +306,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
         setRoomName(currentRoom.name);
         setIsPrivate(currentRoom.settings.isPrivate);
         setRegion(currentRoom.region || "Mumbai Hub");
+        setMaxPlayersLimit(currentRoom.maxPlayers || (GAME_CONFIGS[currentRoom.gameSlug]?.maxPlayers || 2));
 
         if (isSpectatorMode) {
           setIsSpectatingOnly(true);
@@ -297,7 +331,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
           isHost: p.isHost,
           isReady: p.isReady,
           avatar: p.avatar || p.username.charAt(0),
-          isAI: false,
+          isAI: p.isAI || p.userId.startsWith("bot-") || p.avatar === "AI",
           color: p.isHost ? "#FFC107" : "#1971C2",
         }));
         setPlayers(mappedPlayers);
@@ -383,7 +417,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 isHost: newPlayer.isHost,
                 isReady: newPlayer.isReady,
                 avatar: newPlayer.avatar || newPlayer.username.charAt(0),
-                isAI: false,
+                isAI: newPlayer.isAI || newPlayer.userId.startsWith("bot-") || newPlayer.avatar === "AI",
                 color: "#1971C2",
               },
             ];
@@ -588,7 +622,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Switch between Player and Spectator Mode
   const handleToggleSpectatorMode = async () => {
     if (isSpectatingOnly) {
-      if (players.length >= game.maxPlayers) {
+      if (players.length >= maxPlayersLimit) {
         alert("The game slots are currently full! Remove a bot or wait for a slot.");
         return;
       }
@@ -667,34 +701,45 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   };
 
   // Lobby slot logic — standard bot (shown for all games)
-  const handleAddAI = () => {
-    if (players.length >= game.maxPlayers) return;
+  const handleAddAI = async () => {
+    if (players.length >= maxPlayersLimit) return;
     const botIndex = Math.floor(Math.random() * BOT_NAMES.length);
     const botName = BOT_NAMES[botIndex] + ` [AI]`;
     
     if (players.some(p => p.name === botName)) return;
 
-    const newBot: Player = {
-      id: `bot-${Date.now()}`,
-      name: botName,
-      isHost: false,
-      isReady: true,
-      avatar: "AI",
-      isAI: true,
-      color: ["#2B8A3E", "#E67E22", "#C92A2A", "#1971C2"][Math.floor(Math.random() * 4)],
-    };
-
-    setPlayers(prev => [...prev, newBot]);
-    setChatMessages(prev => [
-      ...prev,
-      { sender: "System", text: `${botName} entered the room.`, time: "Now", isSystem: true }
-    ]);
+    try {
+      const res = await fetch(`/api/rooms/${roomCode}/bot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ botName }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        const bot = json.data;
+        const newBot: Player = {
+          id: bot.userId,
+          name: bot.username,
+          isHost: false,
+          isReady: true,
+          avatar: "AI",
+          isAI: true,
+          color: ["#2B8A3E", "#E67E22", "#C92A2A", "#1971C2"][Math.floor(Math.random() * 4)],
+        };
+        setPlayers(prev => {
+          if (prev.some(p => p.id === newBot.id)) return prev;
+          return [...prev, newBot];
+        });
+      }
+    } catch (err) {
+      console.error("Failed to add bot:", err);
+    }
   };
 
   // Play vs AI — adds unbeatable minimax bot and starts immediately
   const handlePlayVsAI = () => {
     setShowAiConfirm(false);
-    if (players.length >= game.maxPlayers) {
+    if (players.length >= maxPlayersLimit) {
       // Remove any existing non-user players first
       setPlayers(prev => prev.filter(p => p.id === user?.id));
     }
@@ -720,15 +765,35 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     ]);
   };
 
-  const handleRemovePlayer = (id: string) => {
+  const handleRemovePlayer = async (id: string) => {
     const targetPlayer = players.find(p => p.id === id);
     if (!targetPlayer) return;
 
-    setPlayers(prev => prev.filter(p => p.id !== id));
-    setChatMessages(prev => [
-      ...prev,
-      { sender: "System", text: `${targetPlayer.name} left the room.`, time: "Now", isSystem: true }
-    ]);
+    if (targetPlayer.isAI) {
+      try {
+        const res = await fetch(`/api/rooms/${roomCode}/bot`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ botId: id }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          setPlayers(prev => prev.filter(p => p.id !== id));
+          setChatMessages(prev => [
+            ...prev,
+            { sender: "System", text: `${targetPlayer.name} left the room.`, time: "Now", isSystem: true }
+          ]);
+        }
+      } catch (err) {
+        console.error("Failed to remove bot:", err);
+      }
+    } else {
+      setPlayers(prev => prev.filter(p => p.id !== id));
+      setChatMessages(prev => [
+        ...prev,
+        { sender: "System", text: `${targetPlayer.name} left the room.`, time: "Now", isSystem: true }
+      ]);
+    }
   };
 
   // Toggle ready status via PATCH API
@@ -846,7 +911,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     // Simulate friend joining after 3 seconds
     setTimeout(() => {
       setPlayers(prev => {
-        if (prev.length >= game.maxPlayers) return prev;
+        if (prev.length >= maxPlayersLimit) return prev;
         if (prev.some(p => p.name === name)) return prev;
         return [...prev, {
           id: `friend-${friendId}`,
@@ -957,7 +1022,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
   // Render Slots based on game capacity
   const renderPlayerSlots = () => {
     const slots = [];
-    const max = game.maxPlayers;
+    const max = maxPlayersLimit;
 
     for (let i = 0; i < max; i++) {
       const player = players[i];
@@ -1322,7 +1387,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                       <div className="flex justify-between items-center pb-1">
                         <h3 className="font-outfit font-black text-[9px] uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-brand-orange" />
-                          Players ({players.length}/{game.maxPlayers})
+                          Players ({players.length}/{maxPlayersLimit})
                         </h3>
                         
                         <button

@@ -50,6 +50,7 @@ export interface MatchPlayer {
   avatar?: string;
   score?: number;
   xpEarned?: number;
+  isAI?: boolean;
 }
 
 export interface MatchDoc {
@@ -71,6 +72,7 @@ export interface RoomPlayer {
   avatar?: string;
   isHost: boolean;
   isReady: boolean;
+  isAI?: boolean;
 }
 
 export interface RoomDoc {

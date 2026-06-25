@@ -48,8 +48,9 @@ function CreateRoomForm() {
   );
 
   const allowedPlayerCounts = useMemo(() => {
-    return [2]; // Only tictactoe is supported (2 players)
-  }, []);
+    if (selectedGame === "ludo") return [2, 3, 4];
+    return [2];
+  }, [selectedGame]);
 
   // Adjust max players if current value is not allowed
   useEffect(() => {
