@@ -74,7 +74,7 @@ export default function GamesPage() {
       category: "Board Games",
       status: "released",
       progressPercent: 100,
-      image: "/images/ludo_logo.webp",
+      image: "/images/snakes_logo.webp",
       tags: ["Dice", "Strategy", "2-4 Players"]
     }
   ], []);
