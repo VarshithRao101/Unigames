@@ -58,6 +58,15 @@ export default function GamesPage() {
       progressPercent: 100,
       image: "/images/tictactoe_logo.png",
       tags: ["Quick", "Simple", "2 Players"]
+    },
+    {
+      slug: "chess",
+      name: "Chess",
+      category: "Strategy",
+      status: "released",
+      progressPercent: 100,
+      image: "/images/chess_logo.avif",
+      tags: ["Brain", "Tactical", "2 Players"]
     }
   ], []);
 

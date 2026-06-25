@@ -77,6 +77,29 @@ export const PLATFORM_GAMES: PlatformGame[] = [
     features: ["Instant reset", "Spectator view", "Simple controls"],
     votes: 720,
   },
+  {
+    id: "g2",
+    slug: "chess",
+    name: "Chess Arena",
+    shortCode: "♟",
+    tone: "amber",
+    spotlight: "Ultimate tactical duel",
+    category: "Strategy",
+    multiplayerType: "2 Players",
+    status: "released",
+    progressPercent: 100,
+    developerName: "UniGames",
+    tags: ["tactical", "classic", "strategy"],
+    description: "Engage in the timeless clash of kings. Perfect your tactics in real-time or practice with NeuroBot.",
+    rules: [
+      "White moves first, players alternate turns.",
+      "Move pieces legally according to standard chess rules.",
+      "Checkmate the opponent king to win the game.",
+      "Draws can occur via stalemate, insufficient material, three-fold repetition, or 50-move rule.",
+    ],
+    features: ["AI practice partner", "Real-time sync", "Spectator view"],
+    votes: 940,
+  }
 ];
 
 export const ROOMS_AVAILABLE: LobbyRoom[] = [];

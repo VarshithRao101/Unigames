@@ -4,6 +4,8 @@ import { TICTACTOE_META, TICTACTOE_RULES, TICTACTOE_SETTINGS } from "./tictactoe
 import TicTacToeGame from "./tictactoe/component";
 import { TEST_ARENA_META, TEST_ARENA_RULES, TEST_ARENA_SETTINGS } from "./test-arena/meta";
 import TestArenaGame from "./test-arena/component";
+import { CHESS_META, CHESS_RULES, CHESS_SETTINGS } from "./chess/meta";
+import ChessGame from "./chess/component";
 
 export interface RegistryEntry {
   metadata: GameMetadata;
@@ -24,6 +26,12 @@ export const GAMES_REGISTRY: Record<string, RegistryEntry> = {
     component: TicTacToeGame,
     rules: TICTACTOE_RULES,
     settings: TICTACTOE_SETTINGS
+  },
+  chess: {
+    metadata: CHESS_META,
+    component: ChessGame,
+    rules: CHESS_RULES,
+    settings: CHESS_SETTINGS
   },
 };
 
