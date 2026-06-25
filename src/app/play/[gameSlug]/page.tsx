@@ -294,13 +294,13 @@ function PlayGameLayout({
 
       {/* EMOTE DRAWER QUICK CHAT TRAY */}
       <footer className="h-16 border-t-3 border-black bg-slate-900/60 backdrop-blur-md px-6 flex items-center justify-center z-50 relative">
-        <div className="relative">
+        <div className="absolute -top-4.5 left-1/2 -translate-x-1/2">
           <Button 
             onClick={() => setShowEmoteTray(!showEmoteTray)}
             className="h-9 px-4 bg-slate-950 hover:bg-slate-800 text-slate-300 rounded-xl border-2 border-black font-black uppercase text-[8px] tracking-widest flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_#000]"
           >
             <Smile className="w-3.5 h-3.5 text-brand-orange" />
-            <span>Send Emote/Signal</span>
+            <span>Send Message</span>
           </Button>
 
           <AnimatePresence>
