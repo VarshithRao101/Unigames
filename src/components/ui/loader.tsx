@@ -70,16 +70,15 @@ export function Loader({ label = "Loading", className = "" }: LoaderProps) {
       }
     }
   }, [frameIdx]);
-
   return (
-    <div className={`w-72 max-w-full flex flex-col items-center pt-24 text-slate-950 dark:text-slate-50 ${className}`}>
+    <div className={`w-72 max-w-full flex flex-col items-center pt-28 text-slate-950 dark:text-slate-50 ${className}`}>
       {/* Dynamic wrapper containing Guybrush and the Progress Track */}
       <div className="w-full relative flex flex-col items-center">
         {/* Animated Guybrush riding on top of the bar */}
         <div
           className="absolute -top-[92px] transition-all duration-75 ease-out pointer-events-none"
           style={{
-            left: `calc(${progress}% * 0.75)`, // Guybrush moves along with the loading bar
+            left: `calc(${progress}% - 36px)`, // Centered over the growing bar edge
             width: `${GUYBRUSH_WIDTH * 2}px`,
             height: `${GUYBRUSH_HEIGHT * 2}px`,
           }}
@@ -110,58 +109,22 @@ export function Loader({ label = "Loading", className = "" }: LoaderProps) {
         </div>
       </div>
 
-      {/* Scoped CSS block for the wavy loading text animation */}
-      <style>{`
-        .custom-text-loader {
-          width: fit-content;
-          font-size: 17px;
-          font-family: monospace;
-          line-height: 1.4;
-          font-weight: bold;
-          --c: no-repeat linear-gradient(currentColor 0 0); 
-          background: var(--c),var(--c),var(--c),var(--c),var(--c),var(--c),var(--c);
-          background-size: calc(1ch + 1px) 100%;
-          border-bottom: 10px solid #0000; 
-          position: relative;
-          animation: l8-0 3s infinite linear;
-          clip-path: inset(-20px 0);
-        }
-        .custom-text-loader::before {
-          content: "Loading";
-        }
-        .custom-text-loader::after {
-          content: "";
-          position: absolute;
-          width: 10px;
-          height: 14px;
-          background: #25adda;
-          left: -10px;
-          bottom: 100%;
-          animation: l8-1 3s infinite linear;
-        }
-        @keyframes l8-0 {
-           0%,
-           12.5% {background-position: calc(0*100%/6) 0   ,calc(1*100%/6)    0,calc(2*100%/6)    0,calc(3*100%/6)    0,calc(4*100%/6)    0,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           25%   {background-position: calc(0*100%/6) 40px,calc(1*100%/6)    0,calc(2*100%/6)    0,calc(3*100%/6)    0,calc(4*100%/6)    0,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           37.5% {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6)    0,calc(3*100%/6)    0,calc(4*100%/6)    0,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           50%   {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6) 40px,calc(3*100%/6)    0,calc(4*100%/6)    0,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           62.5% {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6) 40px,calc(3*100%/6) 40px,calc(4*100%/6)    0,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           75%   {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6) 40px,calc(3*100%/6) 40px,calc(4*100%/6) 40px,calc(5*100%/6)    0,calc(6*100%/6) 0}
-           87.4% {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6) 40px,calc(3*100%/6) 40px,calc(4*100%/6) 40px,calc(5*100%/6) 40px,calc(6*100%/6) 0}
-           100%  {background-position: calc(0*100%/6) 40px,calc(1*100%/6) 40px,calc(2*100%/6) 40px,calc(3*100%/6) 40px,calc(4*100%/6) 40px,calc(5*100%/6) 40px,calc(6*100%/6) 40px}
-        }
-        @keyframes l8-1 {
-          100% {left:115%}
-        }
-      `}</style>
-
       {/* Label and Percentage bottom row */}
       <div className="w-full flex justify-between items-center px-1 mt-4">
-        {/* Custom text loader */}
-        <div className="custom-text-loader text-slate-950 dark:text-slate-50" />
+        {/* Custom text loader - wavy CSS bounce for any string length */}
+        <div className="font-space text-[10px] font-black uppercase tracking-[0.2em] flex gap-0.5 text-slate-50 dark:text-slate-50">
+          {label.split("").map((char, index) => (
+            <span
+              key={index}
+              className="inline-block animate-[bounce_1.4s_infinite_ease-in-out]"
+              style={{ animationDelay: `${index * 0.08}s` }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
+        </div>
         <span className="font-mono font-bold text-brand-orange text-[14px]">{progress}%</span>
       </div>
     </div>
   );
 }
-

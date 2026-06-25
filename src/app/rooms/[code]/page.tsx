@@ -26,6 +26,7 @@ const getGameIcon = (id: string) => {
 };
 import { motion, AnimatePresence } from "framer-motion";
 import { GameContainer } from "@/games/container";
+import { Loader } from "@/components/ui/loader";
 import { PlatformAdComponent, PopupAd } from "@/monetization/ad-components";
 import { ROOMS_AVAILABLE } from "@/data/platform";
 import { loadCreatedRooms, deleteCreatedRoom } from "@/utils/mock-room-store";
@@ -1674,7 +1675,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="max-w-md mx-auto bg-[var(--slate-800)] border-3 border-black text-slate-50 rounded-3xl p-6 text-center flex flex-col justify-between items-center min-h-[380px] shadow-[4px_4px_0px_#000000] relative"
+                className="max-w-md mx-auto bg-[var(--slate-800)] border-3 border-black text-slate-50 rounded-3xl p-6 text-center flex flex-col justify-between items-center min-h-[420px] shadow-[4px_4px_0px_#000000] relative"
               >
                 <div className="w-full flex justify-between items-center border-b-2 border-black/40 pb-4">
                   <div className="flex items-center gap-2">
@@ -1688,7 +1689,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Room: #{roomCode}</span>
                 </div>
 
-                <div className="my-6 space-y-4 max-w-sm">
+                {/* Tips card */}
+                <div className="w-full my-4 space-y-4 max-w-sm">
                   <div className="p-3 bg-[var(--slate-900)] border border-black rounded-xl shadow-[2px_2px_0px_#000000]">
                     <span className="font-outfit font-black text-[8px] uppercase tracking-widest text-brand-orange flex items-center justify-center gap-1">
                       <HelpCircle className="w-3.5 h-3.5" /> Loading Tips & Advice
@@ -1699,18 +1701,9 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   </div>
                 </div>
 
-                <div className="w-full space-y-2">
-                  <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-450 tracking-widest px-1">
-                    <span>Loading game...</span>
-                    <span>{loadingProgress}%</span>
-                  </div>
-                  <div className="w-full h-3 bg-[var(--slate-900)] border border-black rounded-full overflow-hidden shadow-[1.5px_1.5px_0px_#000000]">
-                    <motion.div 
-                      className="h-full bg-brand-orange"
-                      animate={{ width: `${loadingProgress}%` }}
-                      transition={{ duration: 0.1 }}
-                    />
-                  </div>
+                {/* Guybrush walking animation (top) + progress bar (bottom) */}
+                <div className="w-full">
+                  <Loader label="Loading" className="mx-auto" />
                 </div>
               </motion.div>
             )}
