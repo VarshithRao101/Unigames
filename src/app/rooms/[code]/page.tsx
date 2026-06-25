@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/common/sidebar";
 import { Button } from "@/components/ui/button";
 import { 
   Copy, Users, Send, AlertCircle, Crown, LogOut, Trophy, Play, Check, Plus, Eye, BookOpen, Clock, 
-  HelpCircle, RefreshCw, X, ShieldAlert, Award, Zap, Share2, Gamepad2
+  HelpCircle, RefreshCw, X, ShieldAlert, Award, Zap, Share2, Gamepad2, Bot
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/context/toast-context";
@@ -701,10 +701,10 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
 
     const aiBot: Player = {
       id: `ai-minimax-${Date.now()}`,
-      name: "NeuroBot 🤖",
+      name: "NeuroBot",
       isHost: false,
       isReady: true,
-      avatar: "🤖",
+      avatar: "AI",
       isAI: true,
       color: "#7c3aed",
     };
@@ -716,7 +716,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
     setIsAiGame(true);
     setChatMessages(prev => [
       ...prev,
-      { sender: "System", text: "NeuroBot 🤖 joined! This is a practice match — results won't count toward stats.", time: "Now", isSystem: true }
+      { sender: "System", text: "NeuroBot joined! This is a practice match — results won't count toward stats.", time: "Now", isSystem: true }
     ]);
   };
 
@@ -1036,10 +1036,10 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               {/* Play vs AI — prominent */}
               <button
                 onClick={() => setShowAiConfirm(true)}
-                className="h-7 px-3 border-2 border-black text-[8px] font-black uppercase tracking-widest shadow-[1.5px_1.5px_0px_#000000] hover:-translate-y-0.5 hover:shadow-[2.5px_2.5px_0px_#000000] transition-all cursor-pointer active:translate-y-0.5 rounded-lg"
+                className="h-7 px-3 border-2 border-black text-[8px] font-black uppercase tracking-widest shadow-[1.5px_1.5px_0px_#000000] hover:-translate-y-0.5 hover:shadow-[2.5px_2.5px_0px_#000000] transition-all cursor-pointer active:translate-y-0.5 rounded-lg flex items-center gap-1"
                 style={{ background: "var(--color-brand-orange)", color: "#000" }}
               >
-                🤖 vs AI
+                <Bot className="w-3 h-3" /> vs AI
               </button>
               {/* Standard add bot */}
               <button
@@ -1086,8 +1086,8 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
               {/* Header */}
               <div className="p-6 pb-4 relative">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 rounded-2xl border-3 border-black shadow-[3px_3px_0px_#000] bg-purple-500/10 flex items-center justify-center text-3xl shrink-0">
-                    🤖
+                  <div className="w-14 h-14 rounded-2xl border-3 border-black shadow-[3px_3px_0px_#000] bg-purple-500/10 flex items-center justify-center shrink-0">
+                    <Bot className="w-8 h-8 text-purple-500" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
@@ -1099,21 +1099,21 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                       </span>
                     </div>
                     <h3 className="font-outfit font-black text-lg uppercase tracking-tight" style={{ color: "var(--foreground)" }}>
-                      NeuroBot 🤖
+                      NeuroBot
                     </h3>
-                    <p className="text-[10px] font-bold mt-0.5" style={{ color: "#7c3aed" }}>Unbeatable • IQ ∞ • Zero Mistakes</p>
+                    <p className="text-[10px] font-bold mt-0.5" style={{ color: "#7c3aed" }}>Unbeatable • IQ Max • Zero Mistakes</p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   {[
-                    { icon: "🧠", label: "Engine", val: "Minimax + Alpha-Beta Pruning" },
-                    { icon: "⚡", label: "Depth", val: "Full game tree (9 levels)" },
-                    { icon: "🎯", label: "Strategy", val: "Corner → Center → Edge" },
-                    { icon: "🚫", label: "Stats", val: "Practice only — no leaderboard" },
+                    { label: "Engine", val: "Minimax + Alpha-Beta Pruning" },
+                    { label: "Depth", val: "Full game tree (9 levels)" },
+                    { label: "Strategy", val: "Corner -> Center -> Edge" },
+                    { label: "Stats", val: "Practice only — no leaderboard" },
                   ].map(item => (
                     <div key={item.label} className="flex items-center justify-between px-3 py-1.5 rounded-xl border-2 border-black" style={{ background: "var(--panel-bg-hover)" }}>
-                      <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>{item.icon} {item.label}</span>
+                      <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>{item.label}</span>
                       <span className="text-[9px] font-black" style={{ color: "var(--foreground)" }}>{item.val}</span>
                     </div>
                   ))}
@@ -1138,7 +1138,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                   className="flex-[2] h-11 rounded-xl border-2 border-black font-black uppercase text-[9px] tracking-widest transition-all shadow-[2px_2px_0px_#000] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#000] active:translate-y-0.5 cursor-pointer"
                   style={{ background: "#7c3aed", color: "#fff" }}
                 >
-                  ⚔️ Challenge NeuroBot!
+                  Challenge NeuroBot!
                 </button>
               </div>
             </div>
@@ -1476,7 +1476,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                       {/* AI Game Mode Banner */}
                       {isAiGame && (
                         <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 border-black" style={{ background: "#7c3aed15" }}>
-                          <span className="text-xl">🤖</span>
+                          <Bot className="w-5 h-5 text-purple-500 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#7c3aed" }}>AI Practice Mode</p>
                             <p className="text-[8px] font-bold mt-0.5 text-slate-400">Results won't count toward stats or leaderboard</p>
@@ -1520,7 +1520,7 @@ export default function LobbyRoomPage({ params }: { params: Promise<{ code: stri
                             className="btn-neo flex-1 h-9.5 text-slate-950 uppercase font-black text-[11px] tracking-wider rounded-lg shadow-[2px_2px_0px_#000000] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             style={{ background: "#7c3aed" }}
                           >
-                            ⚔️ Start AI Match
+                            Start AI Match
                           </button>
                         )}
 

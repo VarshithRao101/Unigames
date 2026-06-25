@@ -12,7 +12,7 @@ type TimeMode = "weekly" | "allTime";
 type GameFilter = "overall" | string; // slug or "overall"
 
 const GAME_COLORS: Record<string, { badge: string; glow: string; icon: string }> = {
-  overall:    { badge: "bg-brand-orange text-slate-950",  glow: "shadow-[0_0_12px_rgba(255,193,7,0.35)]",  icon: "🏆" },
+  overall:    { badge: "bg-brand-orange text-slate-950",  glow: "shadow-[0_0_12px_rgba(255,193,7,0.35)]",  icon: "ALL" },
   tictactoe:  { badge: "bg-cyan-400 text-slate-950",      glow: "shadow-[0_0_12px_rgba(34,211,238,0.35)]", icon: "✕〇" },
 };
 
@@ -70,11 +70,11 @@ export default function LeaderboardsPage() {
   const colors = GAME_COLORS[gameFilter] ?? GAME_COLORS.overall;
 
   const gameOptions = [
-    { slug: "overall", name: "Overall Rankings", icon: "🏆", desc: "All games combined" },
+    { slug: "overall", name: "Overall Rankings", icon: "ALL", desc: "All games combined" },
     ...PLATFORM_GAMES.map(g => ({
       slug: g.slug,
       name: g.name,
-      icon: GAME_COLORS[g.slug]?.icon ?? "🎮",
+      icon: GAME_COLORS[g.slug]?.icon ?? "GAME",
       desc: g.spotlight ?? g.category,
     })),
   ];

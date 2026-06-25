@@ -40,20 +40,21 @@ function PlayGameContainer() {
 
   const gameSlug = params.gameSlug as string;
   const matchId = searchParams.get("match");
+  const isAiMode = searchParams.get("ai") === "true";
+  const aiRoomCode = searchParams.get("room") || "AI-MATCH";
 
   const [matchDetails, setMatchDetails] = useState<MatchDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showEmoteTray, setShowEmoteTray] = useState(false);
 
-  // Quick Emotes & Messages list
+  // Quick Emotes & Messages list (text only, no emojis)
   const quickEmotes = [
-    "😂", "🔥", "👑", "👍", "🤔", "😤", "🎯", "💀", "😈", "🫡",
-    "🙌", "😱", "🤯", "😎", "🥳", "😤", "💪", "👀", "⚡", "🏆",
-    "GG", "Well Played!", "Ez Clap 😏", "Oops! 😬", "Noooo 😭",
-    "My Bad 🤦", "Let's Go! 🚀", "Too Easy 😎", "Close One! 😅",
-    "Rematch! ⚔️", "I'm on Fire! 🔥", "Respect ✊", "Lucky... 🍀",
-    "Next time 💪", "Unbelievable! 😱", "gg wp 🤝"
+    "GG", "Well Played!", "Ez Clap", "Oops!", "Noooo",
+    "My Bad", "Lets Go!", "Too Easy", "Close One!",
+    "Rematch!", "Im on Fire!", "Respect", "Lucky...",
+    "Next time", "Unbelievable!", "gg wp", "Nice move!",
+    "That was close", "Good game", "Well done",
   ];
 
   // Prevent back button navigation during active game session
@@ -69,6 +70,31 @@ function PlayGameContainer() {
   }, []);
 
   useEffect(() => {
+    // AI Mode: construct a synthetic local match — no DB required
+    if (isAiMode && user) {
+      const syntheticMatch: MatchDetails = {
+        _id: `ai-local-${Date.now()}`,
+        roomCode: aiRoomCode,
+        gameSlug,
+        status: "active",
+        players: [
+          {
+            userId: user.id,
+            username: user.username || "You",
+            avatar: user.avatarUrl || undefined,
+          },
+          {
+            userId: `ai-minimax-${Date.now()}`,
+            username: "NeuroBot",
+            avatar: undefined,
+          },
+        ],
+      };
+      setMatchDetails(syntheticMatch);
+      setLoading(false);
+      return;
+    }
+
     if (!matchId) {
       setError("No Match ID provided in request parameters");
       setLoading(false);
@@ -95,7 +121,7 @@ function PlayGameContainer() {
     };
 
     fetchMatch();
-  }, [matchId]);
+  }, [matchId, isAiMode, user]);
 
   if (loading) {
     return (
@@ -158,15 +184,18 @@ function PlayGameContainer() {
     id: p.userId,
     name: p.username,
     avatar: p.avatar || "/avatars/avatar-placeholder.png",
-    isHost: idx === 0, // Assume first player in array is the host
+    isHost: idx === 0,
     isReady: true,
-    isAI: false,
+    isAI: isAiMode && idx === 1,
   }));
 
   const handleQuit = async () => {
+    if (isAiMode) {
+      router.replace("/games");
+      return;
+    }
     if (confirm("Are you sure you want to abandon the current match? This will count as a loss.")) {
       try {
-        // Submit exit PATCH to end match early
         await fetch(`/api/matches/${matchId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -184,7 +213,7 @@ function PlayGameContainer() {
 
   return (
     <MatchProvider
-      matchId={matchId || ""}
+      matchId={matchDetails._id}
       initialRoom={mappedRoomData}
       initialPlayers={mappedPlayers}
     >
@@ -197,6 +226,7 @@ function PlayGameContainer() {
         showEmoteTray={showEmoteTray}
         setShowEmoteTray={setShowEmoteTray}
         matchId={matchId}
+        isAiMode={isAiMode}
       />
     </MatchProvider>
   );
@@ -211,6 +241,7 @@ function PlayGameLayout({
   showEmoteTray,
   setShowEmoteTray,
   matchId,
+  isAiMode,
 }: {
   matchDetails: MatchDetails;
   registryEntry: any;
@@ -220,6 +251,7 @@ function PlayGameLayout({
   showEmoteTray: boolean;
   setShowEmoteTray: (show: boolean) => void;
   matchId: string | null;
+  isAiMode: boolean;
 }) {
   const context = useMatchContext();
 
@@ -234,17 +266,23 @@ function PlayGameLayout({
       {/* TOP DECK HEADER BAR */}
       <header className="h-14 border-b-3 border-black bg-slate-900/60 backdrop-blur-md px-6 flex items-center justify-between z-50">
         <div className="flex items-center gap-3">
-          <span className="px-2 py-0.5 rounded bg-brand-orange text-slate-950 text-[8px] font-black uppercase tracking-widest border border-black shadow-[1px_1px_0px_#000]">
-            Match: {matchDetails.roomCode}
-          </span>
+          {isAiMode ? (
+            <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border border-black shadow-[1px_1px_0px_#000]" style={{ background: "#7c3aed", color: "#fff" }}>
+              AI Practice
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded bg-brand-orange text-slate-950 text-[8px] font-black uppercase tracking-widest border border-black shadow-[1px_1px_0px_#000]">
+              Match: {matchDetails.roomCode}
+            </span>
+          )}
           <h1 className="font-outfit font-black text-sm uppercase tracking-tighter text-slate-50">
-            {registryEntry.metadata.name}
+            {registryEntry.metadata.name}{isAiMode ? " vs NeuroBot" : ""}
           </h1>
         </div>
 
         <div className="flex items-center gap-3">
           <Button onClick={handleQuit} className="h-8.5 px-3.5 bg-danger/20 hover:bg-danger text-danger hover:text-slate-950 rounded-xl border-2 border-black font-black uppercase text-[8px] tracking-wider transition-all duration-150">
-            <LogOut className="w-3.5 h-3.5 mr-1" /> Quit Game
+            <LogOut className="w-3.5 h-3.5 mr-1" /> {isAiMode ? "Exit Practice" : "Quit Game"}
           </Button>
         </div>
       </header>

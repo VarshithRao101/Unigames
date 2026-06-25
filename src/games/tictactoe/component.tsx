@@ -63,10 +63,7 @@ function minimax(
 function getBestAIMove(board: string[], aiSymbol: string, humanSymbol: string): number {
   let bestVal = -Infinity;
   let bestMove = -1;
-
-  // Strategic priority: center first, then corners, then edges
   const priority = [4, 0, 2, 6, 8, 1, 3, 5, 7];
-
   for (const i of priority) {
     if (board[i] !== "") continue;
     const tempBoard = [...board];
@@ -80,10 +77,10 @@ function getBestAIMove(board: string[], aiSymbol: string, humanSymbol: string): 
   return bestMove;
 }
 
-// ─── AI TAUNT MESSAGES ────────────────────────────────────────────
-const AI_THINKING = ["🧠 Calculating...", "⚡ Processing...", "🔮 Predicting..."];
-const AI_WIN_TAUNTS = ["🤖 Too easy!", "💀 Resistance is futile!", "🧠 IQ > 9000!", "🎯 Flawless victory!", "⚡ Checkmate, human!"];
-const AI_DRAW_TAUNTS = ["🤝 Impressive! You tied the AI!", "🧠 Respect, human!", "⭐ You're the 0.1%!", "🏆 A worthy challenger!"];
+// ─── AI STATUS MESSAGES (no emojis) ──────────────────────────────
+const AI_THINKING = ["Calculating...", "Processing...", "Predicting..."];
+const AI_WIN_TAUNTS = ["Too easy!", "Resistance is futile!", "IQ over 9000!", "Flawless victory!", "Checkmate, human!"];
+const AI_DRAW_TAUNTS = ["Impressive — you tied the AI!", "Respect, human!", "You are the 0.1%!", "A worthy challenger!"];
 
 export default function TicTacToeGame() {
   const sdk = useUnigamesSDK();
@@ -93,7 +90,6 @@ export default function TicTacToeGame() {
   const gameState = match.gameState || {};
   const aiThinkingRef = useRef(false);
 
-  // Destructure or assign defaults for board state
   const board = gameState.board || Array(9).fill("");
   const currentTurnPlayerId = gameState.currentTurnPlayerId || (players[0]?.id || "");
   const scores = gameState.scores || { [players[0]?.id || "p1"]: 0, [players[1]?.id || "p2"]: 0 };
@@ -103,7 +99,6 @@ export default function TicTacToeGame() {
   const roundFirstPlayerId: string = gameState.roundFirstPlayerId || (players[0]?.id || "");
   const aiMessage: string = gameState.aiMessage || "";
 
-  // Track active emotes
   const [activeEmotes, setActiveEmotes] = React.useState<Record<string, { text: string; id: number }>>({});
 
   useEffect(() => {
@@ -133,7 +128,6 @@ export default function TicTacToeGame() {
     }
   }, [match.history]);
 
-  // Map players to X and O symbols
   const getSymbol = (playerId: string) => {
     if (players[0]?.id === playerId) return "X";
     if (players[1]?.id === playerId) return "O";
@@ -141,15 +135,12 @@ export default function TicTacToeGame() {
   };
 
   const localSymbol = localPlayer ? getSymbol(localPlayer.id) : "";
-
-  // Detect which player is the AI bot
   const aiPlayer = players.find(p => p.id.startsWith("ai-minimax"));
   const aiSymbol = aiPlayer ? getSymbol(aiPlayer.id) : "";
   const humanSymbol = aiSymbol === "X" ? "O" : "X";
   const isAiTurn = isAiMode && aiPlayer && currentTurnPlayerId === aiPlayer.id && !roundOver;
   const isMyTurn = localPlayer && currentTurnPlayerId === localPlayer.id && !roundOver && !isAiTurn;
 
-  // Initialize board state if empty
   useEffect(() => {
     if (players.length >= 2 && !gameState.board) {
       sdk.updateState({
@@ -175,13 +166,10 @@ export default function TicTacToeGame() {
     if (board.every((c: string) => c !== "")) return;
 
     aiThinkingRef.current = true;
-
     const thinkMsg = AI_THINKING[Math.floor(Math.random() * AI_THINKING.length)];
     sdk.updateState({ ...gameState, aiMessage: thinkMsg });
 
-    // Delay for dramatic effect (300-700ms)
     const delay = 300 + Math.random() * 400;
-
     const timer = setTimeout(() => {
       aiThinkingRef.current = false;
       const bestMove = getBestAIMove([...board], aiSymbol, humanSymbol);
@@ -301,11 +289,11 @@ export default function TicTacToeGame() {
     if (s1 > s2) finalWinnerId = p1;
     else if (s2 > s1) finalWinnerId = p2;
 
-    // In AI mode, skip stats recording by declaring a "draw" equivalent with no real winner
+    // AI mode: no stats recorded
     sdk.declareWinner(isAiMode ? "" : finalWinnerId, [p1, p2], { [p1]: s1, [p2]: s2 });
   };
 
-  // Status text
+  // Status text (no emojis)
   let statusText = "";
   if (aiMessage && isAiTurn) {
     statusText = aiMessage;
@@ -314,17 +302,17 @@ export default function TicTacToeGame() {
     const isLocalWin = roundWinnerId === localPlayer?.id;
     const isAiWin = roundWinnerId === aiPlayer?.id;
     statusText = isLocalWin
-      ? `🏆 You Beat the AI! Incredible!`
+      ? "You beat the AI! Incredible!"
       : isAiWin
-      ? `🤖 ${aiMessage || "NeuroBot wins!"}`
-      : `Round Won by ${winnerName}!`;
+      ? (aiMessage || "NeuroBot wins!")
+      : `Round won by ${winnerName}!`;
   } else if (isRoundDraw) {
-    statusText = aiMessage || "🤝 It's a Draw! No Points.";
+    statusText = aiMessage || "Draw! No Points.";
   } else if (isAiTurn) {
-    statusText = aiMessage || "🤖 NeuroBot is thinking...";
+    statusText = aiMessage || "NeuroBot is thinking...";
   } else {
     const activeName = players.find(p => p.id === currentTurnPlayerId)?.name || "Waiting...";
-    statusText = currentTurnPlayerId === localPlayer?.id ? "⚡ Your Turn! Make a Move!" : `⏳ ${activeName}'s Turn...`;
+    statusText = currentTurnPlayerId === localPlayer?.id ? "Your Turn! Make a Move!" : `${activeName}'s Turn...`;
   }
 
   const isPlayer1Active = currentTurnPlayerId === players[0]?.id && !roundOver;
@@ -338,8 +326,8 @@ export default function TicTacToeGame() {
         <div className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border-3 border-black shadow-[3px_3px_0px_#000]" style={{ background: "#7c3aed20" }}>
           <Bot className="w-4 h-4 shrink-0" style={{ color: "#7c3aed" }} />
           <div className="flex-1">
-            <p className="font-black text-[8px] uppercase tracking-widest" style={{ color: "#7c3aed" }}>AI Practice Mode • NeuroBot 🤖 • Minimax Engine</p>
-            <p className="text-[7.5px] font-bold text-slate-500 mt-0.5">Results won't be saved to profile or leaderboard</p>
+            <p className="font-black text-[8px] uppercase tracking-widest" style={{ color: "#7c3aed" }}>AI Practice Mode — NeuroBot — Minimax Engine</p>
+            <p className="text-[7.5px] font-bold text-slate-500 mt-0.5">Results are not saved to profile or leaderboard</p>
           </div>
           <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-black" style={{ background: "#7c3aed", color: "#fff" }}>PRACTICE</span>
         </div>
@@ -359,7 +347,8 @@ export default function TicTacToeGame() {
         </div>
         <div className="text-right px-2 relative z-10">
           <p className="font-outfit font-extrabold text-[8px] text-slate-500 uppercase tracking-widest">O PLAYER</p>
-          <p className={`font-outfit font-black text-xs truncate ${isAiMode && aiPlayer?.id === players[1]?.id ? "text-purple-400" : "text-success"}`}>
+          <p className={`font-outfit font-black text-xs truncate ${isAiMode ? "" : "text-success"}`}
+            style={isAiMode ? { color: "#7c3aed" } : {}}>
             {players[1]?.name || "Player 2"}
           </p>
         </div>
@@ -408,11 +397,9 @@ export default function TicTacToeGame() {
                       : "bg-slate-950/20 border-black/25 shadow-none opacity-40 cursor-not-allowed"
                     : cell === "X"
                     ? "bg-brand-orange shadow-[2px_2px_0px_#000000]"
-                    : isAiMode
-                    ? "shadow-[2px_2px_0px_#000000]"
-                    : "bg-success shadow-[2px_2px_0px_#000000]"
+                    : "shadow-[2px_2px_0px_#000000]"
                 }`}
-                style={cell === "O" && isAiMode ? { background: "#7c3aed" } : {}}
+                style={cell === "O" ? { background: isAiMode ? "#7c3aed" : "var(--color-success)" } : {}}
               >
                 {cell !== "" && (
                   <div className="absolute inset-0 bg-[radial-gradient(#000000_1.5px,transparent_1.5px)] [background-size:6px_6px] opacity-[0.15] pointer-events-none" />
@@ -483,16 +470,17 @@ export default function TicTacToeGame() {
         </div>
 
         {/* Player 2 / AI Card */}
-        <div className={`h-[115px] p-3 rounded-2xl text-center flex flex-col justify-between transition-all duration-200 border-3 border-black shadow-[4px_4px_0px_#000000] relative overflow-hidden ${
-          isPlayer2Active ? "bg-slate-900 scale-[1.02]" : "bg-slate-900/50 opacity-60"
-        }`}
+        <div
+          className={`h-[115px] p-3 rounded-2xl text-center flex flex-col justify-between transition-all duration-200 border-3 border-black shadow-[4px_4px_0px_#000000] relative overflow-hidden ${
+            isPlayer2Active ? "bg-slate-900 scale-[1.02]" : "bg-slate-900/50 opacity-60"
+          }`}
           style={isPlayer2Active && isAiMode ? { borderColor: "#7c3aed" } : {}}
         >
-          {isPlayer2Active && !isAiMode && (
-            <div className="absolute inset-0 bg-[radial-gradient(var(--success)_1px,transparent_1px)] [background-size:8px_8px] opacity-[0.06] pointer-events-none" />
-          )}
-          {isPlayer2Active && isAiMode && (
-            <div className="absolute inset-0 bg-[radial-gradient(#7c3aed_1px,transparent_1px)] [background-size:8px_8px] opacity-[0.06] pointer-events-none" />
+          {isPlayer2Active && (
+            <div
+              className="absolute inset-0 [background-size:8px_8px] opacity-[0.06] pointer-events-none"
+              style={{ backgroundImage: `radial-gradient(${isAiMode ? "#7c3aed" : "var(--color-success)"} 1px, transparent 1px)` }}
+            />
           )}
           <div className="flex items-center justify-center gap-2 relative z-10">
             <span
@@ -502,7 +490,7 @@ export default function TicTacToeGame() {
               O
             </span>
             <span className="text-slate-55 block font-outfit font-black text-xs truncate max-w-[110px]">
-              {players[1]?.name || (isAiMode ? "NeuroBot 🤖" : "Challenger B")}
+              {players[1]?.name || (isAiMode ? "NeuroBot" : "Challenger B")}
             </span>
           </div>
           <div className="flex items-center justify-center h-[36px] relative z-10">
@@ -516,7 +504,7 @@ export default function TicTacToeGame() {
                   className="font-black text-xs px-2.5 py-0.5 border-2 border-black rounded-xl shadow-[1.5px_1.5px_0px_#000000] animate-pulse"
                   style={{ background: "#7c3aed", color: "#fff" }}
                 >
-                  🧠 Thinking...
+                  Thinking...
                 </motion.div>
               ) : activeEmotes[players[1]?.id] ? (
                 <motion.div
@@ -531,7 +519,7 @@ export default function TicTacToeGame() {
             </AnimatePresence>
           </div>
           <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-500 pt-1 border-t border-black/25 relative z-10">
-            <span>{isAiMode ? "NEUROBOT 🤖" : "PLAYER 2"}</span>
+            <span>{isAiMode ? "NEUROBOT [AI]" : "PLAYER 2"}</span>
             {isPlayer2Active && (
               <span className="tracking-widest animate-pulse font-bold" style={{ color: isAiMode ? "#7c3aed" : "var(--color-success)" }}>
                 ACTIVE
@@ -559,10 +547,10 @@ export default function TicTacToeGame() {
         </div>
       )}
 
-      {/* AI Mode: practice disclaimer at bottom */}
+      {/* AI Mode disclaimer */}
       {isAiMode && (
         <p className="text-[8px] font-bold text-slate-500 text-center uppercase tracking-widest">
-          🚫 Practice Mode • No XP • No Stats • Just for Fun
+          Practice Mode — No XP — No Stats — Just for Fun
         </p>
       )}
     </div>
