@@ -10,7 +10,7 @@ export function Skeleton({ className, count = 1 }: { className?: string; count?:
       {Array.from({ length: count }).map((_, idx) => (
         <div
           key={idx}
-          className={`bg-gradient-to-r from-grey-surface via-grey-border/60 to-grey-surface bg-[length:200%_100%] animate-[pulse_1.5s_infinite] rounded-2xl ${className}`}
+          className={`bg-gradient-to-r from-slate-600/35 via-slate-600/60 to-slate-600/35 bg-[length:200%_100%] animate-[pulse_1.5s_infinite] rounded-2xl ${className}`}
           style={{ animationDuration: "1.5s" }}
         />
       ))}
