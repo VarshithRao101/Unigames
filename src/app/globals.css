@@ -415,7 +415,7 @@ input[type="text"], input[type="password"], input[type="email"], select, textare
   box-shadow: 2.5px 2.5px 0px 0px #000000 !important;
   border-radius: 0.75rem !important;
   font-weight: 800 !important;
-  padding: 0.5rem 1rem !important;
+  padding: 0.5rem 1rem;
   height: 2.75rem !important;
   font-size: 0.75rem !important;
 }
@@ -648,8 +648,8 @@ html.light .text-slate-300 {
     border-radius: 0.6rem !important;
     height: 2.25rem !important;
     font-size: 0.65rem !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
   input[type="text"]:focus, select:focus, textarea:focus {
     box-shadow: 3px 3px 0px 0px #000000, inset 0px 0px 0px 1px #ffaa00 !important;

@@ -90,7 +90,7 @@ export default function GamesPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 type="text" 
                 placeholder="Search games..."
-                className="w-full h-10 sm:h-11 bg-slate-900 border-2 border-black rounded-xl px-10 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] text-slate-50 focus:outline-none focus:border-brand-orange"
+                className="w-full h-10 sm:h-11 bg-slate-900 border-2 border-black rounded-xl !pl-10 !pr-4 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] text-slate-50 focus:outline-none focus:border-brand-orange"
               />
             </div>
             

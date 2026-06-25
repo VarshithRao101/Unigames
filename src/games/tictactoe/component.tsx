@@ -534,15 +534,17 @@ export default function TicTacToeGame() {
         <div className="flex gap-3 w-full max-w-[340px] relative z-10 shrink-0">
           <Button
             onClick={handleReplayRound}
+            leftIcon={<RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />}
             className="flex-1 btn-neo h-11 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] bg-slate-900 border-2 border-black text-slate-355 hover:bg-slate-800"
           >
-            <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin-slow" /> Play Again
+            Play Again
           </Button>
           <Button
             onClick={handleFinishMatch}
+            leftIcon={<Trophy className="w-3.5 h-3.5" />}
             className="flex-1 btn-neo h-11 text-[10px] uppercase font-black px-6 shadow-[3px_3px_0px_#000000] bg-brand-orange text-slate-955 hover:bg-brand-orange/95"
           >
-            <Trophy className="w-3.5 h-3.5 mr-1" /> {isAiMode ? "Exit Practice" : "Finish Match"}
+            {isAiMode ? "Exit Practice" : "Finish Match"}
           </Button>
         </div>
       )}

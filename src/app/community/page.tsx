@@ -752,7 +752,7 @@ export default function CommunityHubPage() {
                               onChange={(e) => setChatText(e.target.value)}
                               type="text" 
                               placeholder={activeChannel === "global" ? "Type a message..." : `Send message to ${activeChannel}...`}
-                              className="w-full h-8.5 border-2 border-black rounded-lg px-9 text-[8.5px] font-black uppercase tracking-[0.2em] focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
+                              className="w-full h-8.5 border-2 border-black rounded-lg !pl-9 !pr-3 text-[8.5px] font-black uppercase tracking-[0.2em] focus:outline-none focus:border-brand-orange/50 shadow-[1.5px_1.5px_0px_#000]"
                               style={{ background: "var(--input-bg)", color: "var(--input-color)" }}
                             />
                          </div>

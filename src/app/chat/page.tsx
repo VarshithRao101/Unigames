@@ -277,7 +277,7 @@ export default function ChatPage() {
                         onChange={(e) => setText(e.target.value)}
                         type="text" 
                         placeholder="Type a message..."
-                        className="w-full h-16 bg-slate-900 border-3 border-black rounded-2xl px-16 text-[10px] font-black uppercase tracking-[0.3em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[3px_3px_0px_#000000]"
+                        className="w-full h-16 bg-slate-900 border-3 border-black rounded-2xl !pl-16 !pr-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-50 focus:outline-none focus:border-brand-orange/50 shadow-[3px_3px_0px_#000000]"
                       />
                     </div>
                     <Button type="submit" className="btn-neo h-16 px-10 rounded-2xl">
