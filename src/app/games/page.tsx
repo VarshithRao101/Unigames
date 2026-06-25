@@ -67,6 +67,15 @@ export default function GamesPage() {
       progressPercent: 100,
       image: "/images/chess_logo.avif",
       tags: ["Brain", "Tactical", "2 Players"]
+    },
+    {
+      slug: "ludo",
+      name: "Ludo Arena",
+      category: "Board Games",
+      status: "released",
+      progressPercent: 100,
+      image: "/images/ludo_logo.webp",
+      tags: ["Dice", "Strategy", "2-4 Players"]
     }
   ], []);
 
